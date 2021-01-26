@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Repository\UserRpo;
+use Illuminate\Http\Request;
+
+class UserInfoCtl extends Controller
+{
+
+    private $userRpo;
+
+    /**
+     * UserInfoCtl constructor.
+     */
+    public function __construct()
+    {
+        $this->userRpo = new UserRpo();
+    }
+
+    public function register(Request $request){
+
+        return $this->userRpo->register($request);
+
+    }
+
+    public function verifyEmail(Request $request){
+
+        return $this->userRpo->verifyEmail($request);
+
+    }
+
+    public function login(Request $request){
+
+        return $this->userRpo->login($request);
+
+    }
+
+    public function update(Request $request){
+
+        return $this->userRpo->update($request);
+
+    }
+
+}

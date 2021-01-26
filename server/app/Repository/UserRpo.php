@@ -1,0 +1,308 @@
+<?php
+
+namespace App\Repository;
+
+use App\Helpers\TokenGenerator;
+use App\Models\ProjectCategory;
+use App\Models\UserInfo;
+use App\Jobs\MailSender;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+
+class UserRpo
+{
+
+    private static function calculateProfileCompletionPercentage($userInfo)
+    {
+
+        $profileCompleted = 0;
+
+        if (!is_null($userInfo['email']) && !empty($userInfo['email'])){
+            $profileCompleted = $profileCompleted + 20;
+        }
+
+        if (!is_null($userInfo['regionName']) && !empty($userInfo['regionName'])){
+            $profileCompleted = $profileCompleted + 20;
+        }
+
+        if (!is_null($userInfo['countryName']) && !empty($userInfo['countryName'])){
+            $profileCompleted = $profileCompleted + 20;
+        }
+
+        if (!is_null($userInfo['firstName']) && !empty($userInfo['firstName'])){
+            $profileCompleted = $profileCompleted + 10;
+        }
+
+        if (!is_null($userInfo['lastName']) && !empty($userInfo['lastName'])){
+            $profileCompleted = $profileCompleted + 10;
+        }
+
+        if (!is_null($userInfo['contactNumber']) && !empty($userInfo['contactNumber'])){
+            $profileCompleted = $profileCompleted + 10;
+        }
+
+        if (!is_null($userInfo['agreedTermsAndCondition'])
+            && !empty($userInfo['agreedTermsAndCondition'])
+            && $userInfo['agreedTermsAndCondition'] == 1
+        ){
+            $profileCompleted = $profileCompleted + 10;
+        }
+
+        return $profileCompleted;
+
+    }
+
+    public function register(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+        $clientUrl = $request->clientUrl;
+        $isUserInfoExist = UserInfo::where('email', $rUserInfo['email'])->exists();
+
+        if ($isUserInfoExist) {
+
+            $res['msg'] = 'A account already been created using the email !';
+            $res['code'] = 404;
+
+        } else {
+
+            DB::beginTransaction();
+
+            try {
+
+                $token = TokenGenerator::generate();
+
+                $userInfo = new UserInfo();
+                $userInfo->email = $rUserInfo['email'];
+                $userInfo->password = sha1($rUserInfo['password']);
+                $userInfo->ip = $request->ip();
+                $userInfo->token = $token;
+                $userInfo->save();
+
+                $mailData = array(
+                    'email' => $userInfo['email'],
+                    'verificationLink' => $clientUrl . '/#/login/' . $token
+                );
+
+                Queue::push(new MailSender($mailData));
+
+                $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
+                $res['code'] = 200;
+
+                DB::commit();
+            } catch (Exception $e) {
+
+                DB::rollback();
+                $res['msg'] = $e->getMessage();
+                $res['code'] = 404;
+
+            }
+
+        }
+
+        return response()->json($res, 200);
+
+    }
+
+    public function verifyEmail(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+
+        DB::beginTransaction();
+
+        try {
+
+            $isEmailAlreadyVerified = UserInfo::where('isEmailVerified', true)
+                ->where('token', $rUserInfo['token'])
+                ->exists();
+
+            if ($isEmailAlreadyVerified) {
+                $res['msg'] = "Email already verified!";
+                $res['code'] = 404;
+            } else {
+
+                $isTokenMatch = UserInfo::where('token', $rUserInfo['token'])->exists();
+
+                if ($isTokenMatch) {
+
+                    UserInfo::where('token', $rUserInfo['token'])->update(array(
+                        'isEmailVerified' => true
+                    ));
+
+                    $res['msg'] = "Email verification successful!";
+                    $res['code'] = 200;
+
+                } else {
+
+                    $res['msg'] = "Email verification id didn't match!";
+                    $res['code'] = 404;
+
+                }
+
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+
+        }
+
+        return response()->json($res, 200);
+
+    }
+
+    public function login(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+
+        DB::beginTransaction();
+        try {
+
+            $isEmailVerified = UserInfo::where('email', $rUserInfo['email'])
+                ->where('isEmailVerified', true)
+                ->exists();
+
+            if ($isEmailVerified) {
+
+                $userInfo = UserInfo::where('email', $rUserInfo['email'])
+                    ->where('password', sha1($rUserInfo['password']))
+                    ->select(
+                        'id',
+                        'email',
+                        'firstName',
+                        'lastName',
+                        'regionName',
+                        'countryName',
+                        'contactNumber',
+                        'agreedTermsAndCondition',
+                        'wantNewsLetterNotification'
+                    )
+                    ->first();
+
+                if (!is_null($userInfo)) {
+
+                    $res['userInfo'] = [
+                        'id' => $userInfo['id'],
+                        'email' => $userInfo['email'],
+                        'firstName' => $userInfo['firstName'],
+                        'lastName' => $userInfo['lastName'],
+                        'regionName' => $userInfo['regionName'],
+                        'countryName' => $userInfo['countryName'],
+                        'contactNumber' => $userInfo['contactNumber'],
+                        'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
+                        'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
+                        'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
+                    ];
+
+                    $res['userInfo']['projectCategories'] = ProjectCategory::select(
+                        'categoryId',
+                        'categoryName',
+                    )->distinct('categoryId')->get();
+
+                    $res['msg'] = "Login successful!";
+                    $res['code'] = 200;
+
+
+                } else {
+                    $res['msg'] = "This email and password did not with any account!";
+                    $res['code'] = 404;
+                }
+            } else {
+                $res['msg'] = "Please verify your email address first!";
+                $res['code'] = 404;
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+
+        }
+
+        return response()->json($res, 200);
+
+    }
+
+    public function update(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+
+        DB::beginTransaction();
+
+        try {
+
+            if (is_null($rUserInfo['password'])){
+                UserInfo::where('id', $rUserInfo['id'])->update(array(
+                    'firstName' => $rUserInfo['firstName'],
+                    'lastName' => $rUserInfo['lastName'],
+                    'regionName' => $rUserInfo['regionName'],
+                    'countryName' => $rUserInfo['countryName'],
+                    'contactNumber' => $rUserInfo['contactNumber'],
+                    'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
+                    'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
+                ));
+            }else {
+                UserInfo::where('id', $rUserInfo['id'])->update(array(
+                    'password' => sha1($rUserInfo['password']),
+                    'firstName' => $rUserInfo['firstName'],
+                    'lastName' => $rUserInfo['lastName'],
+                    'regionName' => $rUserInfo['regionName'],
+                    'countryName' => $rUserInfo['countryName'],
+                    'contactNumber' => $rUserInfo['contactNumber'],
+                    'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
+                    'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
+                ));
+            }
+
+
+
+            $rUserInfo['profileCompleted'] = self::calculateProfileCompletionPercentage($rUserInfo);
+
+            $res['userInfo'] = $rUserInfo;
+            $res['msg'] = "Profile updated successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+
+        }
+
+        return response()->json($res, 200);
+
+    }
+
+}
