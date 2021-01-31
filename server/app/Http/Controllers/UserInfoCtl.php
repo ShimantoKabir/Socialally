@@ -42,4 +42,10 @@ class UserInfoCtl extends Controller
 
     }
 
+    public function uploadImage(Request $request){
+
+        return $this->userRpo->uploadImage($request);
+
+    }
+
 }

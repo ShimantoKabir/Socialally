@@ -7,9 +7,12 @@ use App\Models\ProjectCategory;
 use App\Models\UserInfo;
 use App\Jobs\MailSender;
 use Exception;
+use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 
 class UserRpo
 {
@@ -19,34 +22,34 @@ class UserRpo
 
         $profileCompleted = 0;
 
-        if (!is_null($userInfo['email']) && !empty($userInfo['email'])){
+        if (!is_null($userInfo['email']) && !empty($userInfo['email'])) {
             $profileCompleted = $profileCompleted + 20;
         }
 
-        if (!is_null($userInfo['regionName']) && !empty($userInfo['regionName'])){
+        if (!is_null($userInfo['regionName']) && !empty($userInfo['regionName'])) {
             $profileCompleted = $profileCompleted + 20;
         }
 
-        if (!is_null($userInfo['countryName']) && !empty($userInfo['countryName'])){
+        if (!is_null($userInfo['countryName']) && !empty($userInfo['countryName'])) {
             $profileCompleted = $profileCompleted + 20;
         }
 
-        if (!is_null($userInfo['firstName']) && !empty($userInfo['firstName'])){
+        if (!is_null($userInfo['firstName']) && !empty($userInfo['firstName'])) {
             $profileCompleted = $profileCompleted + 10;
         }
 
-        if (!is_null($userInfo['lastName']) && !empty($userInfo['lastName'])){
+        if (!is_null($userInfo['lastName']) && !empty($userInfo['lastName'])) {
             $profileCompleted = $profileCompleted + 10;
         }
 
-        if (!is_null($userInfo['contactNumber']) && !empty($userInfo['contactNumber'])){
+        if (!is_null($userInfo['contactNumber']) && !empty($userInfo['contactNumber'])) {
             $profileCompleted = $profileCompleted + 10;
         }
 
         if (!is_null($userInfo['agreedTermsAndCondition'])
             && !empty($userInfo['agreedTermsAndCondition'])
             && $userInfo['agreedTermsAndCondition'] == 1
-        ){
+        ) {
             $profileCompleted = $profileCompleted + 10;
         }
 
@@ -88,8 +91,12 @@ class UserRpo
 
                 $mailData = array(
                     'email' => $userInfo['email'],
-                    'verificationLink' => $clientUrl . '/#/login/' . $token
+                    'verificationLink' => $clientUrl . '/#/email-verification/' . $token
                 );
+
+//                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+//                    $message->to($mailData['email'])->subject('Email Verification');
+//                });
 
                 Queue::push(new MailSender($mailData));
 
@@ -107,7 +114,7 @@ class UserRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 
@@ -163,7 +170,7 @@ class UserRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 
@@ -213,6 +220,7 @@ class UserRpo
                         'contactNumber' => $userInfo['contactNumber'],
                         'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
+                        'imageUrl' => $userInfo['imageUrl'],
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                     ];
 
@@ -243,7 +251,7 @@ class UserRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 
@@ -261,7 +269,7 @@ class UserRpo
 
         try {
 
-            if (is_null($rUserInfo['password'])){
+            if (is_null($rUserInfo['password'])) {
                 UserInfo::where('id', $rUserInfo['id'])->update(array(
                     'firstName' => $rUserInfo['firstName'],
                     'lastName' => $rUserInfo['lastName'],
@@ -271,7 +279,7 @@ class UserRpo
                     'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
                     'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
                 ));
-            }else {
+            } else {
                 UserInfo::where('id', $rUserInfo['id'])->update(array(
                     'password' => sha1($rUserInfo['password']),
                     'firstName' => $rUserInfo['firstName'],
@@ -283,8 +291,6 @@ class UserRpo
                     'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
                 ));
             }
-
-
 
             $rUserInfo['profileCompleted'] = self::calculateProfileCompletionPercentage($rUserInfo);
 
@@ -301,8 +307,81 @@ class UserRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
+    }
+
+    public function uploadImage(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+        $imageString = $rUserInfo['imageString'];
+        $id = $rUserInfo['id'];
+        $fileExt = $rUserInfo['fileExt'];
+        $appUrl = env('APP_URL');
+
+        DB::beginTransaction();
+
+        try {
+
+            $userInfo = UserInfo::where('id', $id)->first();
+            $imageName = Uuid::uuid().".".$fileExt;
+
+            if (is_null($userInfo['imageUrl'])){
+
+                $imageUrl = self::uploadFileToFtp($imageString,$id,$appUrl,$imageName);
+                $res['msg'] = "Image uploaded successfully!";
+                $res['code'] = 200;
+
+            }else {
+
+                $imagPath = str_replace($appUrl,"",$userInfo['imageUrl']);
+                $isImageExist = Storage::disk("ftp")->exists($imagPath);
+                if ($isImageExist){
+                    Storage::disk("ftp")->delete($imagPath);
+                    $imageUrl = self::uploadFileToFtp($imageString,$id,$appUrl,$imageName);
+                    $res['msg'] = "Image replaced successfully!";
+                    $res['code'] = 200;
+                }else {
+                    $imageUrl = "Image url not found!";
+                    $res['msg'] = $imageUrl;
+                    $res['code'] = 404;
+                }
+
+            }
+
+            $res['userInfo'] = [
+              'id' => $id,
+              'imageUrl' => $imageUrl
+            ];
+
+            DB::commit();
+        } catch (Exception $e) {
+
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+
+    }
+
+    private static function uploadFileToFtp($imageString, $id, $appUrl,$imageName)
+    {
+        $imagePath = 'images/'.$imageName;
+        Storage::disk('ftp')->put($imagePath, base64_decode($imageString));
+        $imageUrl = $appUrl.$imagePath;
+        UserInfo::where('id', $id)->update(array(
+            'imageUrl' => $imageUrl
+        ));
+        return $imageUrl;
     }
 
 }

@@ -26,6 +26,7 @@ class Project extends Model
         'estimatedDay',
         'estimatedCost',
         'applicantIds',
+        'isFinished',
         'ip',
         'modifiedBy',
         'createdAt',

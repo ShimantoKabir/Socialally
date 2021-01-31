@@ -18,6 +18,7 @@ class UserInfos extends Migration
             $table->string('token')->nullable();
             $table->string('email');
             $table->string('password');
+            $table->string("imageUrl")->nullable();
             $table->string('lastName')->nullable();
             $table->string('regionName')->nullable();
             $table->string('firstName')->nullable();
@@ -26,6 +27,7 @@ class UserInfos extends Migration
             $table->boolean('isEmailVerified')->default(false);
             $table->boolean('agreedTermsAndCondition')->default(false);
             $table->boolean('wantNewsLetterNotification')->default(false);
+            $table->integer("postedBy")->nullable();
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

@@ -2,12 +2,33 @@ import 'dart:convert';
 
 import 'package:client/constants.dart';
 import 'package:client/models/Project.dart';
-import 'package:client/utilities/HttpHandler.dart';
+import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
-class Available extends StatelessWidget {
+class Available extends StatefulWidget {
+  Available({Key key, this.eventHub, this.userInfo}) : super(key: key);
+  final EventHub eventHub;
+  final userInfo;
+
+  @override
+  AvailableState createState() =>
+      AvailableState(key: key, eventHub: eventHub, userInfo: userInfo);
+}
+
+class AvailableState extends State<Available> {
+  EventHub eventHub;
+  var userInfo;
+
+  AvailableState({Key key, this.eventHub, this.userInfo});
+
+  @override
+  void initState() {
+    super.initState();
+    eventHub.fire("viewTitle", "Mine Job");
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -99,8 +120,11 @@ class Available extends StatelessWidget {
             );
           } else {
             return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
               ),
             );
           }
@@ -147,7 +171,8 @@ class Available extends StatelessWidget {
               estimatedDay: project['estimatedDay'],
               estimatedCost: project['estimatedCost']));
         });
-        print("projects = ${projectList.length}");
+        print("projectList = $projectList");
+        // print("todoStep = $todoStep");
       }
     }
 

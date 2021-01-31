@@ -1,11 +1,12 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:client/constants.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
 class HttpHandler{
 
-  Dio _dio;
+  Dio dio;
   String cookie = '';
 
   final BaseOptions options = new BaseOptions(
@@ -18,27 +19,27 @@ class HttpHandler{
   factory HttpHandler() => _instance;
 
   HttpHandler._internal() {
-    _dio = Dio(options);
-    _dio.interceptors.add(InterceptorsWrapper(
+    dio = Dio(options);
+    dio.interceptors.add(InterceptorsWrapper(
         onRequest:(Options options) async {
-          _dio.interceptors.requestLock.lock();
+          dio.interceptors.requestLock.lock();
           options.headers["cookie"] = cookie;
-          _dio.interceptors.requestLock.unlock();
+          dio.interceptors.requestLock.unlock();
           return options;
         }
     ));
   }
 
   Future createPost(String url,var data) {
-    return _dio.post(url, data: jsonEncode(data));
+    return dio.post(url, data: jsonEncode(data));
   }
 
   Future createPut(String url,var data) {
-    return _dio.put(url, data: jsonEncode(data));
+    return dio.put(url, data: jsonEncode(data));
   }
 
   Future createGet(String url) {
-    return _dio.get(url);
+    return dio.get(url);
   }
 
 }

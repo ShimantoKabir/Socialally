@@ -31,6 +31,9 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
   bool docsOpen = true;
   bool deepExpanded = true;
   EventHub eventHub = EventHub();
+  String viewTitle;
+  TextEditingController searchCtl = new TextEditingController();
+  ImageProvider<Object> profileImageWidget;
 
   @override
   void initState() {
@@ -52,8 +55,22 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
     eventHub.on("userInfo", (dynamic data) {
       setState(() {
         userInfo = data;
+        profileImageWidget = NetworkImage(userInfo['imageUrl']);
       });
     });
+
+    viewTitle = "Available Job";
+    eventHub.on("viewTitle", (dynamic data) {
+      setState(() {
+        viewTitle = data;
+      });
+    });
+
+    if(userInfo['imageUrl'] == null){
+      profileImageWidget = AssetImage("assets/images/people.png");
+    }else {
+      profileImageWidget = NetworkImage(userInfo['imageUrl']);
+    }
 
   }
 
@@ -70,9 +87,9 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
       physics: NeverScrollableScrollPhysics(),
       controller: tabController,
       children: [
-        Available(),
-        Profile(eventHub: eventHub,userInfo: userInfo),
-        Post(userInfo: userInfo)
+        Available(eventHub: eventHub,userInfo: userInfo),
+        Post(eventHub: eventHub,userInfo: userInfo),
+        Profile(eventHub: eventHub,userInfo: userInfo)
       ],
     );
   }
@@ -165,7 +182,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                 child: Icon(Icons.account_circle_rounded),
                                 onTap: () {
                                   setState(() {
-                                    tabController.index = 1;
+                                    tabController.index = 2;
                                   });
                                 },
                               ),
@@ -178,7 +195,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                     if (isClear) {
                                       Navigator.pushNamedAndRemoveUntil(
                                           context,
-                                          "/login",
+                                          "/",
                                               (r) => false);
                                     }
                                   });
@@ -196,7 +213,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                     width: screenSize.width - 300,
                     color: Colors.black12,
                     child: Text(
-                      "Available Jobs",
+                      viewTitle,
                       style: TextStyle(fontSize: 22),
                     ),
                   ),
@@ -224,9 +241,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                       shape: BoxShape.circle,
                                       image: new DecorationImage(
                                           fit: BoxFit.cover,
-                                          image: AssetImage(
-                                            "assets/images/people.png",
-                                          )),
+                                          image: profileImageWidget),
                                     ),
                                   ),
                                   SizedBox(height: 20),
@@ -242,6 +257,21 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                       "Profile Completed ${userInfo['profileCompleted']}%",
                                     style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
+                                  SizedBox(height: 20),
+                                  Visibility(
+                                    visible: userInfo['profileCompleted'] != 100,
+                                    child: FlatButton(
+                                      onPressed: (){
+                                        setState(() {
+                                          tabController.index = 2;
+                                        });
+                                      },
+                                      color: Colors.green,
+                                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                      child: Text(" Complete Now",
+                                          style: TextStyle(color: Colors.white)),
+                                    )
+                                  )
                                 ],
                               ),
                             ),

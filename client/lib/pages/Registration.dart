@@ -17,7 +17,7 @@ class _RegistrationPageState extends State<Registration> {
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
 
-  Widget _entryField(String title, {bool isPassword = false}) {
+  Widget entryField(String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -42,10 +42,10 @@ class _RegistrationPageState extends State<Registration> {
     );
   }
 
-  Widget _submitButton(BuildContext buildContext) {
+  Widget submitButton(BuildContext buildContext) {
     return InkWell(
       onTap: () {
-        bool isInputVerified = _verifyInput(buildContext);
+        bool isInputVerified = verifyInput(buildContext);
         if (isInputVerified) {
           var request = {
             "userInfo": {
@@ -101,7 +101,7 @@ class _RegistrationPageState extends State<Registration> {
     );
   }
 
-  Widget _divider() {
+  Widget divider() {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -134,7 +134,7 @@ class _RegistrationPageState extends State<Registration> {
     );
   }
 
-  Widget _facebookButton() {
+  Widget facebookButton() {
     return Container(
       height: 30,
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -183,7 +183,7 @@ class _RegistrationPageState extends State<Registration> {
     );
   }
 
-  Widget _googleButton() {
+  Widget googleButton() {
     return Container(
       height: 30,
       width: 120,
@@ -232,24 +232,25 @@ class _RegistrationPageState extends State<Registration> {
     );
   }
 
-  Widget _logo() {
+  Widget logo() {
     return Center(
       child: Container(
-        height: 150.0,
+        height: 50.0,
         width: 150.0,
-        child: Image.asset(
-          "assets/images/logo.png",
-          fit: BoxFit.contain,
-        ),
+        child: Text("Registration",style: TextStyle(
+            color: Colors.green,
+            fontSize: 20,
+          fontWeight: FontWeight.bold
+        )),
       ),
     );
   }
 
-  Widget _emailPasswordWidget() {
+  Widget emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        _entryField("Email id"),
-        _entryField("Password", isPassword: true),
+        entryField("Email id"),
+        entryField("Password", isPassword: true),
       ],
     );
   }
@@ -260,33 +261,41 @@ class _RegistrationPageState extends State<Registration> {
     return Scaffold(
         body: Center(
             child: Container(
-      height: screenSize.height,
-      width: 500,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: screenSize.height * 0.05),
-            _logo(),
-            SizedBox(height: 20),
-            _emailPasswordWidget(),
-            SizedBox(height: 20),
-            _submitButton(context),
-            SizedBox(height: 20),
-            _divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [_facebookButton(), _googleButton()],
+              height: screenSize.height,
+              width: 500,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: screenSize.height * 0.05),
+                    logo(),
+                    Divider(
+                      color: Colors.lightGreenAccent,
+                      thickness: 1,
+                    ),
+                    SizedBox(height: 20),
+                    emailPasswordWidget(),
+                    SizedBox(height: 20),
+                    submitButton(context),
+                    SizedBox(height: 20),
+                    divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [facebookButton(), googleButton()],
+                    ),
+                    SizedBox(height: screenSize.height * .005),
+                    createLoginLabel(),
+                  ],
+                ),
+              )
             )
-          ],
-        ),
-      ),
-    )));
+        )
+    );
   }
 
-  bool _verifyInput(BuildContext buildContext) {
+  bool verifyInput(BuildContext buildContext) {
     bool isInputVerified = true;
 
     if (emailCtl.text.isEmpty) {
@@ -310,4 +319,37 @@ class _RegistrationPageState extends State<Registration> {
     }
     return isInputVerified;
   }
+
+  Widget createLoginLabel() {
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, "/login");
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.all(15),
+        alignment: Alignment.bottomCenter,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Already have an account?',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              'Login',
+              style: TextStyle(
+                  color: Color(0xfff79c4f),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

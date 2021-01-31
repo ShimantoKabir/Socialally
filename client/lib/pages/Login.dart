@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:client/constants.dart';
-import 'package:client/models/ProjectCategory.dart';
 import 'package:client/pages/User.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
@@ -25,7 +24,7 @@ class LoginState extends State<Login> {
     print("login");
   }
 
-  Widget _entryField(String title, {bool isPassword = false}) {
+  Widget entryField(String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -53,7 +52,7 @@ class LoginState extends State<Login> {
   Widget submitButton(BuildContext buildContext) {
     return InkWell(
       onTap: () {
-        bool isInputVerified = _verifyInput(buildContext);
+        bool isInputVerified = verifyInput(buildContext);
         if (isInputVerified) {
           var request = {
             "userInfo": {
@@ -67,7 +66,6 @@ class LoginState extends State<Login> {
             Navigator.of(buildContext).pop(false);
             if (res.statusCode == 200) {
               if (res.data['code'] == 200) {
-
                 MySharedPreferences.setStringValue(
                     'userInfo', jsonEncode(res.data['userInfo']));
 
@@ -77,7 +75,6 @@ class LoginState extends State<Login> {
                         builder: (context) =>
                             User(userInfo: res.data['userInfo'])),
                     (route) => false);
-
               } else {
                 Alert.show(
                     alertDialog, buildContext, Alert.ERROR, res.data['msg']);
@@ -150,7 +147,7 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget _facebookButton() {
+  Widget facebookButton() {
     return Container(
       height: 30,
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -199,7 +196,7 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget _googleButton() {
+  Widget googleButton() {
     return Container(
       height: 30,
       width: 120,
@@ -280,15 +277,17 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget logo() {
+  Widget logo(Size screenSize) {
     return Center(
       child: Container(
-        height: 150.0,
-        width: 150.0,
-        child: Image.asset(
-          "assets/images/logo.png",
-          fit: BoxFit.contain,
-        ),
+        height: 50.0,
+        width: screenSize.width,
+        child: Text("Login with your account",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.green,
+                fontSize: 20,
+                fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -296,8 +295,8 @@ class LoginState extends State<Login> {
   Widget emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        _entryField("Email id"),
-        _entryField("Password", isPassword: true),
+        entryField("Email id"),
+        entryField("Password", isPassword: true),
       ],
     );
   }
@@ -308,40 +307,44 @@ class LoginState extends State<Login> {
     return Scaffold(
         body: Center(
             child: Container(
-      height: screenSize.height,
-      width: 500,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: screenSize.height * 0.05),
-            logo(),
-            SizedBox(height: 20),
-            emailPasswordWidget(),
-            SizedBox(height: 20),
-            submitButton(context),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              alignment: Alignment.centerRight,
-              child: Text('Forgot Password ?',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-            ),
-            divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [_facebookButton(), _googleButton()],
-            ),
-            SizedBox(height: screenSize.height * .005),
-            createAccountLabel(),
-          ],
-        ),
-      ),
+              height: screenSize.height,
+              width: 500,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: screenSize.height * 0.05),
+                    logo(screenSize),
+                    Divider(
+                      color: Colors.lightGreenAccent,
+                      thickness: 1,
+                    ),
+                    SizedBox(height: 20),
+                    emailPasswordWidget(),
+                    SizedBox(height: 20),
+                    submitButton(context),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      alignment: Alignment.centerRight,
+                      child: Text('Forgot Password ?',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                    ),
+                    divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [facebookButton(), googleButton()],
+                    ),
+                    SizedBox(height: screenSize.height * .005),
+                    createAccountLabel(),
+                  ],
+                ),
+              ),
     )));
   }
 
-  bool _verifyInput(BuildContext buildContext) {
+  bool verifyInput(BuildContext buildContext) {
     bool isInputVerified = true;
 
     if (emailCtl.text.isEmpty) {

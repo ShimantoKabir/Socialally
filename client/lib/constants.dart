@@ -9,7 +9,15 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-const baseUrl = "http://localhost:8000";
+const baseUrl = "http://localhost:8000/api";
+// const baseUrl = "http://workersengine.com/server/public";
+// const baseUrl = "http://localhost/server/public";
+
+const maxImageSize = 2097152;
+const maxFileSize = 2097152;
+List<String> allowedImageType = ["jpg","JPG","png","PNG"];
+List<String> allowedFileType = ["pdf","docx"];
+const oneMegaByte = 1048576;
 
 final kDefaultShadow = BoxShadow(
   offset: Offset(0, 50),
@@ -50,15 +58,22 @@ RegExp passwordRegExp =
     RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
 
 List<Node> userDashboardMenus = [
-  Node(label: 'Home', key: '0', icon: NodeIcon.fromIconData(Icons.home)),
+  Node(
+      label: 'Profile',
+      key: '2',
+      icon: NodeIcon.fromIconData(Icons.account_circle_sharp)),
   Node(
     label: 'Job',
-    key: '1',
+    key: '10',
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
+          label: 'Mine',
+          key: '0',
+          icon: NodeIcon.fromIconData(Icons.event_available)),
+      Node(
           label: 'Post',
-          key: '2',
+          key: '1',
           icon: NodeIcon.fromIconData(Icons.event_available)),
       Node(
           label: 'Finished',

@@ -3,7 +3,6 @@
 
 namespace App\Repository;
 
-use App\Models\Project;
 use App\Models\ProjectCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +41,7 @@ class ProjectCategoryRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 
@@ -75,7 +74,7 @@ class ProjectCategoryRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 }

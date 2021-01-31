@@ -20,11 +20,9 @@ dependencies:
   shared_preferences: ^0.5.12+4
   dio: ^3.0.10
   http: ^0.12.2
-  get_it: ^5.0.6
-  streaming_shared_preferences: ^1.0.2
   event_hub: ^0.1.1
-  percent_indicator: ^2.1.9
   equatable: ^1.2.5
+  file_picker: ^2.1.5+1
 
 dev_dependencies:
   flutter_test:

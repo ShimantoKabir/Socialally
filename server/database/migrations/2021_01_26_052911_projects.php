@@ -28,6 +28,7 @@ class Projects extends Migration
             $table->integer('estimatedCost');
             $table->json('applicantIds')->nullable();
             $table->string('ip')->nullable();
+            $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();
         });

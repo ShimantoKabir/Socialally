@@ -1,14 +1,15 @@
 import 'dart:convert';
-
 import 'package:client/constants.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
 import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Profile extends StatefulWidget {
   Profile({Key key, this.eventHub, this.userInfo}) : super(key: key);
@@ -16,14 +17,15 @@ class Profile extends StatefulWidget {
   final userInfo;
 
   @override
-  ProfileState createState() => ProfileState(key: key,eventHub: eventHub, userInfo: userInfo);
+  ProfileState createState() =>
+      ProfileState(key: key, eventHub: eventHub, userInfo: userInfo);
 }
 
-class ProfileState extends State<Profile>{
-
+class ProfileState extends State<Profile> {
   EventHub eventHub;
   var userInfo;
-  ProfileState({Key key, this.eventHub,this.userInfo});
+
+  ProfileState({Key key, this.eventHub, this.userInfo});
 
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
@@ -36,42 +38,64 @@ class ProfileState extends State<Profile>{
   SharedPreferences preferences;
   bool agreedTermsAndCondition;
   bool wantNewsLetterNotification;
+  ImageProvider<Object> profileImageWidget;
 
   @override
   void initState() {
     super.initState();
 
+    eventHub.fire("viewTitle", "Profile");
+
     emailCtl.text = userInfo['email'];
     firstNameCtl.text = userInfo['firstName'];
     lastNameCtl.text = userInfo['lastName'];
-    contactNumberCtl.text = userInfo['contactNumber'];
+    contactNumberCtl.text = userInfo['contactNumber'].toString();
 
-    if(userInfo['regionName'] == null){
+    if (userInfo['regionName'] == null) {
       regionName = "Select";
-    }else {
+    } else {
       regionName = userInfo['regionName'];
     }
 
-    if(userInfo['countryName'] == null){
+    if (userInfo['countryName'] == null) {
       countryName = "Select";
-    }else {
+    } else {
+      bool isValueExist = false;
+      countryDropDownList.forEach((element) {
+        if (element.value == userInfo['countryName']) {
+          isValueExist = true;
+        }
+      });
+
       countryName = userInfo['countryName'];
-      countryDropDownList.add(new DropdownMenuItem<String>(
-        value: userInfo['countryName'],
-        child: Text(userInfo['countryName']),
-      ));
+      if (!isValueExist) {
+        countryDropDownList.add(new DropdownMenuItem<String>(
+          value: userInfo['countryName'],
+          child: Text(userInfo['countryName']),
+        ));
+      }
     }
 
-    if(userInfo['agreedTermsAndCondition'] == 0){
+    if (userInfo['agreedTermsAndCondition'] == 0) {
       agreedTermsAndCondition = false;
-    }else {
+    } else {
       agreedTermsAndCondition = true;
     }
 
-    if(userInfo['wantNewsLetterNotification'] == 0){
+    if (userInfo['wantNewsLetterNotification'] == 0) {
       wantNewsLetterNotification = false;
-    }else {
+    } else {
       wantNewsLetterNotification = true;
+    }
+
+    if(userInfo['imageUrl'] == null){
+      profileImageWidget = AssetImage("assets/images/people.png");
+    }else {
+      profileImageWidget = NetworkImage(userInfo['imageUrl']);
+    }
+
+    if(userInfo['contactNumber'] == null){
+      contactNumberCtl.clear();
     }
 
   }
@@ -79,184 +103,167 @@ class ProfileState extends State<Profile>{
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Center(
+        child: Center(
+            child: Column(
+      children: [
+        Row(
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.all(10.0),
+                child: InkWell(
+                  child: Container(
+                    height: 150.0,
+                    width: 150.0,
+                    decoration: new BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: new DecorationImage(
+                          fit: BoxFit.cover,
+                          image: profileImageWidget),
+                    ),
+                  ),
+                  onTap: () {},
+                )),
+            InkWell(
+              onTap: () {
+                onProfilePicUpload(context);
+              },
+              child: Icon(Icons.camera_alt),
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 10),
           child: Column(
-            children: [
-              Row(
-                children: <Widget>[
-                  Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: InkWell(
-                        child: Container(
-                          height: 150.0,
-                          width: 150.0,
-                          decoration: new BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: new DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(
-                                  "assets/images/people.png",
-                                )),
-                          ),
-                        ),
-                        onTap: () {
-                        },
-                      )),
-                  InkWell(
-                    onTap: () {},
-                    child: Icon(Icons.camera_alt),
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Email",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
-                      readOnly: true,
-                        controller: emailCtl,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Color(0xfff3f3f4),
-                            filled: true))
-                  ],
-                ),
-              ),
-              entryField("First Name", firstNameCtl),
-              entryField("Last Name", lastNameCtl),
-              entryField("Contact Number", contactNumberCtl),
-              entryField("Password", passwordCtl),
-              SizedBox(
-                height: 5,
-              ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                    "Region",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
-                ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "Email",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               SizedBox(
                 height: 10,
               ),
-              Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                    Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(5)),
-                  ),
-                  padding: EdgeInsets.fromLTRB(
-                      15.0, 0.0, 0.0, 0.0),
-                  child: DropdownButton<String>(
-                      value: regionName,
-                      isExpanded: true,
-                      underline: SizedBox(),
-                      onChanged: (String newValue) {
-                        fetchCountriesByRegion(context,newValue);
-                      },
-                      items: regionDropDownList
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                    "Country",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                    Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(5)),
-                  ),
-                  padding: EdgeInsets.fromLTRB(
-                      15.0, 0.0, 0.0, 0.0),
-                  child: DropdownButton<String>(
-                      value: countryName,
-                      isExpanded: true,
-                      underline: SizedBox(),
-                      onChanged: (String newValue) {
-                        setState(() {
-                          countryName = newValue;
-                        });
-                      },
-                      items: countryDropDownList
-                  )),
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    value: agreedTermsAndCondition,
-                    onChanged: (value) {
-                      setState(() {
-                        agreedTermsAndCondition = value;
-                      });
-                    },
-                  ),
-                  Text('Agreed terms & condition')
-                ],
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    value: wantNewsLetterNotification,
-                    onChanged: (value) {
-                      setState(() {
-                        wantNewsLetterNotification = value;
-                      });
-                    },
-                  ),
-                  Text('Want news letter notification.')
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlineButton(
-                      onPressed: (){
-                        onSave(context);
-                      },
-                      child: Text("Save")
-                  ),
-                  OutlineButton(
-                      onPressed: (){
-                        onReset(context);
-                      },
-                      child: Text("Reset")
-                  )
-                ],
-              )
+              TextField(
+                  readOnly: true,
+                  controller: emailCtl,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      fillColor: Color(0xfff3f3f4),
+                      filled: true))
             ],
-          )
-      )
-    );
+          ),
+        ),
+        entryField("First Name", firstNameCtl),
+        entryField("Last Name", lastNameCtl),
+        entryField("Contact Number", contactNumberCtl),
+        entryField("Password", passwordCtl),
+        SizedBox(
+          height: 5,
+        ),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Text("Region",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+            child: DropdownButton<String>(
+                value: regionName,
+                isExpanded: true,
+                underline: SizedBox(),
+                onChanged: (String newValue) {
+                  fetchCountriesByRegion(context, newValue);
+                },
+                items: regionDropDownList)),
+        SizedBox(
+          height: 20,
+        ),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Text("Country",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+            child: DropdownButton<String>(
+                value: countryName,
+                isExpanded: true,
+                underline: SizedBox(),
+                onChanged: (String newValue) {
+                  setState(() {
+                    countryName = newValue;
+                  });
+                },
+                items: countryDropDownList)),
+        SizedBox(
+          height: 30,
+        ),
+        Row(
+          children: [
+            Checkbox(
+              value: agreedTermsAndCondition,
+              onChanged: (value) {
+                setState(() {
+                  agreedTermsAndCondition = value;
+                });
+              },
+            ),
+            Text('Agreed terms & condition')
+          ],
+        ),
+        Row(
+          children: [
+            Checkbox(
+              value: wantNewsLetterNotification,
+              onChanged: (value) {
+                setState(() {
+                  wantNewsLetterNotification = value;
+                });
+              },
+            ),
+            Text('Want news letter notification.')
+          ],
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            OutlineButton(
+                onPressed: () {
+                  onSave(context);
+                },
+                child: Text("Save")),
+            OutlineButton(
+                onPressed: () {
+                  onReset(context);
+                },
+                child: Text("Reset"))
+          ],
+        )
+      ],
+    )));
   }
 
-  Widget entryField(String title,TextEditingController controller) {
+  Widget entryField(String title, TextEditingController controller) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -281,78 +288,77 @@ class ProfileState extends State<Profile>{
   }
 
   bool verifyInput(BuildContext buildContext) {
-
     bool isInputVerified = true;
     String errMsg;
 
-    if(firstNameCtl.text.isEmpty){
+    if (firstNameCtl.text.isEmpty) {
       userInfo['firstName'] = null;
-    }else {
+    } else {
       userInfo['firstName'] = firstNameCtl.text;
     }
 
-    if(lastNameCtl.text.isEmpty){
+    if (lastNameCtl.text.isEmpty) {
       userInfo['lastName'] = null;
-    }else {
+    } else {
       userInfo['lastName'] = lastNameCtl.text;
     }
 
-    if(contactNumberCtl.text.isEmpty){
+    if (contactNumberCtl.text.isEmpty) {
       userInfo['contactNumber'] = null;
-    }else {
+    } else {
       userInfo['contactNumber'] = contactNumberCtl.text;
     }
 
-    if(passwordCtl.text.isEmpty){
+    if (passwordCtl.text.isEmpty) {
       userInfo['password'] = null;
-    }else {
+    } else {
       if (!passwordRegExp.hasMatch(passwordCtl.text)) {
-        errMsg = "Password should contain at least 8 character, one capital letter, one number and one special character!";
+        errMsg =
+            "Password should contain at least 8 character, one capital letter, one number and one special character!";
         isInputVerified = false;
         userInfo['password'] = null;
-      }else {
+      } else {
         userInfo['password'] = passwordCtl.text;
       }
     }
 
-    if(regionName == "Select"){
+    if (regionName == "Select") {
       errMsg = "Please select a region!";
       isInputVerified = false;
-    }else {
+    } else {
       userInfo['regionName'] = regionName;
     }
 
-    if(countryName == "Select"){
+    if (countryName == "Select") {
       errMsg = "Please select a country!";
       isInputVerified = false;
-    }else {
+    } else {
       userInfo['countryName'] = countryName;
     }
 
-    if(agreedTermsAndCondition == false){
+    if (agreedTermsAndCondition == false) {
       errMsg = "Please agreed to terms & condition!";
       isInputVerified = false;
-    }else {
+    } else {
       userInfo['agreedTermsAndCondition'] = 1;
     }
 
-    if(wantNewsLetterNotification == false){
+    if (wantNewsLetterNotification == false) {
       userInfo['wantNewsLetterNotification'] = 0;
-    }else {
+    } else {
       userInfo['wantNewsLetterNotification'] = 1;
     }
 
-    if(!isInputVerified){
-      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    if (!isInputVerified) {
+      Alert.show(alertDialog, buildContext, Alert.ERROR, errMsg);
     }
 
     return isInputVerified;
   }
 
-  Future<void> fetchCountriesByRegion(BuildContext context,String region) async {
-
-    Alert.show(
-        alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+  Future<void> fetchCountriesByRegion(
+      BuildContext context, String region) async {
+    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
 
     countryDropDownList.clear();
 
@@ -375,18 +381,15 @@ class ProfileState extends State<Profile>{
         ));
       });
     } else {
-      Alert.show(
-          alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     }
 
     setState(() {
       regionName = region;
     });
-
   }
 
   void onReset(BuildContext context) {
-
     firstNameCtl.clear();
     lastNameCtl.clear();
     contactNumberCtl.clear();
@@ -398,41 +401,89 @@ class ProfileState extends State<Profile>{
       agreedTermsAndCondition = false;
       wantNewsLetterNotification = false;
     });
-
   }
 
   void onSave(BuildContext context) {
-
     bool isInputVerified = verifyInput(context);
     print("user info on save = $userInfo");
 
     if (isInputVerified) {
-      var request = {
-        "userInfo": userInfo
-      };
-      Alert.show(
-          alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+      var request = {"userInfo": userInfo};
+      Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
       HttpHandler().createPut("/users", request).then((res) {
         Navigator.of(context).pop(false);
         if (res.statusCode == 200) {
           if (res.data['code'] == 200) {
             userInfo = res.data['userInfo'];
-            MySharedPreferences.setStringValue('userInfo', jsonEncode(userInfo));
-            eventHub.fire("userInfo",userInfo);
+            MySharedPreferences.setStringValue(
+                'userInfo', jsonEncode(userInfo));
+            eventHub.fire("userInfo", userInfo);
           } else {
-            Alert.show(
-                alertDialog, context, Alert.ERROR, res.data['msg']);
+            Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
           }
         } else {
-          Alert.show(
-              alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+          Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
         }
       }).catchError((err) {
         Navigator.of(context).pop(false);
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       });
     }
-
   }
 
+  Future<void> onProfilePicUpload(BuildContext context) async {
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: allowedImageType,
+    );
+
+    if (result != null) {
+
+      PlatformFile objFile = result.files.single;
+      print("image size = ${objFile.size}");
+
+      if(objFile.size > maxImageSize){
+        Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
+            "You can only upload ${maxImageSize/oneMegaByte} or less then ${maxImageSize/oneMegaByte} mb image.");
+      }else {
+
+        Alert.show(alertDialog, context, Alert.LOADING, "Image uploading please wait........!");
+        String url = baseUrl + '/users/image';
+        Map<String, String> headers = {"Content-type": "application/json"};
+        var request = {
+          'userInfo': {
+            'id': userInfo['id'],
+            'imageString': base64.encode(objFile.bytes),
+            'fileExt': objFile.extension
+          }
+        };
+
+        Response response =
+        await post(url, headers: headers, body: json.encode(request));
+        Navigator.of(context).pop(false);
+
+        if (response.statusCode == 200) {
+          var body = json.decode(response.body);
+
+          if(body['code'] == 200){
+            Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
+            String imageUrl = body['userInfo']["imageUrl"];
+            userInfo["imageUrl"] = imageUrl;
+            MySharedPreferences.setStringValue('userInfo', jsonEncode(userInfo));
+            eventHub.fire("userInfo", userInfo);
+
+            setState(() {
+              profileImageWidget = NetworkImage(imageUrl);
+            });
+          }else {
+            Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+          }
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+        }
+      }
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, "No file selected!");
+    }
+  }
 }

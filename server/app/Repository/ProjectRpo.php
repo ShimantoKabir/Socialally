@@ -50,7 +50,7 @@ class ProjectRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 
@@ -65,23 +65,23 @@ class ProjectRpo
         DB::beginTransaction();
         try {
 
-            $res['projects'] = DB::select(DB::raw("SELECT projects.id,
-                   projects.title,
-                   projects.todoSteps,
-                   projects.requiredProofs,
-                   projects.categoryId,
+            $res['projects'] = DB::select(DB::raw("SELECT Projects.id,
+                   Projects.title,
+                   Projects.todoSteps,
+                   Projects.requiredProofs,
+                   Projects.categoryId,
                    dpg.categoryName AS categoryName,
-                   projects.subCategoryId,
-                   projectcategories.subCategoryName,
-                   projects.regionName,
-                   projects.countryName,
-                   projects.workerNeeded,
-                   projects.estimatedDay,
-                   projects.estimatedCost
-            FROM projects
-                     JOIN (SELECT distinct categoryId, categoryName from projectcategories) AS dpg
-                          ON projects.categoryId = dpg.categoryId
-                     JOIN projectcategories ON projects.subCategoryId = projectcategories.id"));
+                   Projects.subCategoryId,
+                   ProjectCategories.subCategoryName,
+                   Projects.regionName,
+                   Projects.countryName,
+                   Projects.workerNeeded,
+                   Projects.estimatedDay,
+                   Projects.estimatedCost
+            FROM Projects
+                     JOIN (SELECT distinct categoryId, categoryName from ProjectCategories) AS dpg
+                          ON Projects.categoryId = dpg.categoryId
+                     JOIN ProjectCategories ON Projects.subCategoryId = ProjectCategories.id"));
 
             $res['msg'] = "Job fetched successfully!";
             $res['code'] = 200;
@@ -95,7 +95,7 @@ class ProjectRpo
 
         }
 
-        return response()->json($res, 200);
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
     }
 

@@ -14,6 +14,7 @@ class UserInfo extends Model
         'id',
         'token',
         'email',
+        'imageUrl',
         'password',
         'lastName',
         'regionId',

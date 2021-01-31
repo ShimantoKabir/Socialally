@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class CategorySeeder extends Seeder
 {
@@ -47,11 +48,11 @@ class CategorySeeder extends Seeder
             ]
         ];
 
-        DB::table('projectcategories')->truncate();
+        DB::table('ProjectCategories')->truncate();
 
         foreach ($categories as $key=>$val){
 
-            DB::table('projectcategories')->insert([
+            DB::table('ProjectCategories')->insert([
                 "categoryId" => $val['categoryId'],
                 "categoryName" => $val['categoryName'],
                 "subCategoryName" => $val['subCategoryName']

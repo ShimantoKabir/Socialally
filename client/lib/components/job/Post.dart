@@ -4,24 +4,27 @@ import 'package:client/constants.dart';
 import 'package:client/models/ProjectCategory.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
+import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
 class Post extends StatefulWidget {
-  Post({Key key, this.userInfo}) : super(key: key);
+  Post({Key key, this.eventHub, this.userInfo}) : super(key: key);
   final userInfo;
+  final EventHub eventHub;
 
   @override
-  PostState createState() => PostState(userInfo: userInfo);
+  PostState createState() =>
+      PostState(key: key, eventHub: eventHub, userInfo: userInfo);
 }
 
 class PostState extends State<Post> {
   var userInfo;
+  EventHub eventHub;
 
-  PostState({Key key, this.userInfo});
+  PostState({Key key, this.eventHub, this.userInfo});
 
   TextEditingController titleCtl = new TextEditingController();
   TextEditingController workerNeededCtl = new TextEditingController();
@@ -66,6 +69,8 @@ class PostState extends State<Post> {
   void initState() {
     super.initState();
 
+    eventHub.fire("viewTitle", "Post Job");
+
     todoStepsControllers.add(new TextEditingController());
     requiredProofsControllers.add(new TextEditingController());
 
@@ -83,17 +88,27 @@ class PostState extends State<Post> {
 
     List<dynamic> projectCategories = userInfo['projectCategories'];
     projectCategories.asMap().forEach((key, projectCategory) {
-      ProjectCategory pc = new ProjectCategory(
-        id: null,
-        subCategoryName: null,
-        categoryId: projectCategory['categoryId'],
-        categoryName: projectCategory['categoryName'],
-      );
+      bool isValueExist = false;
+      projectCategoriesDropDownList.forEach((element) {
+        if(element.value.categoryName == projectCategory['categoryName']){
+          isValueExist = true;
+        }
+      });
 
-      projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
-        value: pc,
-        child: Text(pc.categoryName),
-      ));
+      if(!isValueExist){
+        ProjectCategory pc = new ProjectCategory(
+          id: null,
+          subCategoryName: null,
+          categoryId: projectCategory['categoryId'],
+          categoryName: projectCategory['categoryName'],
+        );
+
+        projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
+          value: pc,
+          child: Text(pc.categoryName),
+        ));
+      }
+
     });
 
     if (userInfo['regionName'] == null) {
@@ -104,24 +119,35 @@ class PostState extends State<Post> {
     if (userInfo['countryName'] == null) {
       countryName = "Select";
     } else {
-      countryDropDownList.add(new DropdownMenuItem<String>(
-        value: userInfo['countryName'],
-        child: Text(userInfo['countryName']),
-      ));
+      bool isValueExist = false;
+      countryDropDownList.forEach((element) {
+        if (element.value == userInfo['countryName']) {
+          isValueExist = true;
+        }
+      });
+
       countryName = userInfo['countryName'];
+      if (!isValueExist) {
+        countryDropDownList.add(new DropdownMenuItem<String>(
+          value: userInfo['countryName'],
+          child: Text(userInfo['countryName']),
+        ));
+      }
     }
 
     estimatedCostCtl.text = estimatedCost.toString();
     eachWorkerEarnCtl.addListener(() {
       setState(() {
-        if(eachWorkerEarnCtl.text.isNotEmpty && workerNeededCtl.text.isNotEmpty){
+        if (eachWorkerEarnCtl.text.isNotEmpty &&
+            workerNeededCtl.text.isNotEmpty) {
           int res = int.tryParse(eachWorkerEarnCtl.text) *
-              int.tryParse(workerNeededCtl.text) +
+                  int.tryParse(workerNeededCtl.text) +
               companyCharge;
           estimatedCostCtl.text = res.toString();
         }
       });
     });
+
   }
 
   @override
@@ -450,17 +476,20 @@ class PostState extends State<Post> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 OutlineButton(
-                    onPressed: (){
-                      onSave(context);
+                    onPressed: () {
+                      if (userInfo['profileCompleted'] == 100) {
+                        onSave(context);
+                      } else {
+                        Alert.show(alertDialog, context, Alert.ERROR,
+                            "To post a new job, you need to complete your profile 100%.");
+                      }
                     },
-                    child: Text("Save")
-                ),
+                    child: Text("Save")),
                 OutlineButton(
-                    onPressed: (){
+                    onPressed: () {
                       onReset(context);
                     },
-                    child: Text("Reset")
-                )
+                    child: Text("Reset"))
               ],
             )
           ],
@@ -561,7 +590,6 @@ class PostState extends State<Post> {
   }
 
   void onSave(BuildContext context) {
-
     List<String> todoSteps = [];
     List<String> requiredProofs = [];
 
@@ -574,46 +602,39 @@ class PostState extends State<Post> {
     });
 
     var request = {
-      "project" : {
-        "title" : titleCtl.text,
-        "todoSteps" : todoSteps,
-        "requiredProofs" : requiredProofs,
-        "categoryId" : defaultProjectCategory.categoryId,
-        "subCategoryId" : defaultProjectSubCategory.id,
-        "regionName" : regionName,
-        "countryName" : countryName,
-        "workerNeeded" : int.parse(workerNeededCtl.text),
-        "estimatedDay" : int.parse(estimatedDayCtl.text),
-        "estimatedCost" : int.parse(estimatedCostCtl.text),
+      "project": {
+        "title": titleCtl.text,
+        "todoSteps": todoSteps,
+        "requiredProofs": requiredProofs,
+        "categoryId": defaultProjectCategory.categoryId,
+        "subCategoryId": defaultProjectSubCategory.id,
+        "regionName": regionName,
+        "countryName": countryName,
+        "workerNeeded": int.parse(workerNeededCtl.text),
+        "estimatedDay": int.parse(estimatedDayCtl.text),
+        "estimatedCost": int.parse(estimatedCostCtl.text),
       }
     };
 
     print("request = $request");
 
-    Alert.show(
-        alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
     HttpHandler().createPost("/projects", request).then((res) {
       Navigator.of(context).pop(false);
       if (res.statusCode == 200) {
         if (res.data['code'] == 200) {
-          Alert.show(
-              alertDialog, context, Alert.SUCCESS, res.data['msg']);
+          Alert.show(alertDialog, context, Alert.SUCCESS, res.data['msg']);
         } else {
-          Alert.show(
-              alertDialog, context, Alert.ERROR, res.data['msg']);
+          Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
         }
       } else {
-        Alert.show(
-            alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       }
     }).catchError((err) {
       Navigator.of(context).pop(false);
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
-
   }
 
-  void onReset(BuildContext context) {
-
-  }
+  void onReset(BuildContext context) {}
 }
