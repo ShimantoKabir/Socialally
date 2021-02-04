@@ -87,6 +87,7 @@ class UserRpo
                 $userInfo->password = sha1($rUserInfo['password']);
                 $userInfo->ip = $request->ip();
                 $userInfo->token = $token;
+                // $userInfo->isEmailVerified = true;
                 $userInfo->save();
 
                 $mailData = array(
@@ -94,13 +95,14 @@ class UserRpo
                     'verificationLink' => $clientUrl . '/#/email-verification/' . $token
                 );
 
-//                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
-//                    $message->to($mailData['email'])->subject('Email Verification');
-//                });
+                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+                    $message->to($mailData['email'])->subject('Email Verification');
+                });
 
-                Queue::push(new MailSender($mailData));
+                // Queue::push(new MailSender($mailData));
 
                 $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
+                // $res['msg'] = "Registration successful!";
                 $res['code'] = 200;
 
                 DB::commit();
@@ -204,7 +206,8 @@ class UserRpo
                         'countryName',
                         'contactNumber',
                         'agreedTermsAndCondition',
-                        'wantNewsLetterNotification'
+                        'wantNewsLetterNotification',
+                        'imageUrl'
                     )
                     ->first();
 

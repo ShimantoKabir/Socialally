@@ -1,10 +1,11 @@
 import 'dart:convert';
-
+import 'package:http/http.dart';
 import 'package:client/constants.dart';
 import 'package:client/models/ProjectCategory.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
 import 'package:event_hub/event_hub.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +41,7 @@ class PostState extends State<Post> {
   String countryName;
   int estimatedCost = 0;
   int companyCharge = 20;
+  var fileInfo;
 
   Widget entryField(String title, TextEditingController controller) {
     return Container(
@@ -147,6 +149,15 @@ class PostState extends State<Post> {
         }
       });
     });
+
+    fileInfo = {
+      "fileName" : "No file selected yet",
+      "fileExt" : null,
+      "fileString" : null,
+      "imageName" : "No image selected yet",
+      "imageExt" : null,
+      "imageString" : null
+    };
 
   }
 
@@ -477,6 +488,52 @@ class PostState extends State<Post> {
               children: [
                 OutlineButton(
                     onPressed: () {
+                      onFileSelect(context,"img");
+                    },
+                    child: Text("Select Image")),
+                Text(fileInfo["imageName"]),
+                OutlineButton(
+                    onPressed: () {
+                      setState(() {
+                        fileInfo["imageExt"] = null;
+                        fileInfo["imageName"] = "No file selected yet!";
+                        fileInfo["imageString"] = null;
+                      });
+                    },
+                    child: Text("Clear"))
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlineButton(
+                    onPressed: () {
+                      onFileSelect(context,"file");
+                    },
+                    child: Text("Select File")),
+                Text(fileInfo["fileName"]),
+                OutlineButton(
+                    onPressed: () {
+                      setState(() {
+                        fileInfo["fileExt"] = null;
+                        fileInfo["fileName"] = "No file selected yet!";
+                        fileInfo["fileString"] = null;
+                      });
+                    },
+                    child: Text("Clear"))
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlineButton(
+                    onPressed: () {
                       if (userInfo['profileCompleted'] == 100) {
                         onSave(context);
                       } else {
@@ -613,28 +670,66 @@ class PostState extends State<Post> {
         "workerNeeded": int.parse(workerNeededCtl.text),
         "estimatedDay": int.parse(estimatedDayCtl.text),
         "estimatedCost": int.parse(estimatedCostCtl.text),
+        "fileString" : fileInfo["fileString"],
+        "fileExt" : fileInfo["fileExt"],
+        "imageString" : fileInfo["imageString"],
+        "imageExt" : fileInfo["imageExt"]
+      },
+      "userInfo" : {
+        "id" : userInfo['id']
       }
     };
 
-    print("request = $request");
+    String url = baseUrl + '/projects';
+    Map<String, String> headers = {"Content-type": "application/json"};
 
     Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
-    HttpHandler().createPost("/projects", request).then((res) {
+    post(url, headers: headers, body: json.encode(request)).then((response){
       Navigator.of(context).pop(false);
-      if (res.statusCode == 200) {
-        if (res.data['code'] == 200) {
-          Alert.show(alertDialog, context, Alert.SUCCESS, res.data['msg']);
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body.data['code'] == 200) {
+          Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
-          Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
         }
-      } else {
+      }else {
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       }
-    }).catchError((err) {
+    }).catchError((err){
       Navigator.of(context).pop(false);
-      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
   }
 
   void onReset(BuildContext context) {}
+
+  Future<void> onFileSelect(BuildContext context, String fileType) async {
+
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: fileType == "img" ? allowedImageType : allowedFileType,
+    );
+
+    if (result != null) {
+      PlatformFile objFile = result.files.single;
+      if(objFile.size > maxImageSize){
+        Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
+            "You can only upload ${maxImageSize/oneMegaByte} or less then ${maxImageSize/oneMegaByte} mb image/file.");
+      }else {
+        setState(() {
+          if(fileType == "img"){
+            fileInfo["imageName"] = objFile.name;
+            fileInfo["imageString"] = base64.encode(objFile.bytes);
+            fileInfo["imageExt"] = objFile.extension;
+          }else {
+            fileInfo["fileName"] = objFile.name;
+            fileInfo["fileString"] = base64.encode(objFile.bytes);
+            fileInfo["fileExt"] = objFile.extension;
+          }
+        });
+      }
+    }else {
+      Alert.show(alertDialog, context, Alert.ERROR, "No file selected!");
+    }
+  }
 }

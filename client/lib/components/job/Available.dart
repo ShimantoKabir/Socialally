@@ -1,11 +1,12 @@
 import 'dart:convert';
-
 import 'package:client/constants.dart';
 import 'package:client/models/Project.dart';
+import 'package:client/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Available extends StatefulWidget {
   Available({Key key, this.eventHub, this.userInfo}) : super(key: key);
@@ -23,6 +24,8 @@ class AvailableState extends State<Available> {
 
   AvailableState({Key key, this.eventHub, this.userInfo});
 
+  AlertDialog alertDialog;
+
   @override
   void initState() {
     super.initState();
@@ -31,93 +34,175 @@ class AvailableState extends State<Available> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: FutureBuilder(
         future: fetchAvailableJob(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<Project> projects = snapshot.data;
-            return ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: projects.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.work_outline),
-                        title: Text(projects[index].title),
-                        subtitle: Text(
-                          '${projects[index].regionName} - ${projects[index].countryName}',
-                          style:
-                              TextStyle(color: Colors.black.withOpacity(0.6)),
+            if(projects.length == 0){
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                  child: Text("No available job found!"),
+                ),
+              );
+            }else {
+              return ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: projects.length,
+                itemBuilder: (context, index) {
+                  var eachWorkerEarn = projects[index].estimatedCost/projects[index].workerNeeded;
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.extension),
+                          title: Text(projects[index].title),
+                          subtitle: Text(
+                            '${projects[index].regionName} - ${projects[index].countryName}',
+                            style:
+                            TextStyle(color: Colors.black.withOpacity(0.6)),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          "Todo Steps: ${projects[index].todoSteps.toString()} / Required Proofs: ${projects[index].requiredProofs.toString()}",
-                          style:
-                              TextStyle(color: Colors.black.withOpacity(0.6)),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                                "Estimated Cost: ${projects[index].estimatedCost} \$"),
-                            Text(
-                                "Estimated Day: ${projects[index].estimatedDay}"),
-                            Text(
-                                "Category Name: ${projects[index].categoryName}")
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            FlatButton(
-                              onPressed: () => {},
-                              color: Colors.green,
-                              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                              child: Row(
-                                // Replace with a Row for horizontal icon + text
-                                children: <Widget>[
-                                  Icon(Icons.file_download,
-                                      color: Colors.white),
-                                  Text(" Download File",
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                          child: Text(
+                            "Todo Steps",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
                             ),
-                            FlatButton(
-                              onPressed: () => {},
-                              color: Colors.green,
-                              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                              child: Row(
-                                // Replace with a Row for horizontal icon + text
-                                children: <Widget>[
-                                  Icon(Icons.arrow_forward_ios,
-                                      color: Colors.white),
-                                  Text(" Apply",
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
-                            )
-                          ],
+                          ),
+                          decoration: headingDecoration(),
                         ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            );
+                        SizedBox(height: 10),
+                        ListView.builder(
+                          padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                          itemCount: projects[index].todoSteps.length,
+                          itemBuilder: (context, j) {
+                            if(projects[index].todoSteps.length == 0){
+                              return Text("No todo step found!");
+                            }else {
+                              return Text("${j+1}. ${projects[index].todoSteps[j]}");
+                            }
+                          }
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                          child: Text(
+                            "Required Proofs",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),
+                          ),
+                          decoration: headingDecoration(),
+                        ),
+                        SizedBox(height: 10),
+                        ListView.builder(
+                            padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: projects[index].requiredProofs.length,
+                            itemBuilder: (context, j) {
+                              if(projects[index].requiredProofs.length == 0){
+                                return Text("No required proof found!");
+                              }else {
+                                return Text("${j+1}. ${projects[index].requiredProofs[j]}");
+                              }
+                            }
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20,0,20,5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  "Estimated Budget: ${projects[index].estimatedCost} \$"),
+                              Text(
+                                  "Estimated Day: ${projects[index].estimatedDay}"),
+                              Text(
+                                  "Worker Needed: ${projects[index].workerNeeded}")
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20,0,20,5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  "Category: ${projects[index].categoryName}"),
+                              Text(
+                                  "Sub Category: ${projects[index].subCategoryName}"),
+                              Text(
+                                  "Each Worker Earn: ${eachWorkerEarn.round()} \$")
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Visibility(
+                                visible: projects[index].fileUrl != null,
+                                child: FlatButton(
+                                    onPressed: () => {
+                                      openFile(projects[index].fileUrl,context)
+                                    },
+                                    color: Colors.green,
+                                    padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                    child: Row(
+                                      // Replace with a Row for horizontal icon + text
+                                      children: <Widget>[
+                                        Icon(Icons.file_download,
+                                            size: 15,
+                                            color: Colors.white),
+                                        Text(" Instruction File",
+                                            style: TextStyle(color: Colors.white))
+                                      ],
+                                    ),
+                                  )
+                              ),
+                              FlatButton(
+                                onPressed: (){
+                                  eventHub.fire("redirectToProofSubmission",projects[index]);
+                                },
+                                color: Colors.green,
+                                padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                child: Row(
+                                  // Replace with a Row for horizontal icon + text
+                                  children: <Widget>[
+                                    Text(" Submit",
+                                        style: TextStyle(color: Colors.white)),
+                                    Icon(Icons.arrow_forward_ios,
+                                        size: 15,
+                                        color: Colors.white)
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
           } else {
             return Center(
               child: Padding(
@@ -131,6 +216,14 @@ class AvailableState extends State<Available> {
         },
       ),
     );
+  }
+
+  openFile(String url,BuildContext context) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, "Can't open any file!");
+    }
   }
 
   Future<List<Project>> fetchAvailableJob() async {
@@ -169,13 +262,25 @@ class AvailableState extends State<Available> {
               countryName: project['countryName'],
               workerNeeded: project['workerNeeded'],
               estimatedDay: project['estimatedDay'],
+              imageUrl: project['imageUrl'],
+              fileUrl: project['fileUrl'],
               estimatedCost: project['estimatedCost']));
         });
-        print("projectList = $projectList");
-        // print("todoStep = $todoStep");
       }
     }
 
     return projectList;
   }
+
+  BoxDecoration headingDecoration() {
+    return BoxDecoration(
+      border: Border(
+          bottom:  BorderSide(
+            color: Colors.green,
+            width: 3.0,
+          )
+      ),
+    );
+  }
+
 }

@@ -10,7 +10,7 @@ const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
 const baseUrl = "http://localhost:8000/api";
-// const baseUrl = "http://workersengine.com/server/public";
+// const baseUrl = "http://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -59,30 +59,26 @@ RegExp passwordRegExp =
 
 List<Node> userDashboardMenus = [
   Node(
-      label: 'Profile',
-      key: '2',
-      icon: NodeIcon.fromIconData(Icons.account_circle_sharp)),
+      label: 'Available Job',
+      key: '/job/available',
+      icon: NodeIcon.fromIconData(Icons.work_outline)),
   Node(
     label: 'Job',
-    key: '10',
+    key: '/job/mine',
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
           label: 'Mine',
-          key: '0',
+          key: '/job/mine',
           icon: NodeIcon.fromIconData(Icons.event_available)),
       Node(
           label: 'Post',
-          key: '1',
+          key: '/job/post',
           icon: NodeIcon.fromIconData(Icons.event_available)),
       Node(
           label: 'Finished',
-          key: '3',
-          icon: NodeIcon.fromIconData(Icons.event_busy)),
-      Node(
-          label: 'Available',
-          key: '4',
-          icon: NodeIcon.fromIconData(Icons.post_add)),
+          key: '/job/finished',
+          icon: NodeIcon.fromIconData(Icons.event_busy))
     ],
   ),
   Node(
@@ -101,7 +97,10 @@ List<Node> userDashboardMenus = [
       label: 'Plan & Earn',
       key: '8',
       icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)),
-  Node(label: 'Support', key: '9', icon: NodeIcon.fromIconData(Icons.support)),
+  Node(
+      label: 'Support',
+      key: '9',
+      icon: NodeIcon.fromIconData(Icons.support)),
   Node(
       label: 'FAQ',
       key: '10',

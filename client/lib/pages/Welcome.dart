@@ -1,4 +1,4 @@
-import 'package:client/components/AboutUs.dart';
+import 'package:client/components/AboutUsComponent.dart';
 import 'package:client/components/Feedback.dart';
 import 'package:client/components/Footer.dart';
 import 'package:client/components/JobGiver.dart';
@@ -35,7 +35,7 @@ class Welcome extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  "Work Engine",
+                                  "Workers Engine",
                                   style: TextStyle(
                                       fontSize: 64,
                                       fontWeight: FontWeight.w700,
@@ -85,11 +85,7 @@ class Welcome extends StatelessWidget {
             JobSeeker(),
             JobGiver(),
             UserFeedback(),
-            Container(
-              width: screenSize.width,
-              color: Colors.white60,
-              child: AboutUs(),
-            ),
+            AboutUsComponent(),
             Footer()
           ],
         ),

@@ -1,14 +1,14 @@
-import 'dart:convert';
-
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/Post.dart';
 import 'package:client/constants.dart';
+import 'package:client/models/Project.dart';
 import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
+import 'package:client/components/job/ProofSubmissionComponent.dart';
 
 class User extends StatefulWidget {
   User({Key key, this.userInfo}) : super(key: key);
@@ -19,43 +19,34 @@ class User extends StatefulWidget {
 }
 
 class UserPageState extends State<User> with SingleTickerProviderStateMixin {
-
   var userInfo;
-  UserPageState({Key key,this.userInfo});
+  UserPageState({Key key, this.userInfo});
 
-  TabController tabController;
-  int active = 0;
-  String _selectedKey;
-  List<Node> _nodes;
-  TreeViewController _treeViewController;
+  String selectedKey;
+  List<Node> nodes;
+  TreeViewController treeViewController;
   bool docsOpen = true;
   bool deepExpanded = true;
   EventHub eventHub = EventHub();
   String viewTitle;
   TextEditingController searchCtl = new TextEditingController();
   ImageProvider<Object> profileImageWidget;
+  Project project;
 
   @override
   void initState() {
     super.initState();
-    tabController = new TabController(vsync: this, length: 3, initialIndex: 0)
-      ..addListener(() {
-        setState(() {
-          active = tabController.index;
-        });
-      });
+    nodes = userDashboardMenus;
 
-    _nodes = userDashboardMenus;
-
-    _treeViewController = TreeViewController(
-      children: _nodes,
-      selectedKey: _selectedKey,
+    treeViewController = TreeViewController(
+      children: nodes,
+      selectedKey: selectedKey,
     );
 
     eventHub.on("userInfo", (dynamic data) {
       setState(() {
         userInfo = data;
-        profileImageWidget = NetworkImage(userInfo['imageUrl']);
+        showProfilePic(userInfo);
       });
     });
 
@@ -66,33 +57,32 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
       });
     });
 
-    if(userInfo['imageUrl'] == null){
+    eventHub.on("redirectToProofSubmission", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/job/submit");
+      });
+    });
+
+    showProfilePic(userInfo);
+  }
+
+  void showProfilePic(userInfo) {
+    if (userInfo['imageUrl'] == null) {
       profileImageWidget = AssetImage("assets/images/people.png");
-    }else {
+    } else {
       profileImageWidget = NetworkImage(userInfo['imageUrl']);
     }
-
   }
 
   @override
   void dispose() {
-    tabController.dispose();
     super.dispose();
   }
 
   TreeViewTheme _treeViewTheme = treeViewTheme;
 
-  Widget tabBarView() {
-    return TabBarView(
-      physics: NeverScrollableScrollPhysics(),
-      controller: tabController,
-      children: [
-        Available(eventHub: eventHub,userInfo: userInfo),
-        Post(eventHub: eventHub,userInfo: userInfo),
-        Profile(eventHub: eventHub,userInfo: userInfo)
-      ],
-    );
-  }
+  var userNavigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -126,18 +116,20 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   Expanded(
-                      child: TreeView(
-                          controller: _treeViewController,
-                          allowParentSelect: true,
-                          supportParentDoubleTap: false,
-                          onNodeTap: (key) {
-                            setState(() {
-                              _treeViewController = _treeViewController
-                                  .copyWith(selectedKey: key);
-                              tabController.index = int.tryParse(key);
-                            });
-                          },
-                          theme: _treeViewTheme))
+                    child: TreeView(
+                      controller: treeViewController,
+                      allowParentSelect: true,
+                      supportParentDoubleTap: false,
+                      onNodeTap: (key) {
+                        setState(() {
+                          treeViewController = treeViewController
+                              .copyWith(selectedKey: key);
+                          userNavigatorKey.currentState.pushNamed(key);
+                        });
+                      },
+                      theme: _treeViewTheme
+                    )
+                  )
                 ],
               ),
             ),
@@ -181,9 +173,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                               InkWell(
                                 child: Icon(Icons.account_circle_rounded),
                                 onTap: () {
-                                  setState(() {
-                                    tabController.index = 2;
-                                  });
+                                  userNavigatorKey.currentState.pushNamed('/user/profile');
                                 },
                               ),
                               SizedBox(width: 10),
@@ -194,9 +184,7 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                       .then((isClear) {
                                     if (isClear) {
                                       Navigator.pushNamedAndRemoveUntil(
-                                          context,
-                                          "/",
-                                              (r) => false);
+                                          context, "/", (r) => false);
                                     }
                                   });
                                 },
@@ -224,12 +212,32 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                     child: Row(
                       children: [
                         Expanded(
-                          child: tabBarView(),
+                          child: Navigator(
+                            key: userNavigatorKey,
+                            onGenerateRoute: (settings){
+                              if(settings.name == "/user/profile"){
+                                return MaterialPageRoute(builder: (context) => Profile(eventHub: eventHub,userInfo: userInfo));
+                              } else if(settings.name == "/job/post"){
+                                return MaterialPageRoute(builder: (context) => Post(eventHub: eventHub,userInfo: userInfo));
+                              } else if(settings.name == "/job/available"){
+                                return MaterialPageRoute(builder: (context) => Available(eventHub: eventHub,userInfo: userInfo));
+                              }else if(settings.name == "/job/submit"){
+                                return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
+                                    eventHub: eventHub,
+                                    userInfo: userInfo,
+                                    project: project,
+                                  )
+                                );
+                              } else {
+                                return MaterialPageRoute(builder: (context) => Available(eventHub: eventHub,userInfo: userInfo));
+                              }
+                            },
+                          ),
                           flex: 4,
                         ),
                         Expanded(
                             child: Container(
-                              margin: EdgeInsets.fromLTRB(10, 0, 0,0),
+                              margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
                               padding: EdgeInsets.all(20),
                               color: Colors.white60,
                               child: Column(
@@ -249,34 +257,35 @@ class UserPageState extends State<User> with SingleTickerProviderStateMixin {
                                   SizedBox(height: 20),
                                   LinearProgressIndicator(
                                     backgroundColor: Colors.grey,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.amber),
                                     value: userInfo['profileCompleted'] / 100,
                                   ),
                                   SizedBox(height: 20),
                                   Text(
-                                      "Profile Completed ${userInfo['profileCompleted']}%",
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    "Profile Completed ${userInfo['profileCompleted']}%",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   SizedBox(height: 20),
                                   Visibility(
-                                    visible: userInfo['profileCompleted'] != 100,
-                                    child: FlatButton(
-                                      onPressed: (){
-                                        setState(() {
-                                          tabController.index = 2;
-                                        });
-                                      },
-                                      color: Colors.green,
-                                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                      child: Text(" Complete Now",
-                                          style: TextStyle(color: Colors.white)),
-                                    )
-                                  )
+                                      visible:
+                                          userInfo['profileCompleted'] != 100,
+                                      child: FlatButton(
+                                        onPressed: () {
+                                          userNavigatorKey.currentState.pushNamed('/user/profile');
+                                        },
+                                        color: Colors.green,
+                                        padding:
+                                            EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                        child: Text(" Complete Now",
+                                            style:
+                                                TextStyle(color: Colors.white)),
+                                      ))
                                 ],
                               ),
                             ),
-                            flex: 2
-                        )
+                            flex: 2)
                       ],
                     ),
                   )

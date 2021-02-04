@@ -26,7 +26,10 @@ class Projects extends Migration
             $table->integer('requiredScreenShot')->nullable();
             $table->integer('estimatedDay');
             $table->integer('estimatedCost');
+            $table->string('fileUrl')->nullable();
+            $table->string('imageUrl')->nullable();
             $table->json('applicantIds')->nullable();
+            $table->integer('postedBy');
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();

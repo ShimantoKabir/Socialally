@@ -1,7 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="28121880-3806-44a2-988a-ec051c90b145" name="Default Changelist" comment="" />
+    <list default="true" id="28121880-3806-44a2-988a-ec051c90b145" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../client/lib/components/AboutUsComponent.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../client/lib/pages/AboutUs.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/components/AboutUs.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/components/Profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/Profile.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/components/job/Available.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/job/Available.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/components/job/Post.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/job/Post.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/constants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/models/Project.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/models/Project.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/pages/ContactUs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/ContactUs.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/pages/User.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/User.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/pages/Welcome.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/Welcome.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/utilities/RouterGenerator.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/utilities/RouterGenerator.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/widgets/AboutTextWithSign.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/widgets/AboutTextWithSign.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/lib/widgets/WelcomeNavBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/widgets/WelcomeNavBar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b1ba87ec-eb7c-4f29-af0d-1c3d27f0db4b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b1ba87ec-eb7c-4f29-af0d-1c3d27f0db4b.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Project.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Project.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Repository/ProjectRpo.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Repository/ProjectRpo.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Repository/UserRpo.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Repository/UserRpo.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_01_26_052911_projects.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_01_26_052911_projects.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +53,9 @@
     <execution>
       <executable path="composer" />
     </execution>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -124,6 +168,7 @@
     </include_path>
   </component>
   <component name="ProjectId" id="1nn22VGJFbbF4jkSDMaJD8ZlSxl" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -132,7 +177,7 @@
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -164,49 +209,68 @@
       <workItem from="1612069630359" duration="2834000" />
       <workItem from="1612086238617" duration="409000" />
       <workItem from="1612090838319" duration="16000" />
+      <workItem from="1612091049100" duration="1322000" />
+      <workItem from="1612092428138" duration="253000" />
+      <workItem from="1612155212151" duration="1005000" />
+      <workItem from="1612207936546" duration="1717000" />
+      <workItem from="1612210978851" duration="157000" />
+      <workItem from="1612245506998" duration="61000" />
+      <workItem from="1612248301311" duration="206000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="361" y="71" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612013900095">
+    <state x="361" y="71" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612208132696">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="71" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1612013900095" />
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1612015990563">
+    <state x="361" y="71" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1612208132696" />
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1612091742199">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1612015990563" />
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1612091742199" />
     <state x="545" y="325" key="ComposerInitDialogKey" timestamp="1612013703256">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="545" y="325" key="ComposerInitDialogKey/0.0.1536.824@0.0.1536.824" timestamp="1612013703256" />
-    <state width="1264" height="175" key="GridCell.Tab.0.bottom" timestamp="1612090844125">
+    <state width="1264" height="364" key="GridCell.Tab.0.bottom" timestamp="1612209174165">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1264" height="175" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1612090844125" />
-    <state width="1264" height="175" key="GridCell.Tab.0.center" timestamp="1612090844125">
+    <state width="1264" height="364" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1612209174165" />
+    <state width="1264" height="364" key="GridCell.Tab.0.center" timestamp="1612209174165">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1264" height="175" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1612090844125" />
-    <state width="1264" height="175" key="GridCell.Tab.0.left" timestamp="1612090844125">
+    <state width="1264" height="364" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1612209174165" />
+    <state width="1264" height="364" key="GridCell.Tab.0.left" timestamp="1612209174165">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1264" height="175" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1612090844125" />
-    <state width="1264" height="175" key="GridCell.Tab.0.right" timestamp="1612090844125">
+    <state width="1264" height="364" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1612209174165" />
+    <state width="1264" height="364" key="GridCell.Tab.0.right" timestamp="1612209174165">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1264" height="175" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1612090844125" />
+    <state width="1264" height="364" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1612209174165" />
     <state x="564" y="135" key="NewPhpClassDialog" timestamp="1612011899559">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="564" y="135" key="NewPhpClassDialog/0.0.1536.824@0.0.1536.824" timestamp="1612011899559" />
-    <state x="615" y="195" width="312" height="434" key="com.intellij.database.actions.DdlActions$DeleteProvider2$1" timestamp="1612013927352">
+    <state x="615" y="195" width="312" height="434" key="com.intellij.database.actions.DdlActions$DeleteProvider2$1" timestamp="1612092636108">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="615" y="195" width="312" height="434" key="com.intellij.database.actions.DdlActions$DeleteProvider2$1/0.0.1536.824@0.0.1536.824" timestamp="1612013927352" />
+    <state x="615" y="195" width="312" height="434" key="com.intellij.database.actions.DdlActions$DeleteProvider2$1/0.0.1536.824@0.0.1536.824" timestamp="1612092636108" />
     <state x="715" y="192" width="464" height="453" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog" timestamp="1612025835750">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

@@ -13,8 +13,6 @@ class ContactUs extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              // this height only for demo
-              // height: 500,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Color(0xFFE8F0F9),
@@ -25,7 +23,6 @@ class ContactUs extends StatelessWidget {
               ),
               child: Column(
                 children: [
-
                   WelcomeNavBar(),
                   SizedBox(height: kDefaultPadding * 2.5),
                   SectionTitle(

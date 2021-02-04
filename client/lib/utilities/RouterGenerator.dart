@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/pages/AboutUs.dart';
 import 'package:client/pages/EmailVerification.dart';
 import 'package:flutter/material.dart';
 import 'package:client/pages/ContactUs.dart';
@@ -31,6 +32,8 @@ class RouterGenerator {
       }
     } else if (settings.name == '/contactus') {
       return redirect(ContactUs(), settings, false);
+    }else if (settings.name == '/aboutus') {
+      return redirect(AboutUs(), settings, false);
     } else if (settings.name == '/login') {
       return redirect(Login(), settings, false);
     } else if (settings.name == '/registration') {

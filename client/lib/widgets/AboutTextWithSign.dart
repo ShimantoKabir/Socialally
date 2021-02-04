@@ -13,14 +13,12 @@ class AboutTextWithSign extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "About \nOur Story",
+          "About Us",
           style: Theme.of(context)
               .textTheme
               .headline2
               .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        SizedBox(height: kDefaultPadding * 2),
-        Image.asset("assets/images/sign.png")
+        )
       ],
     );
   }

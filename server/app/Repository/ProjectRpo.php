@@ -4,10 +4,11 @@
 namespace App\Repository;
 
 use App\Models\Project;
-use App\Models\UserInfo;
+use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectRpo
 {
@@ -21,6 +22,8 @@ class ProjectRpo
         ];
 
         $rProject = $request->project;
+        $rUserInfo = $request->userInfo;
+        $appUrl = env('APP_URL');
 
         DB::beginTransaction();
         try {
@@ -36,8 +39,20 @@ class ProjectRpo
             $project->workerNeeded = $rProject['workerNeeded'];
             $project->estimatedDay = $rProject['estimatedDay'];
             $project->estimatedCost = $rProject['estimatedCost'];
+            $project->postedBy = $rUserInfo['id'];
             $project->save();
 
+            if (!is_null($rProject['imageString']) && !is_null($rProject['imageExt'])) {
+                $imageName = Uuid::uuid() . "." . $rProject['imageExt'];
+                self::uploadFileToFtp($rProject['imageString'], $project->id, $appUrl, $imageName, "img");
+            }
+
+            if(!is_null($rProject['fileString']) && !is_null($rProject['fileExt'])){
+               $fileName = Uuid::uuid().".".$rProject['fileExt'];
+               self::uploadFileToFtp($rProject['fileString'], $project->id, $appUrl,$fileName,"file");
+            }
+
+            $res['id'] = $project->id;
             $res['msg'] = "Job posted successfully!";
             $res['code'] = 200;
 
@@ -74,6 +89,8 @@ class ProjectRpo
                    Projects.subCategoryId,
                    ProjectCategories.subCategoryName,
                    Projects.regionName,
+				   Projects.imageUrl,
+				   Projects.fileUrl,
                    Projects.countryName,
                    Projects.workerNeeded,
                    Projects.estimatedDay,
@@ -97,6 +114,29 @@ class ProjectRpo
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
 
+    }
+
+    private static function uploadFileToFtp($fileString, $id, $appUrl, $fileName, $type)
+    {
+
+        if ($type == "img") {
+            $filePath = 'images/' . $fileName;
+            $fileUrl = $appUrl . $filePath;
+            $updateSql = array(
+                'imageUrl' => $fileUrl
+            );
+        } else {
+            $filePath = 'files/' . $fileName;
+            $fileUrl = $appUrl . $filePath;
+            $updateSql = array(
+                'fileUrl' => $fileUrl
+            );
+        }
+
+        Storage::disk('ftp')->put($filePath, base64_decode($fileString));
+        Project::where('id', $id)->update($updateSql);
+
+        return $fileUrl;
     }
 
 }

@@ -7,5 +7,11 @@
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://localhost:3306/wengine</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="109.74.193.194" uuid="c35098d3-38ab-4ca4-858f-8e91222537f8">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://109.74.193.194:3306/workerse_wengine</jdbc-url>
+    </data-source>
   </component>
 </project>

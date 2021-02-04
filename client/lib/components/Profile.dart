@@ -88,11 +88,7 @@ class ProfileState extends State<Profile> {
       wantNewsLetterNotification = true;
     }
 
-    if(userInfo['imageUrl'] == null){
-      profileImageWidget = AssetImage("assets/images/people.png");
-    }else {
-      profileImageWidget = NetworkImage(userInfo['imageUrl']);
-    }
+    showProfilePic(userInfo);
 
     if(userInfo['contactNumber'] == null){
       contactNumberCtl.clear();
@@ -418,6 +414,9 @@ class ProfileState extends State<Profile> {
             MySharedPreferences.setStringValue(
                 'userInfo', jsonEncode(userInfo));
             eventHub.fire("userInfo", userInfo);
+            setState(() {
+              showProfilePic(userInfo);
+            });
           } else {
             Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
           }
@@ -440,7 +439,6 @@ class ProfileState extends State<Profile> {
     if (result != null) {
 
       PlatformFile objFile = result.files.single;
-      print("image size = ${objFile.size}");
 
       if(objFile.size > maxImageSize){
         Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
@@ -485,5 +483,15 @@ class ProfileState extends State<Profile> {
     } else {
       Alert.show(alertDialog, context, Alert.ERROR, "No file selected!");
     }
+  }
+
+  void showProfilePic(userInfo) {
+
+    if(userInfo['imageUrl'] == null){
+      profileImageWidget = AssetImage("assets/images/people.png");
+    }else {
+      profileImageWidget = NetworkImage(userInfo['imageUrl']);
+    }
+
   }
 }

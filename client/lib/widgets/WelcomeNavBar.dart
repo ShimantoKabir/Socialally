@@ -37,7 +37,9 @@ class WelcomeNavBar extends StatelessWidget{
           ),
           MenuItem(
             title: "about",
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, "/aboutus");
+            },
           ),
           MenuItem(
             title: "Pricing",

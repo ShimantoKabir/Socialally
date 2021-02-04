@@ -12,6 +12,8 @@ class Project {
   final int workerNeeded;
   final int estimatedDay;
   final int estimatedCost;
+  final String imageUrl;
+  final String fileUrl;
 
   Project({
     this.id,
@@ -27,5 +29,7 @@ class Project {
     this.workerNeeded,
     this.estimatedDay,
     this.estimatedCost,
+    this.imageUrl,
+    this.fileUrl
   });
 }
