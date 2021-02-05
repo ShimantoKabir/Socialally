@@ -12,26 +12,30 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
 class Post extends StatefulWidget {
-  Post({Key key, this.eventHub, this.userInfo}) : super(key: key);
+  Post({Key key, this.eventHub, this.userInfo, this.ctx}) : super(key: key);
   final userInfo;
   final EventHub eventHub;
+  final BuildContext ctx;
 
   @override
   PostState createState() =>
-      PostState(key: key, eventHub: eventHub, userInfo: userInfo);
+      PostState(key: key, eventHub: eventHub, userInfo: userInfo,ctx: ctx);
 }
 
 class PostState extends State<Post> {
+
   var userInfo;
   EventHub eventHub;
+  BuildContext ctx;
 
-  PostState({Key key, this.eventHub, this.userInfo});
+  PostState({Key key, this.eventHub, this.userInfo, this.ctx});
 
   TextEditingController titleCtl = new TextEditingController();
   TextEditingController workerNeededCtl = new TextEditingController();
   TextEditingController eachWorkerEarnCtl = new TextEditingController();
   TextEditingController estimatedCostCtl = new TextEditingController();
   TextEditingController estimatedDayCtl = new TextEditingController();
+  TextEditingController requiredScreenShotsCtl = new TextEditingController();
   List<TextEditingController> todoStepsControllers = [];
   List<TextEditingController> requiredProofsControllers = [];
   ProjectCategory defaultProjectCategory;
@@ -42,35 +46,16 @@ class PostState extends State<Post> {
   int estimatedCost = 0;
   int companyCharge = 20;
   var fileInfo;
-
-  Widget entryField(String title, TextEditingController controller) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
-        ],
-      ),
-    );
-  }
+  bool needToFreezeUi;
+  Widget alertIcon;
+  String alertText;
 
   @override
   void initState() {
     super.initState();
 
+    alertText = "No operation running.";
+    alertIcon = Container();
     eventHub.fire("viewTitle", "Post Job");
 
     todoStepsControllers.add(new TextEditingController());
@@ -118,6 +103,7 @@ class PostState extends State<Post> {
     } else {
       regionName = userInfo['regionName'];
     }
+
     if (userInfo['countryName'] == null) {
       countryName = "Select";
     } else {
@@ -143,7 +129,7 @@ class PostState extends State<Post> {
         if (eachWorkerEarnCtl.text.isNotEmpty &&
             workerNeededCtl.text.isNotEmpty) {
           int res = int.tryParse(eachWorkerEarnCtl.text) *
-                  int.tryParse(workerNeededCtl.text) +
+              int.tryParse(workerNeededCtl.text) +
               companyCharge;
           estimatedCostCtl.text = res.toString();
         }
@@ -159,413 +145,504 @@ class PostState extends State<Post> {
       "imageString" : null
     };
 
-  }
+    needToFreezeUi = false;
 
+  }
+  // AbsorbPointer
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          children: [
-            entryField("Title", titleCtl),
-            SizedBox(
-              height: 10,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Todo Steps",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            Divider(thickness: 1, color: Colors.green),
-            ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                padding: EdgeInsets.all(8),
-                itemCount: todoStepsControllers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextField(
-                        controller: todoStepsControllers[index],
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Color(0xfff3f3f4),
-                            filled: true)),
-                  );
-                }),
-            Row(
-              children: [
-                IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      setState(() {
-                        todoStepsControllers.add(new TextEditingController());
-                      });
-                    }),
-                IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: () {
-                      setState(() {
-                        if (todoStepsControllers.length > 0) {
-                          todoStepsControllers.removeLast();
-                        }
-                      });
-                    })
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Required Proofs",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            Divider(thickness: 1, color: Colors.green),
-            ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                padding: EdgeInsets.all(8),
-                itemCount: requiredProofsControllers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: EdgeInsets.all(5),
-                    child: TextField(
-                        controller: requiredProofsControllers[index],
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Color(0xfff3f3f4),
-                            filled: true)),
-                  );
-                }),
-            Row(
-              children: [
-                IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      setState(() {
-                        requiredProofsControllers
-                            .add(new TextEditingController());
-                      });
-                    }),
-                IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: () {
-                      setState(() {
-                        if (requiredProofsControllers.length > 0) {
-                          requiredProofsControllers.removeLast();
-                        }
-                      });
-                    })
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Category",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                child: DropdownButton<ProjectCategory>(
-                    value: defaultProjectCategory,
-                    isExpanded: true,
-                    underline: SizedBox(),
-                    onChanged: (ProjectCategory pc) {
-                      print("pc id ${pc.categoryId}");
-                      if (pc.categoryId != 0) {
-                        fetchSubCategoriesById(context, pc);
-                      } else {
-                        setState(() {
-                          defaultProjectCategory = new ProjectCategory(
-                              id: 0,
-                              categoryId: 0,
-                              categoryName: "Select",
-                              subCategoryName: "Select");
-                        });
-                        clearSubCategoryDropdown();
-                      }
-                    },
-                    items: projectCategoriesDropDownList)),
-            SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Sub Category",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                child: DropdownButton<ProjectCategory>(
-                    value: defaultProjectSubCategory,
-                    isExpanded: true,
-                    underline: SizedBox(),
-                    onChanged: (ProjectCategory pc) {
-                      setState(() {
-                        defaultProjectSubCategory = pc;
-                      });
-                    },
-                    items: projectSubCategoriesDropDownList)),
-            SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Region",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                child: DropdownButton<String>(
-                    value: regionName,
-                    isExpanded: true,
-                    underline: SizedBox(),
-                    onChanged: (String rn) {
-                      if (rn == "Select") {
-                        setState(() {
-                          regionName = "Select";
-                        });
-                        clearCountryDropdown();
-                      } else {
-                        fetchCountriesByRegion(context, rn);
-                      }
-                    },
-                    items: regionDropDownList)),
-            SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text("Country",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                child: DropdownButton<String>(
-                    value: countryName,
-                    isExpanded: true,
-                    underline: SizedBox(),
-                    onChanged: (String newValue) {
-                      setState(() {
-                        countryName = newValue;
-                      });
-                    },
-                    items: countryDropDownList)),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
+    return AbsorbPointer(
+      absorbing: needToFreezeUi,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(10),
+          child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Worker Needed",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
+                children: [
+                  entryField("Title", titleCtl),
                   SizedBox(
                     height: 10,
                   ),
-                  TextField(
-                      controller: workerNeededCtl,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Todo Steps",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  Divider(thickness: 1, color: Colors.green),
+                  ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.all(8),
+                      itemCount: todoStepsControllers.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                            padding: EdgeInsets.all(5),
+                            child: TextField(
+                                controller: todoStepsControllers[index],
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Color(0xfff3f3f4),
+                                    filled: true))
+                        );
+                      }),
+                  Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              todoStepsControllers.add(new TextEditingController());
+                            });
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              if (todoStepsControllers.length > 0) {
+                                todoStepsControllers.removeLast();
+                              }
+                            });
+                          })
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Required Proofs",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  Divider(thickness: 1, color: Colors.green),
+                  ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.all(8),
+                      itemCount: requiredProofsControllers.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: EdgeInsets.all(5),
+                          child: TextField(
+                              controller: requiredProofsControllers[index],
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  fillColor: Color(0xfff3f3f4),
+                                  filled: true)),
+                        );
+                      }),
+                  Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              requiredProofsControllers
+                                  .add(new TextEditingController());
+                            });
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              if (requiredProofsControllers.length > 0) {
+                                requiredProofsControllers.removeLast();
+                              }
+                            });
+                          })
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Required Screenshots",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            controller: requiredScreenShotsCtl,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
                       ],
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          fillColor: Color(0xfff3f3f4),
-                          filled: true))
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Each Worker Earn",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  TextField(
-                      controller: eachWorkerEarnCtl,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Category",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                      child: DropdownButton<ProjectCategory>(
+                          value: defaultProjectCategory,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          onChanged: (ProjectCategory pc) {
+                            print("pc id ${pc.categoryId}");
+                            if (pc.categoryId != 0) {
+                              fetchSubCategoriesById(context, pc);
+                            } else {
+                              setState(() {
+                                defaultProjectCategory = new ProjectCategory(
+                                    id: 0,
+                                    categoryId: 0,
+                                    categoryName: "Select",
+                                    subCategoryName: "Select");
+                              });
+                              clearSubCategoryDropdown();
+                            }
+                          },
+                          items: projectCategoriesDropDownList)),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Sub Category",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                      child: DropdownButton<ProjectCategory>(
+                          value: defaultProjectSubCategory,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          onChanged: (ProjectCategory pc) {
+                            setState(() {
+                              defaultProjectSubCategory = pc;
+                            });
+                          },
+                          items: projectSubCategoriesDropDownList)),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Region",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                      child: DropdownButton<String>(
+                          value: regionName,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          onChanged: (String rn) {
+                            if (rn == "Select") {
+                              setState(() {
+                                regionName = "Select";
+                              });
+                              clearCountryDropdown();
+                            } else {
+                              fetchCountriesByRegion(context, rn);
+                            }
+                          },
+                          items: regionDropDownList)),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Country",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                      child: DropdownButton<String>(
+                          value: countryName,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              countryName = newValue;
+                            });
+                          },
+                          items: countryDropDownList)),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Worker Needed",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            controller: workerNeededCtl,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
                       ],
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          fillColor: Color(0xfff3f3f4),
-                          filled: true))
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Estimated Cost",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                      controller: estimatedCostCtl,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          fillColor: Color(0xfff3f3f4),
-                          filled: true))
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Estimated Day",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                      controller: estimatedDayCtl,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Each Worker Earn",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            controller: eachWorkerEarnCtl,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
                       ],
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          fillColor: Color(0xfff3f3f4),
-                          filled: true))
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Estimated Cost",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            controller: estimatedCostCtl,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Estimated Day",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            controller: estimatedDayCtl,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlineButton(
+                          onPressed: () {
+                            onFileSelect(context,"img");
+                          },
+                          child: Text("Select Image")),
+                      Text(fileInfo["imageName"]),
+                      OutlineButton(
+                          onPressed: () {
+                            setState(() {
+                              fileInfo["imageExt"] = null;
+                              fileInfo["imageName"] = "No file selected yet!";
+                              fileInfo["imageString"] = null;
+                            });
+                          },
+                          child: Text("Clear"))
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlineButton(
+                          onPressed: () {
+                            onFileSelect(context,"file");
+                          },
+                          child: Text("Select File")),
+                      Text(fileInfo["fileName"]),
+                      OutlineButton(
+                          onPressed: () {
+                            setState(() {
+                              fileInfo["fileExt"] = null;
+                              fileInfo["fileName"] = "No file selected yet!";
+                              fileInfo["fileString"] = null;
+                            });
+                          },
+                          child: Text("Clear"))
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlineButton(
+                          onPressed: () {
+                            if (userInfo['profileCompleted'] == 100) {
+                              onSave(context);
+                            } else {
+                              Alert.show(alertDialog, context, Alert.ERROR,
+                                  "To post a new job, you need to complete your profile 100%.");
+                            }
+                          },
+                          child: Text("Save")),
+                      OutlineButton(
+                          onPressed: () {
+                            onReset(context);
+                          },
+                          child: Text("Reset"))
+                    ],
+                  )
                 ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OutlineButton(
-                    onPressed: () {
-                      onFileSelect(context,"img");
-                    },
-                    child: Text("Select Image")),
-                Text(fileInfo["imageName"]),
-                OutlineButton(
-                    onPressed: () {
-                      setState(() {
-                        fileInfo["imageExt"] = null;
-                        fileInfo["imageName"] = "No file selected yet!";
-                        fileInfo["imageString"] = null;
-                      });
-                    },
-                    child: Text("Clear"))
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OutlineButton(
-                    onPressed: () {
-                      onFileSelect(context,"file");
-                    },
-                    child: Text("Select File")),
-                Text(fileInfo["fileName"]),
-                OutlineButton(
-                    onPressed: () {
-                      setState(() {
-                        fileInfo["fileExt"] = null;
-                        fileInfo["fileName"] = "No file selected yet!";
-                        fileInfo["fileString"] = null;
-                      });
-                    },
-                    child: Text("Clear"))
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OutlineButton(
-                    onPressed: () {
-                      if (userInfo['profileCompleted'] == 100) {
-                        onSave(context);
-                      } else {
-                        Alert.show(alertDialog, context, Alert.ERROR,
-                            "To post a new job, you need to complete your profile 100%.");
-                      }
-                    },
-                    child: Text("Save")),
-                OutlineButton(
-                    onPressed: () {
-                      onReset(context);
-                    },
-                    child: Text("Reset"))
-              ],
-            )
-          ],
+              )
+          ),
         ),
+        bottomNavigationBar: Visibility(
+          visible: needToFreezeUi,
+          child: Container(
+            color: Colors.yellow,
+            height: 50.0,
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 30,
+                  height: 30,
+                  child: alertIcon
+                ),
+                SizedBox(width: 10),
+                Text(alertText,
+                  style: TextStyle(
+                    fontSize: 17.0,
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Armata',
+                  )
+                )
+              ],
+            ),
+          )
+        )
+      )
+    );
+  }
+
+  Widget entryField(String title, TextEditingController controller) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  fillColor: Color(0xfff3f3f4),
+                  filled: true))
+        ],
       ),
     );
   }
 
   Future<void> fetchSubCategoriesById(
       BuildContext context, ProjectCategory pc) async {
-    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
 
     clearSubCategoryDropdown();
 
     var response = await get("$baseUrl/categories/sub/${pc.categoryId}");
+    print("response = $response");
     if (response.statusCode == 200) {
-      Navigator.of(context).pop(false);
+      setState(() {
+        needToFreezeUi = false;
+      });
       var res = jsonDecode(response.body);
-
       if (res['code'] == 200) {
         List<dynamic> projectSubCategories = res['projectCategories'];
         projectSubCategories.asMap().forEach((key, projectCategory) {
@@ -575,15 +652,18 @@ class PostState extends State<Post> {
             categoryId: null,
             categoryName: null,
           );
-          projectSubCategoriesDropDownList
-              .add(new DropdownMenuItem<ProjectCategory>(
+          projectSubCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
             value: pc,
             child: Text(pc.subCategoryName),
           ));
         });
       }
     } else {
-      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      setState(() {
+        needToFreezeUi = false;
+        alertIcon = Alert.showIcon(Alert.ERROR);
+        alertText = Alert.ERROR_MSG;
+      });
     }
 
     setState(() {
@@ -594,15 +674,12 @@ class PostState extends State<Post> {
   void clearSubCategoryDropdown() {
     setState(() {
       projectSubCategoriesDropDownList.clear();
-
       defaultProjectSubCategory = new ProjectCategory(
-          id: 0,
-          categoryId: 0,
-          categoryName: "Select",
-          subCategoryName: "Select");
-
-      projectSubCategoriesDropDownList
-          .add(new DropdownMenuItem<ProjectCategory>(
+        id: 0,
+        categoryId: 0,
+        categoryName: "Select",
+        subCategoryName: "Select");
+      projectSubCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
         value: defaultProjectSubCategory,
         child: Text("Select"),
       ));
@@ -611,13 +688,20 @@ class PostState extends State<Post> {
 
   Future<void> fetchCountriesByRegion(
       BuildContext context, String region) async {
-    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
 
     clearCountryDropdown();
 
     var response = await get("https://restcountries.eu/rest/v2/region/$region");
     if (response.statusCode == 200) {
-      Navigator.of(context).pop(false);
+      setState(() {
+        needToFreezeUi = false;
+      });
       var jsonResponse = jsonDecode(response.body);
       List<dynamic> countryNames = jsonResponse;
       countryNames.asMap().forEach((key, country) {
@@ -627,7 +711,11 @@ class PostState extends State<Post> {
         ));
       });
     } else {
-      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      setState(() {
+        needToFreezeUi = false;
+        alertIcon = Alert.showIcon(Alert.ERROR);
+        alertText = Alert.ERROR_MSG;
+      });
     }
 
     setState(() {
@@ -670,6 +758,7 @@ class PostState extends State<Post> {
         "workerNeeded": int.parse(workerNeededCtl.text),
         "estimatedDay": int.parse(estimatedDayCtl.text),
         "estimatedCost": int.parse(estimatedCostCtl.text),
+        "requiredScreenShots": int.parse(requiredScreenShotsCtl.text),
         "fileString" : fileInfo["fileString"],
         "fileExt" : fileInfo["fileExt"],
         "imageString" : fileInfo["imageString"],
@@ -683,9 +772,16 @@ class PostState extends State<Post> {
     String url = baseUrl + '/projects';
     Map<String, String> headers = {"Content-type": "application/json"};
 
-    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
+
     post(url, headers: headers, body: json.encode(request)).then((response){
-      Navigator.of(context).pop(false);
+      setState(() {
+        needToFreezeUi = false;
+      });
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body.data['code'] == 200) {
@@ -697,7 +793,11 @@ class PostState extends State<Post> {
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       }
     }).catchError((err){
-      Navigator.of(context).pop(false);
+      setState(() {
+        needToFreezeUi = false;
+        alertIcon = Alert.showIcon(Alert.ERROR);
+        alertText = Alert.ERROR_MSG;
+      });
     });
   }
 

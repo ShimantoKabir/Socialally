@@ -10,6 +10,7 @@ class Project {
   final String regionName;
   final String countryName;
   final int workerNeeded;
+  final int requiredScreenShots;
   final int estimatedDay;
   final int estimatedCost;
   final String imageUrl;
@@ -27,6 +28,7 @@ class Project {
     this.regionName,
     this.countryName,
     this.workerNeeded,
+    this.requiredScreenShots,
     this.estimatedDay,
     this.estimatedCost,
     this.imageUrl,

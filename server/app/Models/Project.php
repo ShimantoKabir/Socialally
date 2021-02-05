@@ -22,10 +22,9 @@ class Project extends Model
         'regionName',
         'countryName',
         'workerNeeded',
-        'requiredScreenShot',
+		'requiredScreenShots',
         'estimatedDay',
         'estimatedCost',
-        'applicantIds',
         'postedBy',
         'isFinished',
         'fileUrl',
@@ -39,5 +38,4 @@ class Project extends Model
         'todoSteps' => 'array',
         'requiredProofs' => 'array'
     ];
-
 }

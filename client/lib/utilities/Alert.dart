@@ -44,4 +44,15 @@ class Alert {
       return Text("Error");
     }
   }
+
+  static showIcon(int status) {
+    if (status == LOADING) {
+      return CircularProgressIndicator();
+    } else if (status == SUCCESS) {
+      return Icon(Icons.check_circle_rounded, color: Colors.green);
+    } else {
+      return Icon(Icons.error,color: Colors.red);
+    }
+  }
+
 }

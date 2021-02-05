@@ -261,6 +261,7 @@ class AvailableState extends State<Available> {
               regionName: project['regionName'],
               countryName: project['countryName'],
               workerNeeded: project['workerNeeded'],
+              requiredScreenShots: project['requiredScreenShots'],
               estimatedDay: project['estimatedDay'],
               imageUrl: project['imageUrl'],
               fileUrl: project['fileUrl'],

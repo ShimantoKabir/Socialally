@@ -47,7 +47,7 @@ getThemeData(TextTheme textTheme) {
   return ThemeData(
     primarySwatch: Colors.green,
     textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-      bodyText1: GoogleFonts.montserrat(textStyle: textTheme.bodyText1),
+      bodyText1: GoogleFonts.armata(textStyle: textTheme.bodyText1),
     ),
   );
 }

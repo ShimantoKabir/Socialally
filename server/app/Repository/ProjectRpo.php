@@ -37,6 +37,7 @@ class ProjectRpo
             $project->regionName = $rProject['regionName'];
             $project->countryName = $rProject['countryName'];
             $project->workerNeeded = $rProject['workerNeeded'];
+			$project->requiredScreenShots = $rProject['requiredScreenShots'];
             $project->estimatedDay = $rProject['estimatedDay'];
             $project->estimatedCost = $rProject['estimatedCost'];
             $project->postedBy = $rUserInfo['id'];
@@ -84,6 +85,7 @@ class ProjectRpo
                    Projects.title,
                    Projects.todoSteps,
                    Projects.requiredProofs,
+				   Projects.requiredScreenShots,
                    Projects.categoryId,
                    dpg.categoryName AS categoryName,
                    Projects.subCategoryId,
