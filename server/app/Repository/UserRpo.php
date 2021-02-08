@@ -6,6 +6,8 @@ use App\Helpers\TokenGenerator;
 use App\Models\ProjectCategory;
 use App\Models\UserInfo;
 use App\Jobs\MailSender;
+use App\Models\AppConstant;
+use App\Models\PaymentGateway;
 use Exception;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
@@ -46,7 +48,8 @@ class UserRpo
             $profileCompleted = $profileCompleted + 10;
         }
 
-        if (!is_null($userInfo['agreedTermsAndCondition'])
+        if (
+            !is_null($userInfo['agreedTermsAndCondition'])
             && !empty($userInfo['agreedTermsAndCondition'])
             && $userInfo['agreedTermsAndCondition'] == 1
         ) {
@@ -54,7 +57,6 @@ class UserRpo
         }
 
         return $profileCompleted;
-
     }
 
     public function register(Request $request)
@@ -73,7 +75,6 @@ class UserRpo
 
             $res['msg'] = 'A account already been created using the email !';
             $res['code'] = 404;
-
         } else {
 
             DB::beginTransaction();
@@ -87,22 +88,22 @@ class UserRpo
                 $userInfo->password = sha1($rUserInfo['password']);
                 $userInfo->ip = $request->ip();
                 $userInfo->token = $token;
-                // $userInfo->isEmailVerified = true;
+                $userInfo->isEmailVerified = true;
                 $userInfo->save();
 
-                $mailData = array(
-                    'email' => $userInfo['email'],
-                    'verificationLink' => $clientUrl . '/#/email-verification/' . $token
-                );
+                // $mailData = array(
+                //     'email' => $userInfo['email'],
+                //     'verificationLink' => $clientUrl . '/#/email-verification/' . $token
+                // );
 
-                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
-                    $message->to($mailData['email'])->subject('Email Verification');
-                });
+                // Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+                //     $message->to($mailData['email'])->subject('Email Verification');
+                // });
 
                 // Queue::push(new MailSender($mailData));
 
-                $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
-                // $res['msg'] = "Registration successful!";
+                // $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
+                $res['msg'] = "Registration successful!";
                 $res['code'] = 200;
 
                 DB::commit();
@@ -111,13 +112,10 @@ class UserRpo
                 DB::rollback();
                 $res['msg'] = $e->getMessage();
                 $res['code'] = 404;
-
             }
-
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-
     }
 
     public function verifyEmail(Request $request)
@@ -153,14 +151,11 @@ class UserRpo
 
                     $res['msg'] = "Email verification successful!";
                     $res['code'] = 200;
-
                 } else {
 
                     $res['msg'] = "Email verification id didn't match!";
                     $res['code'] = 404;
-
                 }
-
             }
 
             DB::commit();
@@ -169,11 +164,9 @@ class UserRpo
             DB::rollback();
             $res['msg'] = $e->getMessage();
             $res['code'] = 404;
-
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-
     }
 
     public function login(Request $request)
@@ -225,6 +218,9 @@ class UserRpo
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
                         'imageUrl' => $userInfo['imageUrl'],
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
+                        'paymentGateways' => PaymentGateway::all(),
+                        'takePerDollar' => AppConstant::where("appConstantName", "takePerDollar")->first(),
+                        'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first()
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(
@@ -234,8 +230,6 @@ class UserRpo
 
                     $res['msg'] = "Login successful!";
                     $res['code'] = 200;
-
-
                 } else {
                     $res['msg'] = "This email and password did not with any account!";
                     $res['code'] = 404;
@@ -251,11 +245,9 @@ class UserRpo
             DB::rollback();
             $res['msg'] = $e->getMessage();
             $res['code'] = 404;
-
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-
     }
 
     public function update(Request $request)
@@ -307,11 +299,9 @@ class UserRpo
             DB::rollback();
             $res['msg'] = $e->getMessage();
             $res['code'] = 404;
-
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-
     }
 
     public function uploadImage(Request $request)
@@ -333,34 +323,32 @@ class UserRpo
         try {
 
             $userInfo = UserInfo::where('id', $id)->first();
-            $imageName = Uuid::uuid().".".$fileExt;
+            $imageName = Uuid::uuid() . "." . $fileExt;
 
-            if (is_null($userInfo['imageUrl'])){
+            if (is_null($userInfo['imageUrl'])) {
 
-                $imageUrl = self::uploadFileToFtp($imageString,$id,$appUrl,$imageName);
+                $imageUrl = self::uploadFileToFtp($imageString, $id, $appUrl, $imageName);
                 $res['msg'] = "Image uploaded successfully!";
                 $res['code'] = 200;
+            } else {
 
-            }else {
-
-                $imagPath = str_replace($appUrl,"",$userInfo['imageUrl']);
+                $imagPath = str_replace($appUrl, "", $userInfo['imageUrl']);
                 $isImageExist = Storage::disk("ftp")->exists($imagPath);
-                if ($isImageExist){
+                if ($isImageExist) {
                     Storage::disk("ftp")->delete($imagPath);
-                    $imageUrl = self::uploadFileToFtp($imageString,$id,$appUrl,$imageName);
+                    $imageUrl = self::uploadFileToFtp($imageString, $id, $appUrl, $imageName);
                     $res['msg'] = "Image replaced successfully!";
                     $res['code'] = 200;
-                }else {
+                } else {
                     $imageUrl = "Image url not found!";
                     $res['msg'] = $imageUrl;
                     $res['code'] = 404;
                 }
-
             }
 
             $res['userInfo'] = [
-              'id' => $id,
-              'imageUrl' => $imageUrl
+                'id' => $id,
+                'imageUrl' => $imageUrl
             ];
 
             DB::commit();
@@ -369,22 +357,19 @@ class UserRpo
             DB::rollback();
             $res['msg'] = $e->getMessage();
             $res['code'] = 404;
-
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-
     }
 
-    private static function uploadFileToFtp($imageString, $id, $appUrl,$imageName)
+    private static function uploadFileToFtp($imageString, $id, $appUrl, $imageName)
     {
-        $imagePath = 'images/'.$imageName;
+        $imagePath = 'images/' . $imageName;
         Storage::disk('ftp')->put($imagePath, base64_decode($imageString));
-        $imageUrl = $appUrl.$imagePath;
+        $imageUrl = $appUrl . $imagePath;
         UserInfo::where('id', $id)->update(array(
             'imageUrl' => $imageUrl
         ));
         return $imageUrl;
     }
-
 }

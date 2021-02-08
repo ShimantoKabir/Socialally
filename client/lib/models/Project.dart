@@ -1,26 +1,36 @@
 class Project {
-  final int id;
-  final String title;
-  final List<String> todoSteps;
-  final List<String> requiredProofs;
-  final int categoryId;
-  final String categoryName;
-  final int subCategoryId;
-  final String subCategoryName;
-  final String regionName;
-  final String countryName;
-  final int workerNeeded;
-  final int requiredScreenShots;
-  final int estimatedDay;
-  final int estimatedCost;
-  final String imageUrl;
-  final String fileUrl;
+  int id;
+  String title;
+  List<String> todoSteps;
+  List<String> requiredProofs;
+  List<String> givenProofs;
+  List<String> givenScreenshotUrls;
+  int categoryId;
+  String categoryName;
+  int subCategoryId;
+  String subCategoryName;
+  String regionName;
+  String countryName;
+  int workerNeeded;
+  int requiredScreenShots;
+  int estimatedDay;
+  int estimatedCost;
+  String imageUrl;
+  String fileUrl;
+  int type;
+  int proofSubmissionId;
+  int totalApplied;
+  String publisherName;
+  String applicantName;
+  String status;
 
   Project({
     this.id,
     this.title,
     this.todoSteps,
     this.requiredProofs,
+    this.givenProofs,
+    this.givenScreenshotUrls,
     this.categoryId,
     this.categoryName,
     this.subCategoryId,
@@ -32,6 +42,12 @@ class Project {
     this.estimatedDay,
     this.estimatedCost,
     this.imageUrl,
-    this.fileUrl
+    this.fileUrl,
+    this.type,
+    this.proofSubmissionId,
+    this.totalApplied,
+    this.publisherName,
+    this.applicantName,
+    this.status
   });
 }

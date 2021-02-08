@@ -50,15 +50,13 @@ class CategorySeeder extends Seeder
 
         DB::table('ProjectCategories')->truncate();
 
-        foreach ($categories as $key=>$val){
+        foreach ($categories as $key => $val) {
 
             DB::table('ProjectCategories')->insert([
                 "categoryId" => $val['categoryId'],
                 "categoryName" => $val['categoryName'],
                 "subCategoryName" => $val['subCategoryName']
             ]);
-
         }
-
     }
 }

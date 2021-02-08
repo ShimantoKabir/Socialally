@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\ProjectCategoryCtl;
-use App\Http\Controllers\ProjectCtl;
-use App\Http\Controllers\ProofSubmissionCtl;
 use App\Http\Controllers\TestCtl;
+use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\UserInfoCtl;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TransactionCtl;
+use App\Http\Controllers\ProjectCategoryCtl;
+use App\Http\Controllers\ProofSubmissionCtl;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +35,14 @@ Route::get('/categories/sub/{categoryId}', [ProjectCategoryCtl::class, 'getSubCa
 
 // project
 Route::post('/projects', [ProjectCtl::class, 'create']);
+Route::get('/projects/query', [ProjectCtl::class, 'readByQuery']);
+// ?accept-publisher=0&user-info-id=2&par-page=2&page-index=5
 Route::get('/projects', [ProjectCtl::class, 'read']);
 
 // proof submission
 Route::post('/proof-submissions', [ProofSubmissionCtl::class, 'create']);
 Route::put('/proof-submissions', [ProofSubmissionCtl::class, 'update']);
-Route::get('/proof-submissions/{projectId}', [ProofSubmissionCtl::class, 'readByProjectId']);
+
+// transactions
+Route::post('/transactions', [TransactionCtl::class, 'create']);
+Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);

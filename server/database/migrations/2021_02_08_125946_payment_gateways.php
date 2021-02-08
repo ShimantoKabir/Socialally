@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ProofSubmissions extends Migration
+class PaymentGateways extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class ProofSubmissions extends Migration
      */
     public function up()
     {
-        Schema::create('ProofSubmissions', function (Blueprint $table) {
+        Schema::create('PaymentGateways', function (Blueprint $table) {
             $table->id();
-            $table->integer('projectId');
-            $table->integer('submittedBy');
-            $table->json('givenProofs');
-            $table->json("givenScreenshotUrls");
-            $table->string("status")->default("Pending")->comment("Pending, Accepted, Declined");
+            $table->string('paymentGatewayName');
+            $table->string('cashInNumber');
+            $table->string('personalNumber');
+            $table->string('agentNumber');
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();
@@ -33,6 +32,6 @@ class ProofSubmissions extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("ProofSubmissions");
+        Schema::dropIfExists("PaymentGateways");
     }
 }

@@ -47,12 +47,38 @@ class Alert {
 
   static showIcon(int status) {
     if (status == LOADING) {
-      return CircularProgressIndicator();
+      return CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+        strokeWidth: 1,
+      );
     } else if (status == SUCCESS) {
-      return Icon(Icons.check_circle_rounded, color: Colors.green);
+      return Icon(Icons.check_circle_rounded, color: Colors.red);
     } else {
       return Icon(Icons.error,color: Colors.red);
     }
+  }
+
+  static Widget addBottomLoader(bool needToFreezeUi,Widget alertIcon,String alertText){
+    return Visibility(
+      visible: needToFreezeUi,
+      child: Container(
+        color: Colors.black12,
+        height: 50.0,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(width: 30, height: 30, child: alertIcon),
+            SizedBox(width: 10),
+            Text(alertText,
+              style: TextStyle(
+                color: Colors.black
+              )
+            )
+          ],
+        ),
+      )
+    );
   }
 
 }

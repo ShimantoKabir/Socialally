@@ -11,23 +11,25 @@ class ProjectCtl extends Controller
     private $projectRpo;
 
     /**
-     * UserInfoCtl constructor.
+     * ProjectCtl constructor.
      */
     public function __construct()
     {
         $this->projectRpo = new ProjectRpo();
     }
 
-    public function create(Request $request){
-
+    public function create(Request $request)
+    {
         return $this->projectRpo->create($request);
-
     }
 
-    public function read(Request $request){
+    public function readByQuery(Request $request)
+    {
+        return $this->projectRpo->readByQuery($request);
+    }
 
+    public function read(Request $request)
+    {
         return $this->projectRpo->read($request);
-
     }
-
 }

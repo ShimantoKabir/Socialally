@@ -21,19 +21,11 @@ class ProofSubmissionCtl extends Controller
 
     public function create(Request $request)
     {
-
         return $this->proofSubmissionRpo->create($request);
     }
 
     public function update(Request $request)
     {
-
         return $this->proofSubmissionRpo->update($request);
-    }
-
-    public function readByProjectId(Request $request, $projectId)
-    {
-
-        return $this->proofSubmissionRpo->readByProjectId($request, $projectId);
     }
 }

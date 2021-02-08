@@ -9,7 +9,7 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-const baseUrl = "http://localhost:8000/api";
+const baseUrl = "http://127.0.0.1:8000/api";
 // const baseUrl = "http://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
@@ -61,34 +61,52 @@ List<Node> userDashboardMenus = [
   Node(
       label: 'Available Job',
       key: '/job/available',
-      icon: NodeIcon.fromIconData(Icons.work_outline)),
+      icon: NodeIcon.fromIconData(Icons.extension)),
   Node(
     label: 'Job',
     key: '/job/mine',
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
-          label: 'Mine',
-          key: '/job/mine',
-          icon: NodeIcon.fromIconData(Icons.event_available)),
-      Node(
           label: 'Post',
           key: '/job/post',
+          icon: NodeIcon.fromIconData(Icons.post_add)),
+      Node(
+          label: 'Posted',
+          key: '/job/posted',
           icon: NodeIcon.fromIconData(Icons.event_available)),
       Node(
-          label: 'Finished',
-          key: '/job/finished',
-          icon: NodeIcon.fromIconData(Icons.event_busy))
+          label: 'Accept',
+          key: '/job/accept',
+          icon: NodeIcon.fromIconData(Icons.done_all_outlined)),
+      Node(
+          label: 'Applied',
+          key: '/job/applied',
+          icon: NodeIcon.fromIconData(Icons.pending_actions_sharp))
     ],
   ),
   Node(
-      label: 'Deposit',
-      key: '5',
-      icon: NodeIcon.fromIconData(Icons.monetization_on)),
-  Node(
       label: 'Wallet',
-      key: '6',
-      icon: NodeIcon.fromIconData(Icons.account_balance_wallet_outlined)),
+      key: 'lol',
+      icon: NodeIcon.fromIconData(Icons.monetization_on),
+      children: [
+        Node(
+          label: 'Deposit',
+          key: '/wallet/deposit',
+          icon: NodeIcon.fromIconData(Icons.arrow_downward_sharp),
+        ),
+        Node(
+          label: 'Withdraw',
+          key: '/wallet/withdraw',
+          icon: NodeIcon.fromIconData(Icons.arrow_upward),
+        ),
+        Node(
+          label: 'History',
+          key: '/wallet/history',
+          icon: NodeIcon.fromIconData(Icons.history),
+        )
+      ]
+  ),
   Node(
       label: 'Advertisement',
       key: '7',
@@ -109,25 +127,21 @@ List<Node> userDashboardMenus = [
 
 TreeViewTheme treeViewTheme = TreeViewTheme(
   expanderTheme: ExpanderThemeData(
-    type: ExpanderType.caret,
+    type: ExpanderType.chevron,
     modifier: ExpanderModifier.none,
     position: ExpanderPosition.start,
     size: 20,
+    color: Colors.green
   ),
   labelStyle: TextStyle(
     fontSize: 16,
     letterSpacing: 0.3,
   ),
-  parentLabelStyle: TextStyle(
-    fontSize: 16,
-    letterSpacing: 0.1,
-    fontWeight: FontWeight.w800,
-  ),
   iconTheme: IconThemeData(
     size: 18,
     color: Colors.grey.shade800,
   ),
-  colorScheme: ColorScheme.light(),
+  colorScheme: ColorScheme.light(onSurface: Colors.green,surface: Colors.green),
 );
 
 List<DropdownMenuItem<String>> regionDropDownList = [
@@ -170,5 +184,14 @@ List<DropdownMenuItem<ProjectCategory>> projectSubCategoriesDropDownList = [
   return DropdownMenuItem<ProjectCategory>(
     value: projectCategory,
     child: Text(projectCategory.categoryName),
+  );
+}).toList();
+
+List<DropdownMenuItem<String>> paymentGatewayDropDownList = [
+  'Select'
+].map<DropdownMenuItem<String>>((String value) {
+  return DropdownMenuItem<String>(
+    value: value,
+    child: Text(value),
   );
 }).toList();

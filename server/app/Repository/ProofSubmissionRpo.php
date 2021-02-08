@@ -74,31 +74,11 @@ class ProofSubmissionRpo
                 'status' => $rProofSubmission['status'],
             ));
 
+            DB::commit();
             $res['code'] = 200;
             $res['msg'] = "Proof submission status updated successfully!";
         } catch (Exception $e) {
             DB::rollback();
-            $res['code'] = $e->getCode();
-            $res['msg'] = $e->getMessage();
-        }
-
-        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
-    }
-
-    public function readByProjectId(Request $request, $projectId)
-    {
-
-        $res = [
-            "code" => "",
-            "msg" => ""
-        ];
-
-        try {
-
-            $res["proofSubmissions"] = ProofSubmission::where("projectId", $projectId)->get();
-            $res['code'] = 200;
-            $res['msg'] = "Proof submissions fetched successfully!";
-        } catch (Exception $e) {
             $res['code'] = $e->getCode();
             $res['msg'] = $e->getMessage();
         }

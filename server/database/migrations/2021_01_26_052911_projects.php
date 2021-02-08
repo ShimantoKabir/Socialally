@@ -23,12 +23,12 @@ class Projects extends Migration
             $table->string('regionName');
             $table->string('countryName');
             $table->integer('workerNeeded');
-			$table->integer('requiredScreenShots')->nullable();
+            $table->integer('requiredScreenShots')->nullable();
             $table->integer('estimatedDay');
             $table->integer('estimatedCost');
             $table->string('fileUrl')->nullable();
             $table->string('imageUrl')->nullable();
-            $table->integer('postedBy');
+            $table->integer('publishedBy');
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();

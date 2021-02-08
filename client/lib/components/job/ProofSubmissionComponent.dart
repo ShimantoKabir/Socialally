@@ -8,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:client/constants.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:http/http.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProofSubmissionComponent extends StatefulWidget {
   ProofSubmissionComponent(
@@ -38,6 +39,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
   Widget alertIcon;
   String alertText;
   bool needToFreezeUi;
+  var eachWorkerEarn;
 
   @override
   void initState() {
@@ -45,8 +47,24 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
     alertText = "No operation running.";
     alertIcon = Container();
     needToFreezeUi = false;
-    eventHub.fire("viewTitle", "Proof Submission");
+    eventHub.fire("viewTitle", project.type == 1 ? "Proof Submission" : "Proof Investigation");
     givenProofsControllers.add(new TextEditingController());
+    eachWorkerEarn = project.estimatedCost/project.workerNeeded;
+
+    if(project.type == 2){
+
+      givenProofsControllers.clear();
+      project.givenProofs.forEach((element) {
+        TextEditingController t = new TextEditingController();
+        t.text = element;
+        givenProofsControllers.add(t);
+      });
+
+      project.givenScreenshotUrls.forEach((element) {
+        givenScreenShots.add(new ProofSubmission(imageUrl: element));
+      });
+
+    }
   }
 
   @override
@@ -55,175 +73,180 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
     return AbsorbPointer(
       absorbing: needToFreezeUi,
       child: Scaffold(
-          body: SingleChildScrollView(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                  width: screenSize.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        project.title,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20
-                        ),
-                      ),
-                      Text(
-                        "${project.regionName}/${project.countryName}",
-                      )
-                    ],
-                  ),
-                  decoration: headingDecoration(),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 200,
-                      padding: EdgeInsets.all(5),
-                      child: Column(
-                        children: [
-                          Text("32/20 Submitted"),
-                          SizedBox(height: 5),
-                          LinearProgressIndicator(
-                            backgroundColor: Colors.grey,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.amber),
-                            value: 50 / 100,
-                          )
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.grey)
-                      ),
-                    ),
-                    Container(
-                      width: 200,
-                      padding: EdgeInsets.all(5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text("0.05"),
-                          SizedBox(width: 5),
-                          Icon(Icons.monetization_on, color: Colors.green, size: 25)
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.grey)
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(height: 20),
-                Container(
-                  height: 300,
-                  width: screenSize.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: showProjectPic(project.imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                width: screenSize.width,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${project.categoryName}/${project.subCategoryName}",
-                    ),
-                    Text(
-                      "${project.estimatedDay} days left",
+                      project.title,
+                      textAlign: TextAlign.left,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.red
+                          fontSize: 20
                       ),
+                    ),
+                    Text(
+                      "${project.regionName}/${project.countryName}",
                     )
                   ],
                 ),
-                SizedBox(height: 20),
-                Container(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      "Todo Steps",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15
-                      ),
-                    )
+                decoration: headingDecoration(),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 200,
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      children: [
+                        Text("${project.totalApplied}/${project.workerNeeded} Applied"),
+                        SizedBox(height: 5),
+                        LinearProgressIndicator(
+                          backgroundColor: Colors.grey,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.amber),
+                          value: project.totalApplied / project.workerNeeded,
+                        )
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey)
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("${eachWorkerEarn.round()}"),
+                        SizedBox(width: 5),
+                        Icon(Icons.monetization_on, color: Colors.green, size: 25)
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey)
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 20),
+              Container(
+                height: 300,
+                width: screenSize.width,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: showProjectPic(project.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                SizedBox(height: 10),
-                ListView.builder(
-                    padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: project.todoSteps.length,
-                    itemBuilder: (context, j) {
-                      if (project.todoSteps.length == 0) {
-                        return Text("No given proof found!");
-                      } else {
-                        return Text("${j + 1}. ${project.todoSteps[j]}");
-                      }
-                    }
-                ),
-                SizedBox(height: 20),
-                Container(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      "Required Proofs",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15
-                      ),
-                    )
-                ),
-                SizedBox(height: 10),
-                ListView.builder(
-                    padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: project.requiredProofs.length,
-                    itemBuilder: (context, j) {
-                      if (project.requiredProofs.length == 0) {
-                        return Text("No given proof found!");
-                      } else {
-                        return Text("${j + 1}. ${project.requiredProofs[j]}");
-                      }
-                    }
-                ),
-                SizedBox(height: 20),
-                Align(
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${project.categoryName}/${project.subCategoryName}"
+                  ),
+                  Text(
+                    "${project.estimatedDay} Estimated Day"
+                  ),
+                  Text(
+                    "Published By: ${project.publisherName}",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 20),
+              Container(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Given Proofs",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                ),
-                Divider(thickness: 1, color: Colors.green),
-                ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.all(8),
-                    itemCount: givenProofsControllers.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: EdgeInsets.all(5),
-                        child: TextField(
-                            controller: givenProofsControllers[index],
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true)),
-                      );
-                    }),
-                Row(
+                  child: Text(
+                    "Todo Steps",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15
+                    ),
+                  )
+              ),
+              SizedBox(height: 10),
+              ListView.builder(
+                  padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: project.todoSteps.length,
+                  itemBuilder: (context, j) {
+                    if (project.todoSteps.length == 0) {
+                      return Text("No todo step found!");
+                    } else {
+                      return Text("${j + 1}. ${project.todoSteps[j]}");
+                    }
+                  }
+              ),
+              SizedBox(height: 20),
+              Container(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    "Required Proofs",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15
+                    ),
+                  )
+              ),
+              SizedBox(height: 10),
+              ListView.builder(
+                  padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: project.requiredProofs.length,
+                  itemBuilder: (context, j) {
+                    if (project.requiredProofs.length == 0) {
+                      return Text("No required proof found!");
+                    } else {
+                      return Text("${j + 1}. ${project.requiredProofs[j]}");
+                    }
+                  }
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Text("Given Proofs",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              ),
+              Divider(thickness: 1, color: Colors.green),
+              ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.all(8),
+                  itemCount: givenProofsControllers.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: EdgeInsets.all(5),
+                      child: TextField(
+                          readOnly: project.type == 1 ? false : true,
+                          controller: givenProofsControllers[index],
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Color(0xfff3f3f4),
+                              filled: true)),
+                    );
+                  }),
+              Visibility(
+                visible: project.type == 1 ? true : false,
+                child: Row(
                   children: [
                     IconButton(
                         icon: Icon(Icons.add),
@@ -242,40 +265,65 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                             }
                           });
                         })
-                  ],
-                ),
-                SizedBox(height: 20),
-                Align(
+                  ]
+                )
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Text("Given Screenshots (${project.requiredScreenShots}/${givenScreenShots.length})",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              ),
+              Visibility(
+                visible: givenScreenShots.length == 0,
+                child: Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Given ScreenShots (${project.requiredScreenShots}/${givenScreenShots.length})",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                ),
-                Visibility(
-                  visible: givenScreenShots.length == 0,
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      child: Text("No screenshot selected yet!",style: TextStyle(color: Colors.red)),
-                      padding: EdgeInsets.fromLTRB(20,10,0,0),
-                    ),
+                  child: Padding(
+                    child: Text("No screenshot selected yet!",style: TextStyle(color: Colors.red)),
+                    padding: EdgeInsets.fromLTRB(20,10,0,0),
                   ),
                 ),
-                ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.all(10),
-                    itemCount: givenScreenShots.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                          padding: EdgeInsets.all(5),
-                          child: Image.memory(
-                            base64.decode(givenScreenShots[index].imageString),
-                            width: 200,
-                            height: 200,
-                          )
-                      );
-                    }),
-                Row(
+              ),
+              ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                padding: EdgeInsets.all(10),
+                itemCount: givenScreenShots.length,
+                itemBuilder: (BuildContext context, int index) {
+                  if(project.type == 1){
+                    return Container(
+                      padding: EdgeInsets.all(5),
+                      child: Image.memory(
+                        base64.decode(givenScreenShots[index].imageString),
+                        width: 200,
+                        height: 200,
+                      )
+                    );
+                  }else {
+                    return InkWell(
+                      child: Container(
+                        margin: EdgeInsets.all(20),
+                        height: 300,
+                        width: screenSize.width,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: showProjectPic(givenScreenShots[index].imageUrl),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      onTap: (){
+                        if(project.type == 2){
+                          openFile(givenScreenShots[index].imageUrl,context);
+                        }
+                      },
+                    );
+                  }
+                }
+              ),
+              Visibility(
+                visible: project.type == 1 ? true : false,
+                child: Row(
                   children: [
                     IconButton(
                         icon: Icon(Icons.add),
@@ -298,61 +346,58 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                           });
                         })
                   ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
+                )
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Visibility(
+                  visible: project.type == 1 ? true : false,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlineButton(
+                          onPressed: () {
+                            if (userInfo['profileCompleted'] == 100) {
+                              onSave(context);
+                            } else {
+                              Alert.show(alertDialog, context, Alert.ERROR,
+                                  "To post a new job, you need to complete your profile 100%.");
+                            }
+                          },
+                          child: Text("Save")),
+                      OutlineButton(
+                          onPressed: () {
+
+                          },
+                          child: Text("Reset")
+                      )
+                    ],
+                  )
+              ),
+              Visibility(
+                visible: project.type == 2 ? project.status != null && project.status == "Pending" ? true : false : false,
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlineButton(
                         onPressed: () {
-                          if (userInfo['profileCompleted'] == 100) {
-                            onSave(context);
-                          } else {
-                            Alert.show(alertDialog, context, Alert.ERROR,
-                                "To post a new job, you need to complete your profile 100%.");
-                          }
+                          onProofSubmissionStatusChange(context,"Accepted");
                         },
-                        child: Text("Save")),
+                        child: Text("Accept")),
                     OutlineButton(
                         onPressed: () {
-
+                          onProofSubmissionStatusChange(context,"Declined");
                         },
-                        child: Text("Reset")
+                        child: Text("Declined")
                     )
                   ],
                 )
-              ],
-            ),
-          ),
-          bottomNavigationBar: Visibility(
-              visible: needToFreezeUi,
-              child: Container(
-                color: Colors.yellow,
-                height: 50.0,
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                        width: 30,
-                        height: 30,
-                        child: alertIcon
-                    ),
-                    SizedBox(width: 10),
-                    Text(alertText,
-                        style: TextStyle(
-                          fontSize: 17.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Armata',
-                        )
-                    )
-                  ],
-                ),
               )
-          )
+            ],
+          ),
+        ),
+        bottomNavigationBar: Alert.addBottomLoader(needToFreezeUi, alertIcon, alertText)
       )
     );
   }
@@ -362,6 +407,14 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       return AssetImage("assets/images/bg_img_2.png");
     } else {
       return NetworkImage(imageUrl);
+    }
+  }
+
+  openFile(String url,BuildContext context) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, "Can't open any file!");
     }
   }
 
@@ -459,6 +512,48 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       });
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
+  }
+
+  void onProofSubmissionStatusChange(BuildContext context, String status) {
+
+    var request = {
+      "proofSubmission": {
+        "id": project.proofSubmissionId,
+        "status": status
+      }
+    };
+
+    String url = baseUrl + '/proof-submissions';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
+
+    put(url, headers: headers, body: json.encode(request)).then((response){
+      setState(() {
+        needToFreezeUi = false;
+      });
+
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body['code'] == 200) {
+          eventHub.fire("redirectToAcceptJob");
+        }else {
+          Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err){
+      setState(() {
+        needToFreezeUi = false;
+      });
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
+
   }
 
 }

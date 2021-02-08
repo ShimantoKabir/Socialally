@@ -39,6 +39,9 @@ class ProfileState extends State<Profile> {
   bool agreedTermsAndCondition;
   bool wantNewsLetterNotification;
   ImageProvider<Object> profileImageWidget;
+  Widget alertIcon;
+  String alertText;
+  bool needToFreezeUi;
 
   @override
   void initState() {
@@ -50,6 +53,9 @@ class ProfileState extends State<Profile> {
     firstNameCtl.text = userInfo['firstName'];
     lastNameCtl.text = userInfo['lastName'];
     contactNumberCtl.text = userInfo['contactNumber'].toString();
+    alertText = "No operation running.";
+    alertIcon = Container();
+    needToFreezeUi = false;
 
     if (userInfo['regionName'] == null) {
       regionName = "Select";
@@ -90,173 +96,180 @@ class ProfileState extends State<Profile> {
 
     showProfilePic(userInfo);
 
-    if(userInfo['contactNumber'] == null){
+    if (userInfo['contactNumber'] == null) {
       contactNumberCtl.clear();
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        child: Center(
+    return AbsorbPointer(
+      absorbing: needToFreezeUi,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(10),
+          child: Center(
             child: Column(
-      children: [
-        Row(
-          children: <Widget>[
-            Padding(
-                padding: EdgeInsets.all(10.0),
-                child: InkWell(
-                  child: Container(
-                    height: 150.0,
-                    width: 150.0,
-                    decoration: new BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: new DecorationImage(
-                          fit: BoxFit.cover,
-                          image: profileImageWidget),
-                    ),
+              children: [
+                Row(
+                  children: <Widget>[
+                    Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: InkWell(
+                          child: Container(
+                            height: 150.0,
+                            width: 150.0,
+                            decoration: new BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: new DecorationImage(
+                                  fit: BoxFit.cover, image: profileImageWidget),
+                            ),
+                          ),
+                          onTap: () {},
+                        )),
+                    InkWell(
+                      onTap: () {
+                        onProfilePicUpload(context);
+                      },
+                      child: Icon(Icons.camera_alt),
+                    )
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Email",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                          readOnly: true,
+                          controller: emailCtl,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Color(0xfff3f3f4),
+                              filled: true))
+                    ],
                   ),
-                  onTap: () {},
-                )),
-            InkWell(
-              onTap: () {
-                onProfilePicUpload(context);
-              },
-              child: Icon(Icons.camera_alt),
+                ),
+                entryField("First Name", firstNameCtl),
+                entryField("Last Name", lastNameCtl),
+                entryField("Contact Number", contactNumberCtl),
+                entryField("Password", passwordCtl),
+                SizedBox(
+                  height: 5,
+                ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text("Region",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                    child: DropdownButton<String>(
+                        value: regionName,
+                        isExpanded: true,
+                        underline: SizedBox(),
+                        onChanged: (String newValue) {
+                          fetchCountriesByRegion(context, newValue);
+                        },
+                        items: regionDropDownList)),
+                SizedBox(
+                  height: 20,
+                ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text("Country",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                    child: DropdownButton<String>(
+                        value: countryName,
+                        isExpanded: true,
+                        underline: SizedBox(),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            countryName = newValue;
+                          });
+                        },
+                        items: countryDropDownList)),
+                SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: agreedTermsAndCondition,
+                      onChanged: (value) {
+                        setState(() {
+                          agreedTermsAndCondition = value;
+                        });
+                      },
+                    ),
+                    Text('Agreed terms & condition')
+                  ],
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: wantNewsLetterNotification,
+                      onChanged: (value) {
+                        setState(() {
+                          wantNewsLetterNotification = value;
+                        });
+                      },
+                    ),
+                    Text('Want news letter notification.')
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlineButton(
+                        onPressed: () {
+                          onSave(context);
+                        },
+                        child: Text("Save")),
+                    OutlineButton(
+                        onPressed: () {
+                          onReset(context);
+                        },
+                        child: Text("Reset"))
+                  ],
+                )
+              ]
             )
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
+          )
         ),
-        Container(
-          margin: EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                "Email",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextField(
-                  readOnly: true,
-                  controller: emailCtl,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: Color(0xfff3f3f4),
-                      filled: true))
-            ],
-          ),
-        ),
-        entryField("First Name", firstNameCtl),
-        entryField("Last Name", lastNameCtl),
-        entryField("Contact Number", contactNumberCtl),
-        entryField("Password", passwordCtl),
-        SizedBox(
-          height: 5,
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Text("Region",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-            child: DropdownButton<String>(
-                value: regionName,
-                isExpanded: true,
-                underline: SizedBox(),
-                onChanged: (String newValue) {
-                  fetchCountriesByRegion(context, newValue);
-                },
-                items: regionDropDownList)),
-        SizedBox(
-          height: 20,
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Text("Country",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-            child: DropdownButton<String>(
-                value: countryName,
-                isExpanded: true,
-                underline: SizedBox(),
-                onChanged: (String newValue) {
-                  setState(() {
-                    countryName = newValue;
-                  });
-                },
-                items: countryDropDownList)),
-        SizedBox(
-          height: 30,
-        ),
-        Row(
-          children: [
-            Checkbox(
-              value: agreedTermsAndCondition,
-              onChanged: (value) {
-                setState(() {
-                  agreedTermsAndCondition = value;
-                });
-              },
-            ),
-            Text('Agreed terms & condition')
-          ],
-        ),
-        Row(
-          children: [
-            Checkbox(
-              value: wantNewsLetterNotification,
-              onChanged: (value) {
-                setState(() {
-                  wantNewsLetterNotification = value;
-                });
-              },
-            ),
-            Text('Want news letter notification.')
-          ],
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OutlineButton(
-                onPressed: () {
-                  onSave(context);
-                },
-                child: Text("Save")),
-            OutlineButton(
-                onPressed: () {
-                  onReset(context);
-                },
-                child: Text("Reset"))
-          ],
-        )
-      ],
-    )));
+        bottomNavigationBar: Alert.addBottomLoader(needToFreezeUi, alertIcon, alertText)
+      )
+    );
   }
 
   Widget entryField(String title, TextEditingController controller) {
@@ -354,7 +367,12 @@ class ProfileState extends State<Profile> {
 
   Future<void> fetchCountriesByRegion(
       BuildContext context, String region) async {
-    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
 
     countryDropDownList.clear();
 
@@ -366,8 +384,10 @@ class ProfileState extends State<Profile> {
     countryName = "Select";
 
     var response = await get("https://restcountries.eu/rest/v2/region/$region");
+    setState(() {
+      needToFreezeUi = false;
+    });
     if (response.statusCode == 200) {
-      Navigator.of(context).pop(false);
       var jsonResponse = jsonDecode(response.body);
       List<dynamic> countryNames = jsonResponse;
       countryNames.asMap().forEach((key, country) {
@@ -401,15 +421,23 @@ class ProfileState extends State<Profile> {
 
   void onSave(BuildContext context) {
     bool isInputVerified = verifyInput(context);
-    print("user info on save = $userInfo");
 
     if (isInputVerified) {
       var request = {"userInfo": userInfo};
-      Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+
+      setState(() {
+        needToFreezeUi = true;
+        alertIcon = Alert.showIcon(Alert.LOADING);
+        alertText = Alert.LOADING_MSG;
+      });
+
       HttpHandler().createPut("/users", request).then((res) {
-        Navigator.of(context).pop(false);
+        setState(() {
+          needToFreezeUi = false;
+        });
         if (res.statusCode == 200) {
           if (res.data['code'] == 200) {
+            Alert.show(alertDialog, context, Alert.SUCCESS, res.data['msg']);
             userInfo = res.data['userInfo'];
             MySharedPreferences.setStringValue(
                 'userInfo', jsonEncode(userInfo));
@@ -424,7 +452,9 @@ class ProfileState extends State<Profile> {
           Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
         }
       }).catchError((err) {
-        Navigator.of(context).pop(false);
+        setState(() {
+          needToFreezeUi = false;
+        });
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       });
     }
@@ -437,15 +467,24 @@ class ProfileState extends State<Profile> {
     );
 
     if (result != null) {
-
       PlatformFile objFile = result.files.single;
 
-      if(objFile.size > maxImageSize){
-        Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
-            "You can only upload ${maxImageSize/oneMegaByte} or less then ${maxImageSize/oneMegaByte} mb image.");
-      }else {
+      if (objFile.size > maxImageSize) {
+        Alert.show(
+            alertDialog,
+            context,
+            Alert.ERROR,
+            "Image size cross the max limit, "
+            "You can only upload ${maxImageSize / oneMegaByte} or "
+                "less then ${maxImageSize / oneMegaByte} mb image.");
+      } else {
 
-        Alert.show(alertDialog, context, Alert.LOADING, "Image uploading please wait........!");
+        setState(() {
+          needToFreezeUi = true;
+          alertIcon = Alert.showIcon(Alert.LOADING);
+          alertText = Alert.LOADING_MSG;
+        });
+
         String url = baseUrl + '/users/image';
         Map<String, String> headers = {"Content-type": "application/json"};
         var request = {
@@ -457,23 +496,27 @@ class ProfileState extends State<Profile> {
         };
 
         Response response =
-        await post(url, headers: headers, body: json.encode(request));
-        Navigator.of(context).pop(false);
+            await post(url, headers: headers, body: json.encode(request));
+
+        setState(() {
+          needToFreezeUi = false;
+        });
 
         if (response.statusCode == 200) {
           var body = json.decode(response.body);
 
-          if(body['code'] == 200){
+          if (body['code'] == 200) {
             Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
             String imageUrl = body['userInfo']["imageUrl"];
             userInfo["imageUrl"] = imageUrl;
-            MySharedPreferences.setStringValue('userInfo', jsonEncode(userInfo));
+            MySharedPreferences.setStringValue(
+                'userInfo', jsonEncode(userInfo));
             eventHub.fire("userInfo", userInfo);
 
             setState(() {
               profileImageWidget = NetworkImage(imageUrl);
             });
-          }else {
+          } else {
             Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
           }
         } else {
@@ -486,12 +529,10 @@ class ProfileState extends State<Profile> {
   }
 
   void showProfilePic(userInfo) {
-
-    if(userInfo['imageUrl'] == null){
+    if (userInfo['imageUrl'] == null) {
       profileImageWidget = AssetImage("assets/images/people.png");
-    }else {
+    } else {
       profileImageWidget = NetworkImage(userInfo['imageUrl']);
     }
-
   }
 }
