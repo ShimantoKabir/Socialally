@@ -2,7 +2,7 @@ import 'package:client/constants.dart';
 import 'package:flutter/material.dart';
 
 class AboutSectionText extends StatelessWidget {
-  const AboutSectionText({
+  AboutSectionText({
     Key key,
     this.text,
   }) : super(key: key);

@@ -1,5 +1,5 @@
 import 'package:client/constants.dart';
-import 'package:client/utilities/RouterGenerator.dart';
+import 'package:client/route/RouterGenerator.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

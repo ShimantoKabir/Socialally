@@ -7,7 +7,7 @@ class Transaction {
   String transactionId;
   String accountNumber;
   String paymentGatewayName;
-  String createdDate;
+  String createdAt;
   String status;
 
   Transaction({
@@ -19,7 +19,7 @@ class Transaction {
     this.transactionId,
     this.accountNumber,
     this.paymentGatewayName,
-    this.createdDate,
+    this.createdAt,
     this.status
   });
 }

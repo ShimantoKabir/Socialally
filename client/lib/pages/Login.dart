@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:client/constants.dart';
+import 'package:client/pages/Admin.dart';
 import 'package:client/pages/User.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
@@ -7,13 +8,18 @@ import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
-  Login({Key key}) : super(key: key);
+  Login({Key key, this.type}) : super(key: key);
 
+  final type;
   @override
-  LoginState createState() => LoginState();
+  LoginState createState() => LoginState(type: type);
 }
 
 class LoginState extends State<Login> {
+
+  int type;
+  LoginState({Key key,this.type});
+
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
@@ -21,7 +27,51 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    print("login");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+      body: Center(
+        child: Container(
+          height: screenSize.height,
+          width: 500,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(height: screenSize.height * 0.05),
+                logo(screenSize),
+                Divider(
+                  color: Colors.lightGreenAccent,
+                  thickness: 1,
+                ),
+                SizedBox(height: 20),
+                emailPasswordWidget(),
+                SizedBox(height: 20),
+                submitButton(context),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.centerRight,
+                  child: Text('Forgot Password ?',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                ),
+                divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [facebookButton(), googleButton()],
+                ),
+                SizedBox(height: screenSize.height * .005),
+                createAccountLabel(),
+              ],
+            ),
+          ),
+)
+      )
+    );
   }
 
   Widget entryField(String title, {bool isPassword = false}) {
@@ -43,7 +93,9 @@ class LoginState extends State<Login> {
               decoration: InputDecoration(
                   border: InputBorder.none,
                   fillColor: Color(0xfff3f3f4),
-                  filled: true))
+                  filled: true
+              )
+          )
         ],
       ),
     );
@@ -58,6 +110,7 @@ class LoginState extends State<Login> {
             "userInfo": {
               "email": emailCtl.text,
               "password": passwordCtl.text,
+              "type" : type
             }
           };
           Alert.show(
@@ -69,12 +122,21 @@ class LoginState extends State<Login> {
                 MySharedPreferences.setStringValue(
                     'userInfo', jsonEncode(res.data['userInfo']));
 
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            User(userInfo: res.data['userInfo'])),
-                    (route) => false);
+                if(type ==1){
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              User(userInfo: res.data['userInfo'])),
+                          (route) => false);
+                }else {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              Admin(userInfo: res.data['userInfo'])),
+                          (route) => false);
+                }
               } else {
                 Alert.show(
                     alertDialog, buildContext, Alert.ERROR, res.data['msg']);
@@ -213,7 +275,8 @@ class LoginState extends State<Login> {
                 color: Colors.red,
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(5),
-                    topLeft: Radius.circular(5)),
+                    topLeft: Radius.circular(5)
+                ),
               ),
               alignment: Alignment.center,
               child: Text('G',
@@ -230,14 +293,17 @@ class LoginState extends State<Login> {
                 color: Colors.redAccent,
                 borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(5),
-                    topRight: Radius.circular(5)),
+                    topRight: Radius.circular(5)
+                ),
               ),
               alignment: Alignment.center,
               child: Text('Google',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 13,
-                      fontWeight: FontWeight.w400)),
+                      fontWeight: FontWeight.w400
+                  )
+              ),
             ),
           ),
         ],
@@ -269,7 +335,8 @@ class LoginState extends State<Login> {
               style: TextStyle(
                   color: Color(0xfff79c4f),
                   fontSize: 13,
-                  fontWeight: FontWeight.w600),
+                  fontWeight: FontWeight.w600
+              ),
             ),
           ],
         ),
@@ -282,12 +349,14 @@ class LoginState extends State<Login> {
       child: Container(
         height: 50.0,
         width: screenSize.width,
-        child: Text("Login with your account",
+        child: Text(type == 1 ? "Login with your account" : "Admin Login",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.green,
                 fontSize: 20,
-                fontWeight: FontWeight.bold)),
+                fontWeight: FontWeight.bold
+            )
+        ),
       ),
     );
   }
@@ -299,49 +368,6 @@ class LoginState extends State<Login> {
         entryField("Password", isPassword: true),
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-        body: Center(
-            child: Container(
-              height: screenSize.height,
-              width: 500,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height: screenSize.height * 0.05),
-                    logo(screenSize),
-                    Divider(
-                      color: Colors.lightGreenAccent,
-                      thickness: 1,
-                    ),
-                    SizedBox(height: 20),
-                    emailPasswordWidget(),
-                    SizedBox(height: 20),
-                    submitButton(context),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      alignment: Alignment.centerRight,
-                      child: Text('Forgot Password ?',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    ),
-                    divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [facebookButton(), googleButton()],
-                    ),
-                    SizedBox(height: screenSize.height * .005),
-                    createAccountLabel(),
-                  ],
-                ),
-              ),
-    )));
   }
 
   bool verifyInput(BuildContext buildContext) {

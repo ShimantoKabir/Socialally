@@ -217,6 +217,7 @@ class UserRpo
                         'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
                         'imageUrl' => $userInfo['imageUrl'],
+                        'type' => $userInfo['type'],
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                         'paymentGateways' => PaymentGateway::all(),
                         'takePerDollar' => AppConstant::where("appConstantName", "takePerDollar")->first(),

@@ -24,9 +24,9 @@ class UserInfo extends Model
         'isEmailVerified',
         'agreedTermsAndCondition',
         'wantNewsLetterNotification',
+        'type',
         'ip',
         'modifiedBy',
         'createdAt',
     ];
-
 }

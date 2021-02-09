@@ -28,6 +28,7 @@ class UserInfos extends Migration
             $table->boolean('agreedTermsAndCondition')->default(false);
             $table->boolean('wantNewsLetterNotification')->default(false);
             $table->integer("postedBy")->nullable();
+            $table->tinyInteger("type")->comment("1 = user, 2 = admin");
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

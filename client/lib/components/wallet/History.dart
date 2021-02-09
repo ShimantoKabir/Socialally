@@ -30,7 +30,7 @@ class HistoryState extends State<History> {
   String alertText;
   bool needToFreezeUi;
   int pageIndex = 0;
-  int perPage = 2;
+  int perPage = 10;
   int pageNumber = 0;
 
   @override
@@ -48,6 +48,7 @@ class HistoryState extends State<History> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
           child: FutureBuilder(
             future: futureTransactions,
             builder: (context, snapshot) {
@@ -61,50 +62,57 @@ class HistoryState extends State<History> {
                     ),
                   );
                 }else {
-                  return DataTable(
-                    columns: <DataColumn>[
-                      DataColumn(
-                        label: Text('Sl'),
-                      ),
-                      DataColumn(
-                        label: Text("Tx Id"),
-                      ),
-                      DataColumn(
-                        label: Text("Payment Gateway"),
-                      ),
-                      DataColumn(
-                        label: Text("Type"),
-                      ),
-                      DataColumn(
-                        label: Text("Account Number"),
-                      ),
-                      DataColumn(
-                        label: Text("Amount"),
-                      ),
-                      DataColumn(
-                        label: Text("Status"),
-                      ),
-                      DataColumn(
-                        label: Text("Date"),
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      sortAscending: true,
+                      columns: <DataColumn>[
+                        DataColumn(
+                          label: Text('Sl'),
+                        ),
+                        DataColumn(
+                          label: Text("Tx Id"),
+                        ),
+                        DataColumn(
+                          label: Text("Payment Gateway"),
+                        ),
+                        DataColumn(
+                          label: Text("Type"),
+                        ),
+                        DataColumn(
+                          label: Text("Account Number"),
+                        ),
+                        DataColumn(
+                          label: Text("Amount"),
+                        ),
+                        DataColumn(
+                          label: Text("Status"),
+                        ),
+                        DataColumn(
+                          label: Text("Date"),
+                        )
+                      ],
+                      rows: List<DataRow>.generate(
+                          transactions.length, (index) => DataRow(
+                          cells: [
+                            DataCell(Text("${index+1}")),
+                            DataCell(
+                                Text(transactions[index].transactionId == null ?
+                                "N/A" : "${transactions[index].transactionId}")
+                            ),
+                            DataCell(Text("${transactions[index].paymentGatewayName}")),
+                            DataCell(Text("${transactions[index].transactionType}")),
+                            DataCell(Text("${transactions[index].accountNumber}")),
+                            DataCell(Text(
+                                transactions[index].transactionType == "deposit" ?
+                                "${transactions[index].depositAmount}" :
+                                "${transactions[index].withdrawAmount}"
+                            )),
+                            DataCell(Text("${transactions[index].status}")),
+                            DataCell(Text("${transactions[index].createdAt}"))
+                          ]
                       )
-                    ],
-                    rows: List<DataRow>.generate(
-                        transactions.length, (index) => DataRow(
-                        cells: [
-                          DataCell(Text("${index+1}")),
-                          DataCell(Text("${transactions[index].transactionId}")),
-                          DataCell(Text("${transactions[index].paymentGatewayName}")),
-                          DataCell(Text("${transactions[index].transactionType}")),
-                          DataCell(Text("${transactions[index].accountNumber}")),
-                          DataCell(Text(
-                            transactions[index].transactionType == "deposit" ?
-                            "${transactions[index].depositAmount}" :
-                            "${transactions[index].withdrawAmount}"
-                          )),
-                          DataCell(Text("${transactions[index].status}")),
-                          DataCell(Text("${transactions[index].createdDate}"))
-                        ]
-                      )
+                      ),
                     ),
                   );
                 }
@@ -197,16 +205,16 @@ class HistoryState extends State<History> {
 
       transactions.asMap().forEach((key, value) {
         transactionList.add(new Transaction(
-          createdDate: value["createdDate"],
+          createdAt: value["createdAt"],
+          transactionId: value["transactionId"],
           withdrawAmount: value["withdrawAmount"],
           depositAmount: value["depositAmount"],
           paymentGatewayName: value['paymentGatewayName'],
-          accountNumber: value['accountNumber'],
+          accountNumber: value['accountNumber'].toString(),
           transactionType: value['transactionType'],
-          status: value['status'],
+          status: value['status']
         ));
       });
-
     }
 
     setState(() {

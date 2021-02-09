@@ -125,7 +125,29 @@ List<Node> userDashboardMenus = [
       icon: NodeIcon.fromIconData(Icons.question_answer))
 ];
 
-TreeViewTheme treeViewTheme = TreeViewTheme(
+List<Node> adminDashboardMenus = [
+  Node(
+      label: 'Dashboard',
+      key: '/admin/dashboard',
+      icon: NodeIcon.fromIconData(Icons.dashboard)),
+  Node(
+    label: 'Transaction',
+    key: '/transaction',
+    icon: NodeIcon.fromIconData(Icons.monetization_on_sharp),
+    children: [
+      Node(
+          label: 'Requisition',
+          key: '/transactions/requisition',
+          icon: NodeIcon.fromIconData(Icons.request_page)),
+      Node(
+          label: 'History',
+          key: '/job/posted',
+          icon: NodeIcon.fromIconData(Icons.history))
+    ],
+  ),
+];
+
+TreeViewTheme tvt = TreeViewTheme(
   expanderTheme: ExpanderThemeData(
     type: ExpanderType.chevron,
     modifier: ExpanderModifier.none,

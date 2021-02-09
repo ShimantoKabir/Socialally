@@ -38,7 +38,7 @@ class WelcomeNavBar extends StatelessWidget{
           MenuItem(
             title: "about",
             press: () {
-              Navigator.pushNamed(context, "/aboutus");
+              Navigator.pushNamed(context, "/about-us");
             },
           ),
           MenuItem(
@@ -54,7 +54,7 @@ class WelcomeNavBar extends StatelessWidget{
           MenuItem(
             title: "Login",
             press: () {
-              Navigator.pushNamed(context, "/login");
+              Navigator.pushNamed(context, "/user/login");
             },
           ),
           DefaultButton(

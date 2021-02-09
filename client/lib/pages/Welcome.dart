@@ -10,7 +10,6 @@ class Welcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("welcome page");
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
@@ -45,7 +44,7 @@ class Welcome extends StatelessWidget {
                                   height: 8,
                                 ),
                                 Text(
-                                  "Easy Approach makes it easy for every one to dessiminate knowledge, and making "
+                                  "Easy Approach makes it easy for every one to disseminate knowledge, and making "
                                   "difficult problems easy to solve",
                                   style: TextStyle(
                                       fontSize: 15,
@@ -58,7 +57,7 @@ class Welcome extends StatelessWidget {
                                 ),
                                 FlatButton.icon(
                                     onPressed: () {
-                                      Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+                                      Navigator.pushNamedAndRemoveUntil(context, "/user/login", (r) => false);
                                     },
                                     icon: Icon(Icons.login),
                                     label: Text("Login"),

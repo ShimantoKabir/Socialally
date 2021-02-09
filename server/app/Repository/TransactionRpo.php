@@ -58,10 +58,7 @@ class TransactionRpo
         $parPage = 10;
         $pageIndex = 10;
 
-        if (!$request->has('user-info-id')) {
-            $res['code'] = 404;
-            $res['msg'] = "User info id required!";
-        } else if (!$request->has('par-page')) {
+        if (!$request->has('par-page')) {
             $res['code'] = 404;
             $res['msg'] = "Par page required!";
         } else if (!$request->has('page-index')) {
@@ -69,14 +66,19 @@ class TransactionRpo
             $res['msg'] = "Page index required!";
         } else {
 
-            $userInfoId = $request->query('user-info-id');
             $parPage = $request->query('par-page');
             $pageIndex = $request->query('page-index');
 
             try {
 
                 $sql = "SELECT * FROM Transactions WHERE Transactions.accountHolderId";
-                $sql = $sql . " = " . $userInfoId . " LIMIT " . $pageIndex . ", " . $parPage;
+
+                if ($request->has('user-info-id')) {
+                    $userInfoId = $request->query('user-info-id');
+                    $sql = $sql . " = " . $userInfoId . " LIMIT " . $pageIndex . ", " . $parPage;
+                } else {
+                    $sql = $sql .  " LIMIT " . $pageIndex . ", " . $parPage;
+                }
 
                 $res['transactions'] = DB::select(DB::raw($sql));
 
