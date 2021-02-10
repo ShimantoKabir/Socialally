@@ -47,8 +47,11 @@ class AvailableState extends State<Available> {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize =  MediaQuery.of(context).size;
+    print("screenSize = $screenSize");
     return Scaffold(
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: FutureBuilder(
           future: futureProjects,
           builder: (context, snapshot) {
@@ -209,41 +212,47 @@ class AvailableState extends State<Available> {
                             ),
                             visible: type == 4 || type == 2,
                           ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20,0,20,5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                    "Budget: ${projects[index].estimatedCost}\$"),
-                                Text(
+                          Visibility(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(20,0,20,5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      "Budget: ${projects[index].estimatedCost}\$"),
+                                  Text(
                                     "Estimated Day: ${projects[index].estimatedDay}",
-                                  textAlign: TextAlign.right,
-                                ),
-                                Text(
-                                    "Worker Needed: ${projects[index].workerNeeded}")
-                              ],
+                                    textAlign: TextAlign.right,
+                                  ),
+                                  Text(
+                                      "Worker Needed: ${projects[index].workerNeeded}")
+                                ],
+                              ),
                             ),
+                            visible: type != 5,
                           ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20,0,20,5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                    "Category: ${projects[index].categoryName}"),
-                                Text(
+                          Visibility(
+                            visible: type != 5,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(20,0,20,5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      "Category: ${projects[index].categoryName}"),
+                                  Text(
                                     "Sub Category: ${projects[index].subCategoryName}",
-                                  textAlign: TextAlign.right,),
-                                Text(
-                                    type == 2 ? "Applied By: ${projects[index].applicantName}" : "Published By: ${projects[index].publisherName}",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold
+                                    textAlign: TextAlign.right,),
+                                  Text(
+                                      type == 2 ? "Applied By: ${projects[index].applicantName}" : "Published By: ${projects[index].publisherName}",
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold
+                                      )
                                   )
-                                )
-                              ],
-                            ),
+                                ],
+                              ),
+                            )
                           ),
                           Padding(
                             padding: EdgeInsets.all(16),
@@ -251,7 +260,7 @@ class AvailableState extends State<Available> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                    visible: projects[index].fileUrl != null && type == 1,
+                                    visible: projects[index].fileUrl != null && type == 1 || type == 5,
                                     child: FlatButton(
                                       onPressed: () => {
                                         openFile(projects[index].fileUrl,context)
@@ -284,7 +293,9 @@ class AvailableState extends State<Available> {
                                     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                                     child: Row(
                                       children: <Widget>[
-                                        Text(type == 1 ? " Submit " : type == 2 ? " Investigate " : " Update ",
+                                        Text(type == 1 ? " Submit " : type == 2
+                                            ? " Investigate " : type == 5
+                                            ? " Submit " : " Update ",
                                             style: TextStyle(color: Colors.white)),
                                         Icon(Icons.arrow_forward_ios,
                                             size: 15,
@@ -390,16 +401,16 @@ class AvailableState extends State<Available> {
 
     List<Project> projectList = [];
 
-    String url;
-    if(type == 1){ // job accept published by me
-      url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    }else if(type == 2){ // job approve request
-      url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    }else if(type == 3){ // job only published by me
-      url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    }else { // job applied by me
-      url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    }
+    String url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    // if(type == 1){ // job accept published by me
+    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    // }else if(type == 2){ // job approve request
+    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    // }else if(type == 3){ // job only published by me
+    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    // }else { // job applied by me
+    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    // }
 
     var response = await get(url);
     if (response.statusCode == 200) {

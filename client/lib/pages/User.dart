@@ -1,6 +1,7 @@
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/Post.dart';
+import 'package:client/components/user/advertisement/AdvertisementSender.dart';
 import 'package:client/components/wallet/Deposit.dart';
 import 'package:client/components/wallet/History.dart';
 import 'package:client/components/wallet/Withdraw.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:client/components/job/ProofSubmissionComponent.dart';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 class User extends StatefulWidget {
@@ -104,7 +106,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
           // side menu bar
           DashboardLeftNavigation(
               type: 1,
-              isSideNavOpen: isSideNavOpen,
+              eventHub: eventHub,
               treeViewController: treeViewController,
               userNavigatorKey: userNavigatorKey
           ),
@@ -115,9 +117,10 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                 children: [
                   // top menu bar
                   DashboardTopNavigation(
-                      type: 1,
-                      isSideNavOpen: isSideNavOpen,
-                      userNavigatorKey: userNavigatorKey
+                    type: 1,
+                    eventHub: eventHub,
+                    userNavigatorKey: userNavigatorKey,
+                    userInfo: userInfo
                   ),
                   // component tile
                   Expanded(
@@ -210,7 +213,18 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                       eventHub: eventHub,
                                       userInfo: userInfo)
                                   );
-                                } else {
+                                }else if(settings.name == "/advertisement/send"){
+                                  return MaterialPageRoute(builder: (context) => AdvertisementSender(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo)
+                                  );
+                                }else if(settings.name == "/advertisement/job"){
+                                  return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 5)
+                                  );
+                                }  else {
                                   return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
@@ -222,55 +236,82 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                             flex: 5
                           ),
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(20),
-                              color: Colors.white70,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 70.0,
-                                    width: 70.0,
-                                    decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: new DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: profileImageWidget
+                            child: Column(
+                              children: [
+                                Container(
+                                  child: Text(
+                                    "Advertisement Job",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15
+                                    ),
+                                  ),
+                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                ),
+                                Expanded(
+                                  child: Available(
+                                    eventHub: eventHub,
+                                    userInfo: userInfo,
+                                    type: 5
+                                  ),
+                                  flex: 4,
+                                ),
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Container(
+                                      padding: EdgeInsets.all(20),
+                                      color: Colors.white70,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 70.0,
+                                            width: 70.0,
+                                            decoration: new BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: new DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: profileImageWidget
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text(userInfo['email']),
+                                          SizedBox(height: 20),
+                                          LinearProgressIndicator(
+                                            backgroundColor: Colors.grey,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                                Colors.amber),
+                                            value: userInfo['profileCompleted'] / 100,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text(
+                                            "Profile Completed ${userInfo['profileCompleted']}%",
+                                            style:
+                                            TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Visibility(
+                                              visible:
+                                              userInfo['profileCompleted'] != 100,
+                                              child: FlatButton(
+                                                onPressed: () {
+                                                  userNavigatorKey.currentState.pushNamed('/user/profile');
+                                                },
+                                                color: Colors.green,
+                                                padding:
+                                                EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                                child: Text(" Complete Now",
+                                                    style:
+                                                    TextStyle(color: Colors.white)),
+                                              )
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: 20),
-                                  Text(userInfo['email']),
-                                  SizedBox(height: 20),
-                                  LinearProgressIndicator(
-                                    backgroundColor: Colors.grey,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.amber),
-                                    value: userInfo['profileCompleted'] / 100,
-                                  ),
-                                  SizedBox(height: 20),
-                                  Text(
-                                    "Profile Completed ${userInfo['profileCompleted']}%",
-                                    style:
-                                    TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 20),
-                                  Visibility(
-                                    visible:
-                                    userInfo['profileCompleted'] != 100,
-                                    child: FlatButton(
-                                      onPressed: () {
-                                        userNavigatorKey.currentState.pushNamed('/user/profile');
-                                      },
-                                      color: Colors.green,
-                                      padding:
-                                      EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                      child: Text(" Complete Now",
-                                          style:
-                                          TextStyle(color: Colors.white)),
-                                    )
-                                  )
-                                ],
-                              ),
+                                  flex: 3
+                                )
+                              ],
                             ),
                             flex: 2
                           )

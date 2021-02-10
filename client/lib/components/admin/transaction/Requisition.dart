@@ -31,6 +31,7 @@ class RequisitionState extends State<Requisition> {
   int pageNumber = 0;
   int listPosition;
   Transaction transaction;
+  TextEditingController transactionIdCtl = new TextEditingController();
 
   @override
   void initState() {
@@ -100,10 +101,12 @@ class RequisitionState extends State<Requisition> {
                             rows: List<DataRow>.generate(
                                 transactions.length, (index) => DataRow(
                                 onSelectChanged: (value){
-                                  setState(() {
-                                    transaction = transactions[index];
-                                    listPosition = index;
-                                  });
+                                  if(!needToFreezeUi){
+                                    setState(() {
+                                      transaction = transactions[index];
+                                      listPosition = index;
+                                    });
+                                  }
                                 },
                                 cells: [
                                   DataCell(Text("${index+1}")),
@@ -129,16 +132,23 @@ class RequisitionState extends State<Requisition> {
                         flex: 7
                       ),
                       Visibility(
-                        visible: transaction != null,
+                        visible: transaction != null
+                            && transaction.status == "Pending",
                         child: Expanded(
                           child: Container(
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(15),
                             decoration: BoxDecoration(
-                                border: Border(
-                                    left: BorderSide(
-                                        color: Colors.grey
-                                    )
-                                )
+                              border: Border(
+                                // top: BorderSide(
+                                //     color: Colors.grey
+                                // ),
+                                // left: BorderSide(
+                                //     color: Colors.grey
+                                // ),
+                                // bottom: BorderSide(
+                                //     color: Colors.grey
+                                // )
+                              )
                             ),
                             child: transaction == null ? Container() : Column(
                               children: [
@@ -156,19 +166,17 @@ class RequisitionState extends State<Requisition> {
                                 SizedBox(height: 10),
                                 Text("Status: ${transaction.createdAt}"),
                                 SizedBox(height: 10),
-                                Text(transaction.transactionId == null ?
-                                "TransactionId: N/A" : "TransactionId: ${
+                                transaction.transactionType == "withdraw" ?
+                                entryField("Transaction Id",transactionIdCtl) :
+                                Text("TransactionId: ${
                                     transaction.transactionId}"),
                                 SizedBox(height: 10),
                                 Visibility(
                                   child: OutlineButton(
-                                    onPressed: (){
-                                      setState(() {
-                                        transactions[listPosition].status
-                                        = "Approved";
-                                      });
-                                    },
-                                    child: Text("Approved"),
+                                      onPressed: (){
+                                        onUpdate(context,"Approved",transactions);
+                                      },
+                                      child: Text("Approved"),
                                     ),
                                   visible: transaction.status == "Pending",
                                 ),
@@ -176,9 +184,9 @@ class RequisitionState extends State<Requisition> {
                                 Visibility(
                                   child: OutlineButton(
                                     onPressed: (){
-
+                                      onUpdate(context,"Denied",transactions);
                                     },
-                                    child: Text("Declined"),
+                                    child: Text("Denied"),
                                   ),
                                   visible: transaction.status == "Pending",
                                 ),
@@ -290,14 +298,15 @@ class RequisitionState extends State<Requisition> {
 
       transactions.asMap().forEach((key, value) {
         transactionList.add(new Transaction(
-            createdAt: value["createdAt"],
-            transactionId: value["transactionId"],
-            withdrawAmount: value["withdrawAmount"],
-            depositAmount: value["depositAmount"],
-            paymentGatewayName: value['paymentGatewayName'],
-            accountNumber: value['accountNumber'].toString(),
-            transactionType: value['transactionType'],
-            status: value['status']
+          id: value["id"],
+          createdAt: value["createdAt"],
+          transactionId: value["transactionId"],
+          withdrawAmount: value["withdrawAmount"],
+          depositAmount: value["depositAmount"],
+          paymentGatewayName: value['paymentGatewayName'],
+          accountNumber: value['accountNumber'].toString(),
+          transactionType: value['transactionType'],
+          status: value['status']
         ));
       });
     }
@@ -306,6 +315,91 @@ class RequisitionState extends State<Requisition> {
       needToFreezeUi = false;
     });
     return transactionList;
+  }
+
+  void onUpdate(BuildContext context,String status,List<Transaction> transactions) {
+
+    var request;
+
+    if(transactions[listPosition].transactionType == "withdraw"){
+      request = {
+        "transaction": {
+          "id": transactions[listPosition].id,
+          "status": status,
+          "transactionId" : transactionIdCtl.text,
+          "transactionType" : transactions[listPosition].transactionType,
+        }
+      };
+    }else {
+      request = {
+        "transaction": {
+          "id": transactions[listPosition].id,
+          "status": status,
+          "transactionType" : transactions[listPosition].transactionType,
+        }
+      };
+    }
+
+    String url = baseUrl + '/transactions';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    setState(() {
+      needToFreezeUi = true;
+      transaction = null;
+    });
+
+    put(url, headers: headers, body: json.encode(request)).then((response) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body['code'] == 200) {
+          setState(() {
+            transactions[listPosition].status = status;
+            if(transactions[listPosition].transactionType == "withdraw"){
+              transactions[listPosition].transactionId = transactionIdCtl.text;
+            }
+          });
+          Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
+  }
+
+  Widget entryField(String title, TextEditingController controller) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              fillColor: Color(0xfff3f3f4),
+              filled: true
+            )
+          )
+        ],
+      ),
+    );
   }
 
 }

@@ -1,4 +1,5 @@
 import 'package:client/utilities/MySharedPreferences.dart';
+import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -6,19 +7,22 @@ class DashboardTopNavigation extends StatefulWidget {
   DashboardTopNavigation({
     Key key,
     this.type,
-    this.isSideNavOpen,
-    this.userNavigatorKey
+    this.eventHub,
+    this.userNavigatorKey,
+    this.userInfo
   }) : super(key: key);
 
   final int type;
-  final bool isSideNavOpen;
+  final EventHub eventHub;
   final userNavigatorKey;
+  final userInfo;
 
   @override
   DashboardTopNavigationState createState() => DashboardTopNavigationState(
       type: type,
-      isSideNavOpen: isSideNavOpen,
-      userNavigatorKey: userNavigatorKey
+      eventHub: eventHub,
+      userNavigatorKey: userNavigatorKey,
+      userInfo: userInfo
   );
 }
 
@@ -26,14 +30,16 @@ class DashboardTopNavigation extends StatefulWidget {
 class DashboardTopNavigationState extends State<DashboardTopNavigation>{
 
   int type;
-  bool isSideNavOpen;
+  EventHub eventHub;
   var userNavigatorKey;
+  var userInfo;
 
   DashboardTopNavigationState({
     Key key,
     this.type,
-    this.isSideNavOpen,
+    this.eventHub,
     this.userNavigatorKey,
+    this.userInfo,
   });
 
   @override
@@ -57,9 +63,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                     child: InkWell(
                       child: Icon(Icons.apps),
                       onTap: () async {
-                        setState(() {
-                          isSideNavOpen = !isSideNavOpen;
-                        });
+                        eventHub.fire("openAndCloseSideNav");
                       },
                     )),
               ),
@@ -67,6 +71,71 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                 padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
                 child: Row(
                   children: [
+                    Visibility(
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.refresh,
+                          size: 20,
+                          color: Colors.black
+                        ),
+                        onPressed: (){
+
+                        },
+                      ),
+                      visible: type == 1,
+                    ),
+                    Visibility(
+                      child: FlatButton(
+                        onPressed: () => {
+
+                        },
+                        color: Colors.blue,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        child: Row(
+                          children: <Widget>[
+                            Text("Deposit  ${userInfo['totalDeposit']} \$ ",
+                                style: TextStyle(color: Colors.white))
+                          ],
+                        ),
+                      ),
+                      visible: type == 1,
+                    ),
+                    SizedBox(width: 10),
+                    Visibility(
+                      child: FlatButton(
+                        onPressed: () => {
+
+                        },
+                        color: Colors.red,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        child: Row(
+                          children: <Widget>[
+                            Text("Withdraw  ${userInfo['totalWithdraw']} \$ ",
+                                style: TextStyle(color: Colors.white))
+                          ],
+                        ),
+                      ),
+                      visible: type == 1,
+                    ),
+                    SizedBox(width: 10),
+                    Visibility(
+                      child: FlatButton(
+                        onPressed: () => {
+
+                        },
+                        color: Colors.green,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        child: Row(
+                          // Replace with a Row for horizontal icon + text
+                          children: <Widget>[
+                            Text("Balance  ${userInfo['totalDeposit'] - userInfo['totalWithdraw']} \$ ",
+                                style: TextStyle(color: Colors.white))
+                          ],
+                        ),
+                      ),
+                      visible: type == 1,
+                    ),
+                    SizedBox(width: 10),
                     InkWell(
                       child: Icon(Icons.notifications_active),
                       onTap: () {

@@ -36,8 +36,11 @@ Route::get('/categories/sub/{categoryId}', [ProjectCategoryCtl::class, 'getSubCa
 // project
 Route::post('/projects', [ProjectCtl::class, 'create']);
 Route::get('/projects/query', [ProjectCtl::class, 'readByQuery']);
-// ?accept-publisher=0&user-info-id=2&par-page=2&page-index=5
+// -- ?accept-publisher=0&user-info-id=2&par-page=2&page-index=5&
 Route::get('/projects', [ProjectCtl::class, 'read']);
+Route::get('/projects/title-query', [ProjectCtl::class, 'readByTitle']);
+// -- ?title=tile&user-info-id=2
+Route::put('/projects/advertisements', [ProjectCtl::class, 'addAdToProject']);
 
 // proof submission
 Route::post('/proof-submissions', [ProofSubmissionCtl::class, 'create']);
@@ -46,3 +49,4 @@ Route::put('/proof-submissions', [ProofSubmissionCtl::class, 'update']);
 // transactions
 Route::post('/transactions', [TransactionCtl::class, 'create']);
 Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
+Route::put('/transactions', [TransactionCtl::class, 'update']);

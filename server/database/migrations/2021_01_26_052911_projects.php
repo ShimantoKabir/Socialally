@@ -29,6 +29,9 @@ class Projects extends Migration
             $table->string('fileUrl')->nullable();
             $table->string('imageUrl')->nullable();
             $table->integer('publishedBy');
+            $table->integer('adCost')->nullable();
+            $table->integer('adDuration')->nullable();
+            $table->dateTime("addPublishDate")->nullable();
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();

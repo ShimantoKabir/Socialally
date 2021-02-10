@@ -9,8 +9,8 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-const baseUrl = "http://127.0.0.1:8000/api";
-// const baseUrl = "http://workersengine.com/server/public/api";
+// const baseUrl = "http://127.0.0.1:8000/api";
+const baseUrl = "http://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -109,8 +109,21 @@ List<Node> userDashboardMenus = [
   ),
   Node(
       label: 'Advertisement',
-      key: '7',
-      icon: NodeIcon.fromIconData(Icons.account_tree)),
+      key: '/advertisement',
+      icon: NodeIcon.fromIconData(Icons.account_tree),
+      children: [
+        Node(
+          label: 'Send',
+          key: '/advertisement/send',
+          icon: NodeIcon.fromIconData(Icons.send_to_mobile),
+        ),
+        Node(
+          label: 'Job',
+          key: '/advertisement/job',
+          icon: NodeIcon.fromIconData(Icons.pending_actions_sharp),
+        )
+      ]
+  ),
   Node(
       label: 'Plan & Earn',
       key: '8',
@@ -215,5 +228,17 @@ List<DropdownMenuItem<String>> paymentGatewayDropDownList = [
   return DropdownMenuItem<String>(
     value: value,
     child: Text(value),
+  );
+}).toList();
+
+List<DropdownMenuItem<dynamic>> adCostPlanDropDownList = [
+  {
+    "day" : 0,
+    "cost" : 0
+  }
+].map<DropdownMenuItem<dynamic>>((var value) {
+  return DropdownMenuItem<dynamic>(
+    value: value,
+    child: Text("${value['day']} day = ${value['cost']}")
   );
 }).toList();

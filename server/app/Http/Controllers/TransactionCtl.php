@@ -28,4 +28,9 @@ class TransactionCtl extends Controller
     {
         return $this->transactionRpo->readByQuery($request);
     }
+
+    public function update(Request $request)
+    {
+        return $this->transactionRpo->update($request);
+    }
 }

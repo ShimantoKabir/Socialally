@@ -8,6 +8,7 @@ use App\Models\UserInfo;
 use App\Jobs\MailSender;
 use App\Models\AppConstant;
 use App\Models\PaymentGateway;
+use App\Models\Transaction;
 use Exception;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
@@ -18,7 +19,6 @@ use Illuminate\Support\Facades\Storage;
 
 class UserRpo
 {
-
     private static function calculateProfileCompletionPercentage($userInfo)
     {
 
@@ -221,7 +221,17 @@ class UserRpo
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                         'paymentGateways' => PaymentGateway::all(),
                         'takePerDollar' => AppConstant::where("appConstantName", "takePerDollar")->first(),
-                        'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first()
+                        'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first(),
+                        'adCostPlanList' => AppConstant::where("appConstantName", "adCostPlanList")
+                            ->first()['appConstantJsonValue'],
+                        'totalWithdraw' => Transaction::where("accountHolderId", $userInfo['id'])
+                            ->where("transactionType", "withdraw")
+                            ->where("status", "Approved")
+                            ->sum("withdrawAmount"),
+                        'totalDeposit' => Transaction::where("accountHolderId", $userInfo['id'])
+                            ->where("transactionType", "deposit")
+                            ->where("status", "Approved")
+                            ->sum("depositAmount")
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(

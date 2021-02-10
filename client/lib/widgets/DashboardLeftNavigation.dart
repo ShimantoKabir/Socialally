@@ -1,4 +1,5 @@
 import 'package:client/constants.dart';
+import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
@@ -7,20 +8,20 @@ class DashboardLeftNavigation extends StatefulWidget {
   DashboardLeftNavigation({
     Key key,
     this.type,
-    this.isSideNavOpen,
+    this.eventHub,
     this.treeViewController,
     this.userNavigatorKey
   }) : super(key: key);
 
   final int type;
-  final bool isSideNavOpen;
+  final EventHub eventHub;
   final TreeViewController treeViewController;
   final userNavigatorKey;
 
   @override
   DashboardLeftNavigationState createState() => DashboardLeftNavigationState(
     type: type,
-    isSideNavOpen: isSideNavOpen,
+    eventHub: eventHub,
     treeViewController: treeViewController,
     userNavigatorKey: userNavigatorKey
   );
@@ -30,17 +31,30 @@ class DashboardLeftNavigation extends StatefulWidget {
 class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
 
   int type;
-  bool isSideNavOpen;
+  EventHub eventHub;
   TreeViewController treeViewController;
   var userNavigatorKey;
 
   DashboardLeftNavigationState({
     Key key,
     this.type,
-    this.isSideNavOpen,
+    this.eventHub,
     this.treeViewController,
     this.userNavigatorKey,
   });
+
+  bool isSideNavOpen;
+
+  @override
+  void initState() {
+    super.initState();
+    isSideNavOpen = true;
+    eventHub.on("openAndCloseSideNav", (dynamic data) {
+      setState(() {
+        isSideNavOpen = !isSideNavOpen;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

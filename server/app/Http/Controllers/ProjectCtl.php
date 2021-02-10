@@ -32,4 +32,14 @@ class ProjectCtl extends Controller
     {
         return $this->projectRpo->read($request);
     }
+
+    public function readByTitle(Request $request)
+    {
+        return $this->projectRpo->readByTitle($request);
+    }
+
+    public function addAdToProject(Request $request)
+    {
+        return $this->projectRpo->addAdToProject($request);
+    }
 }

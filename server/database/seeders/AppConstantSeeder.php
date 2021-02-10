@@ -27,6 +27,29 @@ class AppConstantSeeder extends Seeder
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => json_encode(["Pending", "Accepted", "Denied"]),
                 "appConstantIntegerValue" => null,
+            ],
+            [
+                "appConstantName" => "adCostPlanList",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => json_encode([
+                    [
+                        "day" => 1,
+                        "cost" => 5
+                    ],
+                    [
+                        "day" => 2,
+                        "cost" => 10
+                    ],
+                    [
+                        "day" => 3,
+                        "cost" => 15
+                    ],
+                    [
+                        "day" => 4,
+                        "cost" => 20
+                    ]
+                ]),
+                "appConstantIntegerValue" => null,
             ]
         ];
 

@@ -24,6 +24,7 @@ dependencies:
   equatable: ^1.2.5
   file_picker: ^2.1.5+1
   url_launcher: ^5.7.10
+  flutter_typeahead: ^2.0.0
 
 dev_dependencies:
   flutter_test:

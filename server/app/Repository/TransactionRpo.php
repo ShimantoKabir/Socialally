@@ -23,7 +23,6 @@ class TransactionRpo
         DB::beginTransaction();
         try {
 
-
             $transaction = new Transaction();
             $transaction->depositAmount = $rTransaction["depositAmount"];
             $transaction->withdrawAmount = $rTransaction["withdrawAmount"];
@@ -71,11 +70,12 @@ class TransactionRpo
 
             try {
 
-                $sql = "SELECT * FROM Transactions WHERE Transactions.accountHolderId";
+                $sql = "SELECT * FROM Transactions";
 
                 if ($request->has('user-info-id')) {
                     $userInfoId = $request->query('user-info-id');
-                    $sql = $sql . " = " . $userInfoId . " LIMIT " . $pageIndex . ", " . $parPage;
+                    $sql = $sql . " WHERE Transactions.accountHolderId = " . $userInfoId
+                        . " LIMIT " . $pageIndex . ", " . $parPage;
                 } else {
                     $sql = $sql .  " LIMIT " . $pageIndex . ", " . $parPage;
                 }
@@ -88,6 +88,44 @@ class TransactionRpo
                 $res['msg'] = $e->getMessage();
                 $res['code'] = 404;
             }
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+
+    public function update(Request $request)
+    {
+        $res = [
+            "code" => "",
+            "msg" => ""
+        ];
+
+        $rTransaction = $request->transaction;
+
+        DB::beginTransaction();
+        try {
+
+            if ($rTransaction["transactionType"] == "withdraw") {
+                $updateQuery = array(
+                    "status" => $rTransaction["status"],
+                    "transactionId" => $rTransaction["transactionId"]
+                );
+            } else {
+                $updateQuery = array(
+                    "status" => $rTransaction["status"]
+                );
+            }
+
+            Transaction::where('id', $rTransaction["id"])->update($updateQuery);
+
+            DB::commit();
+            $res['code'] = 200;
+            $res['msg'] = "Transactions " . $rTransaction["status"] . " successfully!";
+        } catch (Exception $e) {
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
+use function PHPSTORM_META\type;
+
 class ProjectRpo
 {
 
@@ -180,9 +182,12 @@ class ProjectRpo
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
                 } else if ($type == 3) { // job only published by me
                     $sql = $sql . " = " . $userInfoId;
-                } else {
+                } else if ($type == 4) {
                     $sql = $sql . " != " . $userInfoId;
                     $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ")";
+                } else {
+                    $sql = $sql . " != " . $userInfoId;
+                    $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY)";
                 }
 
                 $sql = $sql . " LIMIT " . $pageIndex . ", " . $parPage;
@@ -247,5 +252,77 @@ class ProjectRpo
         Project::where('id', $id)->update($updateSql);
 
         return $fileUrl;
+    }
+
+    public function readByTitle(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $userInfoId = 0;
+        $type = 0;
+        $parPage = 10;
+        $pageIndex = 10;
+
+        if (!$request->has('user-info-id')) {
+            $res['code'] = 404;
+            $res['msg'] = "User id required!";
+        } else if (!$request->has('title')) {
+            $res['code'] = 404;
+            $res['msg'] = "Project title required!";
+        } else {
+
+            $title = $request->query('title');
+            $userInfoId = $request->query('user-info-id');
+
+            try {
+
+                $res['projects'] = Project::where("title", 'like', '%' . $title . '%')
+                    ->where("publishedBy", $userInfoId)->get();
+
+                $res['code'] = 200;
+                $res['msg'] = "Project fetched successfully!";
+            } catch (Exception $e) {
+                $res['msg'] = $e->getMessage();
+                $res['code'] = 404;
+            }
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function addAdToProject(Request $request)
+    {
+
+        date_default_timezone_set('Asia/Dhaka');
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rProject = $request->project;
+        DB::beginTransaction();
+        try {
+
+            Project::where('id', $rProject['id'])->update(array(
+                'adCost' => $rProject['adCost'],
+                'adDuration' => $rProject['adDuration'],
+                'adPublishDate' => date('Y-m-d H:i:s'),
+            ));
+
+            DB::commit();
+            $res['code'] = 200;
+            $res['msg'] = "Job advertised successfully!";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 }

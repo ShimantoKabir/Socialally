@@ -44,6 +44,11 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
     );
     html.window.history.pushState(null,"Admin Dashboard","/#/admin/dashboard");
     viewTitle = "Dashboard";
+    eventHub.on("openAndCloseSideNav", (dynamic data) {
+      setState(() {
+        isSideNavOpen = !isSideNavOpen;
+      });
+    });
   }
 
   @override
@@ -54,7 +59,7 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
           // side menu bar
           DashboardLeftNavigation(
             type: 2,
-            isSideNavOpen: isSideNavOpen,
+            eventHub: eventHub,
             treeViewController: treeViewController,
             userNavigatorKey: userNavigatorKey
           ),
@@ -66,8 +71,9 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                   // top menu bar
                   DashboardTopNavigation(
                       type: 2,
-                      isSideNavOpen: isSideNavOpen,
-                      userNavigatorKey: userNavigatorKey
+                      eventHub: eventHub,
+                      userNavigatorKey: userNavigatorKey,
+                      userInfo: userInfo
                   ),
                   // component tile
                   Expanded(
