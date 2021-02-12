@@ -7,6 +7,7 @@ use App\Models\ProjectCategory;
 use App\Models\UserInfo;
 use App\Jobs\MailSender;
 use App\Models\AppConstant;
+use App\Models\Notification;
 use App\Models\PaymentGateway;
 use App\Models\Transaction;
 use Exception;
@@ -89,6 +90,7 @@ class UserRpo
                 $userInfo->ip = $request->ip();
                 $userInfo->token = $token;
                 $userInfo->isEmailVerified = true;
+                $userInfo->type = $rUserInfo['type'];
                 $userInfo->save();
 
                 // $mailData = array(
@@ -200,7 +202,8 @@ class UserRpo
                         'contactNumber',
                         'agreedTermsAndCondition',
                         'wantNewsLetterNotification',
-                        'imageUrl'
+                        'imageUrl',
+                        'type'
                     )
                     ->first();
 
@@ -231,7 +234,9 @@ class UserRpo
                         'totalDeposit' => Transaction::where("accountHolderId", $userInfo['id'])
                             ->where("transactionType", "deposit")
                             ->where("status", "Approved")
-                            ->sum("depositAmount")
+                            ->sum("depositAmount"),
+                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
+                            ->where("isSeen", false)->count()
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(

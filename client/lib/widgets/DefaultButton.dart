@@ -15,13 +15,13 @@ class DefaultButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(25),
       child: FlatButton(
         padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-        color: Colors.lightGreen,
+        color: Colors.yellow,
         onPressed: press,
         child: Text(
           text.toUpperCase(),
           style: TextStyle(
-            fontWeight: FontWeight.normal,
-            color: Colors.black
+            fontWeight: FontWeight.bold,
+            color: Colors.red
           ),
         ),
       ),

@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
-use function PHPSTORM_META\type;
-
 class ProjectRpo
 {
 
@@ -134,6 +132,7 @@ class ProjectRpo
                     Projects.workerNeeded,
                     Projects.estimatedDay,
                     Projects.estimatedCost,
+                    Projects.publishedBy,
                     IFNULL(UserInfos.firstName, UserInfos.email) AS publisherName,
                     (
                     SELECT
@@ -177,17 +176,18 @@ class ProjectRpo
 
                 if ($type == 1) { // job accept published by me
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ")";
+                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
                 } else if ($type == 2) { // job approve request
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
+                    $sql = $sql . " ORDER BY p.id DESC ";
                 } else if ($type == 3) { // job only published by me
                     $sql = $sql . " = " . $userInfoId;
                 } else if ($type == 4) {
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ")";
+                    $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
                 } else {
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY)";
+                    $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY) ORDER BY Projects.id DESC ";
                 }
 
                 $sql = $sql . " LIMIT " . $pageIndex . ", " . $parPage;

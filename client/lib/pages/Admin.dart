@@ -1,13 +1,14 @@
+import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/admin/AdminDashboard.dart';
 import 'package:client/components/admin/transaction/Requisition.dart';
 import 'package:client/constants.dart';
-import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:client/widgets/DashboardLeftNavigation.dart';
 import 'package:client/widgets/DashboardTopNavigation.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 class Admin extends StatefulWidget {
@@ -70,34 +71,35 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                 children: [
                   // top menu bar
                   DashboardTopNavigation(
-                      type: 2,
-                      eventHub: eventHub,
-                      userNavigatorKey: userNavigatorKey,
-                      userInfo: userInfo
+                    type: 2,
+                    eventHub: eventHub,
+                    userNavigatorKey: userNavigatorKey,
+                    totalUnseenNotification: userInfo["totalUnseenNotification"],
+                    userInfo: userInfo
                   ),
                   // component tile
                   Expanded(
                     child: Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.all(5),
-                        color: Colors.black12,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                icon: Icon(Icons.arrow_back_ios),
-                                onPressed: (){
-                                  if(userNavigatorKey.currentState.canPop()){
-                                    userNavigatorKey.currentState.pop();
-                                  }
-                                }
-                            ),
-                            Text(
-                              viewTitle,
-                              style: TextStyle(fontSize: 20),
-                            )
-                          ],
-                        )
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(5),
+                      color: Colors.black12,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back_ios),
+                            onPressed: (){
+                              if(userNavigatorKey.currentState.canPop()){
+                                userNavigatorKey.currentState.pop();
+                              }
+                            }
+                          ),
+                          Text(
+                            viewTitle,
+                            style: TextStyle(fontSize: 20),
+                          )
+                        ],
+                      )
                     ),
                     flex: 1,
                   ),
@@ -107,22 +109,31 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                       child: Row(
                         children: [
                           Expanded(
-                              child: Navigator(
-                                key: userNavigatorKey,
-                                onGenerateRoute: (settings){
-                                  if(settings.name == "/transactions/requisition"){
-                                    return MaterialPageRoute(builder: (context) => Requisition(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo
-                                    ));
-                                  } else {
-                                    return MaterialPageRoute(builder: (context) => AdminDashboard(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo)
-                                    );
-                                  }
-                                },
-                              )
+                            child: Navigator(
+                              key: userNavigatorKey,
+                              onGenerateRoute: (settings){
+                                if(settings.name == "/transactions/requisition"){
+                                  return MaterialPageRoute(builder: (context) => Requisition(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    )
+                                  );
+                                }else if(settings.name == "/admins/notifications"){
+                                  return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 2,
+                                    )
+                                  );
+                                } else {
+                                  return MaterialPageRoute(builder: (context) => AdminDashboard(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    )
+                                  );
+                                }
+                              },
+                            )
                           )
                         ],
                       ),

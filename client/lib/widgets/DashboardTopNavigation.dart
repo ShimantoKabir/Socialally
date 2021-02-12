@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,22 +8,25 @@ class DashboardTopNavigation extends StatefulWidget {
   DashboardTopNavigation({
     Key key,
     this.type,
+    this.totalUnseenNotification,
     this.eventHub,
     this.userNavigatorKey,
     this.userInfo
   }) : super(key: key);
 
   final int type;
+  final int totalUnseenNotification;
   final EventHub eventHub;
   final userNavigatorKey;
   final userInfo;
 
   @override
   DashboardTopNavigationState createState() => DashboardTopNavigationState(
-      type: type,
-      eventHub: eventHub,
-      userNavigatorKey: userNavigatorKey,
-      userInfo: userInfo
+    type: type,
+    totalUnseenNotification: totalUnseenNotification,
+    eventHub: eventHub,
+    userNavigatorKey: userNavigatorKey,
+    userInfo: userInfo
   );
 }
 
@@ -30,6 +34,7 @@ class DashboardTopNavigation extends StatefulWidget {
 class DashboardTopNavigationState extends State<DashboardTopNavigation>{
 
   int type;
+  int totalUnseenNotification;
   EventHub eventHub;
   var userNavigatorKey;
   var userInfo;
@@ -37,6 +42,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
   DashboardTopNavigationState({
     Key key,
     this.type,
+    this.totalUnseenNotification,
     this.eventHub,
     this.userNavigatorKey,
     this.userInfo,
@@ -58,14 +64,16 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Center(
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                    child: InkWell(
-                      child: Icon(Icons.apps),
-                      onTap: () async {
-                        eventHub.fire("openAndCloseSideNav");
-                      },
-                    )),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.apps,
+                    size: 20,
+                    color: Colors.black
+                  ),
+                  onPressed: () async {
+                    eventHub.fire("openAndCloseSideNav");
+                  },
+                ),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
@@ -136,16 +144,43 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                       visible: type == 1,
                     ),
                     SizedBox(width: 10),
-                    InkWell(
-                      child: Icon(Icons.notifications_active),
-                      onTap: () {
-
-                      },
+                    Badge(
+                      position: BadgePosition.topEnd(top: 0, end: -5),
+                      showBadge: totalUnseenNotification != null
+                        && totalUnseenNotification > 0,
+                      badgeContent: Text(
+                        totalUnseenNotification == null ? "" :
+                        totalUnseenNotification.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10
+                        ),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                            Icons.notifications_active,
+                            size: 20,
+                            color: Colors.black
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            totalUnseenNotification = 0;
+                          });
+                          if(type == 1){
+                            userNavigatorKey.currentState.pushNamed('/users/notifications');
+                          }else {
+                            userNavigatorKey.currentState.pushNamed('/admins/notifications');
+                          }
+                        },
+                      ),
                     ),
-                    SizedBox(width: 10),
-                    InkWell(
-                      child: Icon(Icons.account_circle_rounded),
-                      onTap: () {
+                    IconButton(
+                      icon: Icon(
+                        Icons.account_circle_rounded,
+                        size: 20,
+                        color: Colors.black
+                      ),
+                      onPressed: () {
                         if(type == 1){
                           userNavigatorKey.currentState.pushNamed('/user/profile');
                         }else {
@@ -153,10 +188,13 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                         }
                       },
                     ),
-                    SizedBox(width: 10),
-                    InkWell(
-                      child: Icon(Icons.logout),
-                      onTap: () {
+                    IconButton(
+                      icon: Icon(
+                        Icons.logout,
+                        size: 20,
+                        color: Colors.black
+                      ),
+                      onPressed: () {
                         MySharedPreferences.clear("userInfo")
                             .then((isClear) {
                           if (isClear) {

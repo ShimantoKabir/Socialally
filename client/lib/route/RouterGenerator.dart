@@ -39,8 +39,10 @@ class RouterGenerator {
       return redirect(Login(type: 1), routeSettings, false);
     }else if (routeSettings.name == '/admin/login') {
       return redirect(Login(type: 2), routeSettings, false);
-    } else if (routeSettings.name == '/registration') {
-      return redirect(Registration(), routeSettings, false);
+    } else if (routeSettings.name == '/user/registration') {
+      return redirect(Registration(type: 1), routeSettings, false);
+    }else if (routeSettings.name == '/admin/registration') {
+      return redirect(Registration(type: 2), routeSettings, false);
     } else if (routeSettings.name == '/user/dashboard') {
       return redirect(User(), routeSettings, true);
     }else if (routeSettings.name == '/admin/dashboard') {
@@ -74,6 +76,7 @@ class RouterGenerator {
                 return next;
 
               }
+
             } else {
 
               if(routeSettings.name == '/user/dashboard'){
@@ -89,22 +92,22 @@ class RouterGenerator {
                 return Unknown();
 
               }
+
             }
+
           } else {
 
             if (snapshot.hasData) {
 
-              if(routeSettings.name == '/user/dashboard'){
+              var userInfo = jsonDecode(snapshot.data);
 
-                return User(userInfo: jsonDecode(snapshot.data));
+              if(userInfo['type']==1){
 
-              }else if(routeSettings.name == '/admin/dashboard'){
-
-                return Admin(userInfo: jsonDecode(snapshot.data));
+                return User(userInfo: userInfo);
 
               }else {
 
-                return Unknown();
+                return Admin(userInfo: userInfo);
 
               }
 

@@ -88,13 +88,13 @@ class LoginState extends State<Login> {
             height: 10,
           ),
           TextField(
-              controller: isPassword ? passwordCtl : emailCtl,
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true
-              )
+            controller: isPassword ? passwordCtl : emailCtl,
+            obscureText: isPassword,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              fillColor: Color(0xfff3f3f4),
+              filled: true
+            )
           )
         ],
       ),
@@ -120,22 +120,23 @@ class LoginState extends State<Login> {
             if (res.statusCode == 200) {
               if (res.data['code'] == 200) {
                 MySharedPreferences.setStringValue(
-                    'userInfo', jsonEncode(res.data['userInfo']));
-
-                if(type ==1){
+                  'userInfo', jsonEncode(res.data['userInfo'])
+                );
+                var ui = res.data['userInfo'];
+                if(ui['type'] == 1){
                   Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              User(userInfo: res.data['userInfo'])),
-                          (route) => false);
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>User(userInfo: ui)
+                    ),(route) => false
+                  );
                 }else {
                   Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              Admin(userInfo: res.data['userInfo'])),
-                          (route) => false);
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Admin(userInfo: ui)
+                    ),(route) => false
+                  );
                 }
               } else {
                 Alert.show(
@@ -280,10 +281,12 @@ class LoginState extends State<Login> {
               ),
               alignment: Alignment.center,
               child: Text('G',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400)),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                )
+              ),
             ),
           ),
           Expanded(
@@ -292,17 +295,17 @@ class LoginState extends State<Login> {
               decoration: BoxDecoration(
                 color: Colors.redAccent,
                 borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(5),
-                    topRight: Radius.circular(5)
+                  bottomRight: Radius.circular(5),
+                  topRight: Radius.circular(5)
                 ),
               ),
               alignment: Alignment.center,
               child: Text('Google',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400
-                  )
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400
+                )
               ),
             ),
           ),
@@ -314,7 +317,11 @@ class LoginState extends State<Login> {
   Widget createAccountLabel() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, "/registration");
+        if(type == 1){
+          Navigator.pushNamed(context, "/user/registration");
+        }else {
+          Navigator.pushNamed(context, "/admin/registration");
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 20),
@@ -333,9 +340,9 @@ class LoginState extends State<Login> {
             Text(
               'Register',
               style: TextStyle(
-                  color: Color(0xfff79c4f),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600
+                color: Color(0xfff79c4f),
+                fontSize: 13,
+                fontWeight: FontWeight.w600
               ),
             ),
           ],
@@ -350,12 +357,12 @@ class LoginState extends State<Login> {
         height: 50.0,
         width: screenSize.width,
         child: Text(type == 1 ? "Login with your account" : "Admin Login",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.green,
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-            )
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.green,
+            fontSize: 20,
+            fontWeight: FontWeight.bold
+          )
         ),
       ),
     );

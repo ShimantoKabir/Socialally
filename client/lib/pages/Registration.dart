@@ -4,20 +4,65 @@ import 'package:client/utilities/HttpHandler.dart';
 import 'package:client/utilities/Alert.dart';
 
 class Registration extends StatefulWidget {
-  Registration({Key key, this.title}) : super(key: key);
+  Registration({Key key, this.type}) : super(key: key);
 
-  final String title;
+  final int type;
 
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  RegistrationState createState() => RegistrationState(type: type);
 }
 
-class _RegistrationPageState extends State<Registration> {
+class RegistrationState extends State<Registration> {
+
+  int type;
+  RegistrationState({Key key,this.type});
+
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
+  TextEditingController confirmPasswordCtl = new TextEditingController();
 
-  Widget entryField(String title, {bool isPassword = false}) {
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+      body: Center(
+        child: Container(
+          height: screenSize.height,
+          width: 500,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(height: screenSize.height * 0.05),
+                logo(),
+                Divider(
+                  color: Colors.lightGreenAccent,
+                  thickness: 1,
+                ),
+                SizedBox(height: 20),
+                emailPasswordWidget(),
+                SizedBox(height: 20),
+                submitButton(context),
+                SizedBox(height: 20),
+                divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [facebookButton(), googleButton()],
+                ),
+                SizedBox(height: screenSize.height * .005),
+                createLoginLabel(),
+              ],
+            ),
+          )
+        )
+      )
+    );
+  }
+
+  Widget entryField(String title,TextEditingController ctl,bool isPassword) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -25,18 +70,23 @@ class _RegistrationPageState extends State<Registration> {
         children: <Widget>[
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15
+            ),
           ),
           SizedBox(
             height: 10,
           ),
           TextField(
-              controller: isPassword ? passwordCtl : emailCtl,
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
+            controller: ctl,
+            obscureText: isPassword,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              fillColor: Color(0xfff3f3f4),
+              filled: true
+            )
+          )
         ],
       ),
     );
@@ -51,6 +101,7 @@ class _RegistrationPageState extends State<Registration> {
             "userInfo": {
               "email": emailCtl.text,
               "password": passwordCtl.text,
+              "type" : type
             },
             "clientUrl": Uri.base.origin
           };
@@ -81,18 +132,21 @@ class _RegistrationPageState extends State<Registration> {
         padding: EdgeInsets.symmetric(vertical: 15),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.grey.shade200,
-                  offset: Offset(2, 4),
-                  blurRadius: 5,
-                  spreadRadius: 2)
-            ],
-            gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.green, Colors.greenAccent])),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.grey.shade200,
+              offset: Offset(2, 4),
+              blurRadius: 5,
+              spreadRadius: 2
+            )
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Colors.green, Colors.greenAccent]
+          )
+        ),
         child: Text(
           'Register',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -150,15 +204,18 @@ class _RegistrationPageState extends State<Registration> {
               decoration: BoxDecoration(
                 color: Color(0xff1959a9),
                 borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(5),
-                    topLeft: Radius.circular(5)),
+                  bottomLeft: Radius.circular(5),
+                  topLeft: Radius.circular(5)
+                ),
               ),
               alignment: Alignment.center,
               child: Text('f',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400)),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                )
+              ),
             ),
           ),
           Expanded(
@@ -167,15 +224,18 @@ class _RegistrationPageState extends State<Registration> {
               decoration: BoxDecoration(
                 color: Color(0xff2872ba),
                 borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(5),
-                    topRight: Radius.circular(5)),
+                  bottomRight: Radius.circular(5),
+                  topRight: Radius.circular(5)
+                ),
               ),
               alignment: Alignment.center,
               child: Text('Facebook',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400)),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400
+                )
+              ),
             ),
           ),
         ],
@@ -235,13 +295,13 @@ class _RegistrationPageState extends State<Registration> {
   Widget logo() {
     return Center(
       child: Container(
-        height: 50.0,
-        width: 150.0,
-        child: Text("Registration",style: TextStyle(
+        child: Text(type == 1 ? "User Registration" : "Admin Registration",
+          style: TextStyle(
             color: Colors.green,
             fontSize: 20,
-          fontWeight: FontWeight.bold
-        )),
+            fontWeight: FontWeight.bold
+          )
+        ),
       ),
     );
   }
@@ -249,49 +309,10 @@ class _RegistrationPageState extends State<Registration> {
   Widget emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        entryField("Email id"),
-        entryField("Password", isPassword: true),
+        entryField("Email id", emailCtl, false),
+        entryField("Password", passwordCtl,true),
+        entryField("Confirm Password", confirmPasswordCtl, true)
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-        body: Center(
-            child: Container(
-              height: screenSize.height,
-              width: 500,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height: screenSize.height * 0.05),
-                    logo(),
-                    Divider(
-                      color: Colors.lightGreenAccent,
-                      thickness: 1,
-                    ),
-                    SizedBox(height: 20),
-                    emailPasswordWidget(),
-                    SizedBox(height: 20),
-                    submitButton(context),
-                    SizedBox(height: 20),
-                    divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [facebookButton(), googleButton()],
-                    ),
-                    SizedBox(height: screenSize.height * .005),
-                    createLoginLabel(),
-                  ],
-                ),
-              )
-            )
-        )
     );
   }
 
@@ -316,6 +337,12 @@ class _RegistrationPageState extends State<Registration> {
           "Password should contain at least 8 character, "
           "one capital letter, one number and one special character!");
       isInputVerified = false;
+    } else if (confirmPasswordCtl.text.isEmpty){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, "Confirm password required!");
+      isInputVerified = false;
+    }else if (confirmPasswordCtl.text != passwordCtl.text){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, "Password and confirm password did not matched!");
+      isInputVerified = false;
     }
     return isInputVerified;
   }
@@ -323,7 +350,11 @@ class _RegistrationPageState extends State<Registration> {
   Widget createLoginLabel() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, "/login");
+        if(type == 1){
+          Navigator.pushNamed(context, "/user/login");
+        }else {
+          Navigator.pushNamed(context, "/admin/login");
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 20),
@@ -342,9 +373,10 @@ class _RegistrationPageState extends State<Registration> {
             Text(
               'Login',
               style: TextStyle(
-                  color: Color(0xfff79c4f),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
+                color: Color(0xfff79c4f),
+                fontSize: 13,
+                fontWeight: FontWeight.w600
+              )
             ),
           ],
         ),

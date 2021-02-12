@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\Notification;
 use App\Models\Transaction;
 use Exception;
 use Illuminate\Http\Request;
@@ -32,6 +33,20 @@ class TransactionRpo
             $transaction->accountNumber = $rTransaction["accountNumber"];
             $transaction->paymentGatewayName = $rTransaction["paymentGatewayName"];
             $transaction->save();
+
+            if ($rTransaction["transactionType"] == "deposit") {
+                $msg = "Deposit request " . $rTransaction['depositAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
+            } else {
+                $msg = "Withdraw request " . $rTransaction['withdrawAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
+            }
+
+            Notification::create([
+                "message" => $msg,
+                "receiverId" => 2,
+                "senderId" => $rTransaction['accountHolderId'],
+                "isSeen" => 0,
+                "type" => 2
+            ]);
 
             DB::commit();
             $res['code'] = 200;
@@ -75,9 +90,9 @@ class TransactionRpo
                 if ($request->has('user-info-id')) {
                     $userInfoId = $request->query('user-info-id');
                     $sql = $sql . " WHERE Transactions.accountHolderId = " . $userInfoId
-                        . " LIMIT " . $pageIndex . ", " . $parPage;
+                        . " ORDER BY Transactions.id DESC LIMIT " . $pageIndex . ", " . $parPage;
                 } else {
-                    $sql = $sql .  " LIMIT " . $pageIndex . ", " . $parPage;
+                    $sql = $sql .  " ORDER BY Transactions.id DESC LIMIT " . $pageIndex . ", " . $parPage;
                 }
 
                 $res['transactions'] = DB::select(DB::raw($sql));
@@ -111,13 +126,31 @@ class TransactionRpo
                     "status" => $rTransaction["status"],
                     "transactionId" => $rTransaction["transactionId"]
                 );
+                $msg = "Your withdraw request "
+                    . $rTransaction['withdrawAmount']
+                    . "$ By "
+                    . $rTransaction["paymentGatewayName"] . " is "
+                    . $rTransaction["status"];
             } else {
                 $updateQuery = array(
                     "status" => $rTransaction["status"]
                 );
+                $msg = "Your deposit request "
+                    . $rTransaction['depositAmount']
+                    . "$ By "
+                    . $rTransaction["paymentGatewayName"] . " is "
+                    . $rTransaction["status"];
             }
 
             Transaction::where('id', $rTransaction["id"])->update($updateQuery);
+
+            Notification::create([
+                "message" => $msg,
+                "receiverId" => $rTransaction["accountHolderId"],
+                "senderId" => 2,
+                "isSeen" => 0,
+                "type" => 1
+            ]);
 
             DB::commit();
             $res['code'] = 200;

@@ -23,6 +23,8 @@ class Project {
   String publisherName;
   String applicantName;
   String status;
+  int publishedBy;
+  int submittedBy;
 
   Project({
     this.id,
@@ -48,6 +50,8 @@ class Project {
     this.totalApplied,
     this.publisherName,
     this.applicantName,
-    this.status
+    this.status,
+    this.publishedBy,
+    this.submittedBy
   });
 }

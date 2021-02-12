@@ -61,7 +61,12 @@ class AvailableState extends State<Available> {
                 return Center(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text(type == 1 ?"No available job found!" : "No job found to accept!"),
+                    child: Text(type == 1 ?"No available job found!" :
+                      type == 2 ? "No job found to accept!" :
+                      type == 3 ? "You didn't post any job yet!" :
+                      type == 4 ? "You didn't applied any job yet!" :
+                      "No advertisement job fount!"
+                    ),
                   ),
                 );
               }else {
@@ -473,7 +478,9 @@ class AvailableState extends State<Available> {
               totalApplied: project['totalApplied'],
               publisherName: project['publisherName'],
               applicantName: project['applicantName'],
-              status: type == 2 ? project['pfStatus'] : project['status']
+              status: type == 2 ? project['pfStatus'] : project['status'],
+              publishedBy: project['publishedBy'],
+              submittedBy: project['submittedBy']
           ));
         });
       }

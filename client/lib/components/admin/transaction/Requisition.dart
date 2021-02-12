@@ -57,6 +57,7 @@ class RequisitionState extends State<Requisition> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<Transaction> transactions = snapshot.data;
+
                 if(transactions.length == 0){
                   return Center(
                     child: Padding(
@@ -100,7 +101,9 @@ class RequisitionState extends State<Requisition> {
                             ],
                             rows: List<DataRow>.generate(
                                 transactions.length, (index) => DataRow(
+
                                 onSelectChanged: (value){
+                                  print("tans = ${transactions[index].accountHolderId}");
                                   if(!needToFreezeUi){
                                     setState(() {
                                       transaction = transactions[index];
@@ -304,6 +307,7 @@ class RequisitionState extends State<Requisition> {
           withdrawAmount: value["withdrawAmount"],
           depositAmount: value["depositAmount"],
           paymentGatewayName: value['paymentGatewayName'],
+          accountHolderId: value['accountHolderId'],
           accountNumber: value['accountNumber'].toString(),
           transactionType: value['transactionType'],
           status: value['status']
@@ -319,26 +323,18 @@ class RequisitionState extends State<Requisition> {
 
   void onUpdate(BuildContext context,String status,List<Transaction> transactions) {
 
-    var request;
-
-    if(transactions[listPosition].transactionType == "withdraw"){
-      request = {
-        "transaction": {
-          "id": transactions[listPosition].id,
-          "status": status,
-          "transactionId" : transactionIdCtl.text,
-          "transactionType" : transactions[listPosition].transactionType,
-        }
-      };
-    }else {
-      request = {
-        "transaction": {
-          "id": transactions[listPosition].id,
-          "status": status,
-          "transactionType" : transactions[listPosition].transactionType,
-        }
-      };
-    }
+    var request = {
+      "transaction": {
+        "id": transactions[listPosition].id,
+        "status": status,
+        "transactionId" : transactionIdCtl.text,
+        "transactionType" : transactions[listPosition].transactionType,
+        "accountHolderId" : transactions[listPosition].accountHolderId,
+        "withdrawAmount" : transactions[listPosition].withdrawAmount,
+        "depositAmount" : transactions[listPosition].depositAmount,
+        "paymentGatewayName" : transactions[listPosition].paymentGatewayName,
+      }
+    };
 
     String url = baseUrl + '/transactions';
     Map<String, String> headers = {"Content-type": "application/json"};

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationCtl;
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\UserInfoCtl;
@@ -50,3 +51,7 @@ Route::put('/proof-submissions', [ProofSubmissionCtl::class, 'update']);
 Route::post('/transactions', [TransactionCtl::class, 'create']);
 Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
+
+// notifications
+Route::get('/notifications/query', [NotificationCtl::class, 'readByQuery']);
+Route::put('/notifications', [NotificationCtl::class, 'update']);

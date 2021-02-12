@@ -7,11 +7,9 @@ class WelcomeNavBar extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(46),
         boxShadow: [
           BoxShadow(
             offset: Offset(0, -2),
@@ -60,7 +58,7 @@ class WelcomeNavBar extends StatelessWidget{
           DefaultButton(
             text: "Registration",
             press: () {
-              Navigator.pushNamed(context, "/registration");
+              Navigator.pushNamed(context, "/user/registration");
             },
           ),
         ],

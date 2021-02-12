@@ -1,3 +1,4 @@
+import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/Post.dart';
@@ -14,8 +15,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:client/components/job/ProofSubmissionComponent.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'dart:html' as html; // ignore: avoid_web_libraries_in_flutter
 
 class User extends StatefulWidget {
   User({Key key, this.userInfo}) : super(key: key);
@@ -119,6 +119,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                   DashboardTopNavigation(
                     type: 1,
                     eventHub: eventHub,
+                    totalUnseenNotification: userInfo["totalUnseenNotification"],
                     userNavigatorKey: userNavigatorKey,
                     userInfo: userInfo
                   ),
@@ -132,12 +133,12 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           IconButton(
-                              icon: Icon(Icons.arrow_back_ios),
-                              onPressed: (){
-                                if(userNavigatorKey.currentState.canPop()){
-                                  userNavigatorKey.currentState.pop();
-                                }
+                            icon: Icon(Icons.arrow_back_ios),
+                            onPressed: (){
+                              if(userNavigatorKey.currentState.canPop()){
+                                userNavigatorKey.currentState.pop();
                               }
+                            }
                           ),
                           Text(
                             viewTitle,
@@ -223,6 +224,13 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                       eventHub: eventHub,
                                       userInfo: userInfo,
                                       type: 5)
+                                  );
+                                }else if(settings.name == "/users/notifications"){
+                                  return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 1
+                                    )
                                   );
                                 }  else {
                                   return MaterialPageRoute(builder: (context) => Available(

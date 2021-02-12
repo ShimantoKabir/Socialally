@@ -477,7 +477,9 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       "proofSubmission": {
         "projectId": project.id,
         "submittedBy": userInfo['id'],
+        "publishedBy": project.publishedBy,
         "givenProofs": givenProofs,
+        "applicantName": userInfo['firstName'],
         "givenScreenshots": json.encode(gs)
       }
     };
@@ -519,7 +521,10 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
     var request = {
       "proofSubmission": {
         "id": project.proofSubmissionId,
-        "status": status
+        "status": status,
+        "submittedBy": project.submittedBy,
+        "publisherName": project.publisherName,
+        "publishedBy": project.publishedBy,
       }
     };
 

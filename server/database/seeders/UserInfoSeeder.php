@@ -17,51 +17,73 @@ class UserInfoSeeder extends Seeder
     {
         $userInfos = [
             [
+                "id" => 1,
+                "email" => "workersengineai247@mail.com",
+                "password" => sha1("Workersengineai247@"),
+                "isEmailVerified" => true,
+                "firstName" => "WorkersEngineAi",
+                "type" => 2
+            ],
+            [
+                "id" => 2,
                 "email" => "admin420@mail.com",
                 "password" => sha1("Admin420@"),
                 "isEmailVerified" => true,
+                "firstName" => "Admin",
                 "type" => 2
             ],
             [
+                "id" => 3,
                 "email" => "developer420@mail.com",
                 "password" => sha1("Developer420@"),
+                "firstName" => "Developer",
                 "isEmailVerified" => true,
                 "type" => 2
             ],
             [
+                "id" => 4,
                 "email" => "sakib420@mail.com",
                 "password" => sha1("Sakib420@"),
+                "firstName" => "Sakib",
                 "isEmailVerified" => true,
                 "type" => 1
             ],
             [
+                "id" => 5,
                 "email" => "musfiq420@mail.com",
                 "password" => sha1("Musfiq420@"),
+                "firstName" => "Musfiq",
                 "isEmailVerified" => true,
                 "type" => 1
             ],
             [
+                "id" => 6,
                 "email" => "liton420@mail.com",
                 "password" => sha1("Liton420@"),
+                "firstName" => "Liton",
                 "isEmailVerified" => true,
                 "type" => 1
             ],
             [
+                "id" => 7,
                 "email" => "tamim420@mail.com",
                 "password" => sha1("Tamim420@"),
+                "firstName" => "Tamim",
                 "isEmailVerified" => true,
                 "type" => 1
             ]
         ];
 
-        // DB::table('UserInfos')->truncate();
+        DB::table('UserInfos')->truncate();
 
         foreach ($userInfos as $key => $val) {
 
             DB::table('UserInfos')->insert([
+                "id" => $val['id'],
                 "email" => $val['email'],
                 "password" => $val['password'],
                 "isEmailVerified" => $val['isEmailVerified'],
+                "firstName" => $val['firstName'],
                 "type" => $val['type']
             ]);
         }

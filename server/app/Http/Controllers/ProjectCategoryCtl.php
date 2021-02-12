@@ -19,15 +19,15 @@ class ProjectCategoryCtl extends Controller
         $this->projectCategoryRpo = new ProjectCategoryRpo();
     }
 
-    public function read(Request $request){
+    public function read(Request $request)
+    {
 
         return $this->projectCategoryRpo->read($request);
-
     }
 
-    public function getSubCategoriesById(Request $request,$categoryId){
+    public function getSubCategoriesById(Request $request, $categoryId)
+    {
 
-        return $this->projectCategoryRpo->getSubCategoriesById($request,$categoryId);
-
+        return $this->projectCategoryRpo->getSubCategoriesById($request, $categoryId);
     }
 }

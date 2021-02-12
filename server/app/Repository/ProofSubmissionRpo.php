@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use Exception;
 use Faker\Provider\Uuid;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\ProofSubmission;
 use Illuminate\Support\Facades\DB;
@@ -41,9 +42,18 @@ class ProofSubmissionRpo
             $proofSubmission = new ProofSubmission();
             $proofSubmission->projectId = $rProofSubmission["projectId"];
             $proofSubmission->submittedBy = $rProofSubmission["submittedBy"];
-            $proofSubmission->givenProofs = $rProofSubmission["givenProofs"];
+            // $proofSubmission->givenProofs = $rProofSubmission["givenProofs"];
             $proofSubmission->givenScreenshotUrls = $givenScreenshotUrls;
+            $proofSubmission->givenScreenshotUrls = [];
             $proofSubmission->save();
+
+            Notification::create([
+                "message" => $rProofSubmission["applicantName"] . " has applied to your posted job!",
+                "receiverId" => $rProofSubmission["publishedBy"],
+                "senderId" => $rProofSubmission["submittedBy"],
+                "isSeen" => 0,
+                "type" => 1
+            ]);
 
             DB::commit();
             $res['code'] = 200;
@@ -73,6 +83,14 @@ class ProofSubmissionRpo
             ProofSubmission::where('id', $rProofSubmission['id'])->update(array(
                 'status' => $rProofSubmission['status'],
             ));
+
+            Notification::create([
+                "message" => $rProofSubmission["publisherName"] . " has " . $rProofSubmission['status'] . " your job proof.",
+                "receiverId" => $rProofSubmission["submittedBy"],
+                "senderId" => $rProofSubmission["publishedBy"],
+                "isSeen" => 0,
+                "type" => 1
+            ]);
 
             DB::commit();
             $res['code'] = 200;

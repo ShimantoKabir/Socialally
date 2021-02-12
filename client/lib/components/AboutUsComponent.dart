@@ -38,7 +38,7 @@ class AboutUsComponent extends StatelessWidget {
                 imageSrc: "assets/images/download.png",
                 text: "See Our Team",
                 press: () {
-                  Navigator.pushNamed(context, "/aboutus");
+                  Navigator.pushNamed(context, "/about-us");
                 },
               ),
               SizedBox(width: kDefaultPadding * 1.5),
@@ -46,7 +46,7 @@ class AboutUsComponent extends StatelessWidget {
                 imageSrc: "assets/images/hand.png",
                 text: "See How It Works",
                 press: () {
-                  Navigator.pushNamed(context, "/aboutus");
+                  Navigator.pushNamed(context, "/about-us");
                 },
               ),
               SizedBox(width: kDefaultPadding * 1.5),
@@ -54,7 +54,7 @@ class AboutUsComponent extends StatelessWidget {
                 imageSrc: "assets/images/download.png",
                 text: "See Our Workers",
                 press: () {
-                  Navigator.pushNamed(context, "/aboutus");
+                  Navigator.pushNamed(context, "/about-us");
                 },
               ),
             ],
