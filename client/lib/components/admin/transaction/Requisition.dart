@@ -118,12 +118,12 @@ class RequisitionState extends State<Requisition> {
                                       "N/A" : "${transactions[index].transactionId}")
                                   ),
                                   DataCell(Text("${transactions[index].paymentGatewayName}")),
-                                  DataCell(Text("${transactions[index].transactionType}")),
+                                  DataCell(Text("${transactions[index].ledgerName}")),
                                   DataCell(Text("${transactions[index].accountNumber}")),
                                   DataCell(Text(
-                                      transactions[index].transactionType == "deposit" ?
-                                      "${transactions[index].depositAmount}" :
-                                      "${transactions[index].withdrawAmount}"
+                                      transactions[index].ledgerId == 101 ?
+                                      "${transactions[index].creditAmount}" :
+                                      "${transactions[index].debitAmount}"
                                   )),
                                   DataCell(Text("${transactions[index].status}")),
                                   DataCell(Text("${transactions[index].createdAt}"))
@@ -155,12 +155,12 @@ class RequisitionState extends State<Requisition> {
                             ),
                             child: transaction == null ? Container() : Column(
                               children: [
-                                Text("Type: ${transaction.transactionType}"),
+                                Text("Type: ${transaction.ledgerName}"),
                                 SizedBox(height: 10),
                                 Text(
-                                  transaction.transactionType == "deposit" ?
-                                  "Amount: ${transaction.depositAmount}" :
-                                  "Amount: ${transaction.withdrawAmount}"
+                                  transaction.ledgerId == 101 ?
+                                  "Amount: ${transaction.creditAmount}" :
+                                  "Amount: ${transaction.debitAmount}"
                                 ),
                                 SizedBox(height: 10),
                                 Text("Account Number: ${transaction.accountNumber}"),
@@ -169,7 +169,7 @@ class RequisitionState extends State<Requisition> {
                                 SizedBox(height: 10),
                                 Text("Status: ${transaction.createdAt}"),
                                 SizedBox(height: 10),
-                                transaction.transactionType == "withdraw" ?
+                                transaction.ledgerId == 102 ?
                                 entryField("Transaction Id",transactionIdCtl) :
                                 Text("TransactionId: ${
                                     transaction.transactionId}"),
@@ -304,12 +304,12 @@ class RequisitionState extends State<Requisition> {
           id: value["id"],
           createdAt: value["createdAt"],
           transactionId: value["transactionId"],
-          withdrawAmount: value["withdrawAmount"],
-          depositAmount: value["depositAmount"],
+          debitAmount: value["debitAmount"],
+          creditAmount: value["creditAmount"],
           paymentGatewayName: value['paymentGatewayName'],
           accountHolderId: value['accountHolderId'],
           accountNumber: value['accountNumber'].toString(),
-          transactionType: value['transactionType'],
+            ledgerId: value['ledgerId'],
           status: value['status']
         ));
       });
@@ -328,10 +328,10 @@ class RequisitionState extends State<Requisition> {
         "id": transactions[listPosition].id,
         "status": status,
         "transactionId" : transactionIdCtl.text,
-        "transactionType" : transactions[listPosition].transactionType,
+        "ledgerId" : transactions[listPosition].ledgerId,
         "accountHolderId" : transactions[listPosition].accountHolderId,
-        "withdrawAmount" : transactions[listPosition].withdrawAmount,
-        "depositAmount" : transactions[listPosition].depositAmount,
+        "debitAmount" : transactions[listPosition].debitAmount,
+        "creditAmount" : transactions[listPosition].creditAmount,
         "paymentGatewayName" : transactions[listPosition].paymentGatewayName,
       }
     };
@@ -353,7 +353,7 @@ class RequisitionState extends State<Requisition> {
         if (body['code'] == 200) {
           setState(() {
             transactions[listPosition].status = status;
-            if(transactions[listPosition].transactionType == "withdraw"){
+            if(transactions[listPosition].ledgerId == 102){
               transactions[listPosition].transactionId = transactionIdCtl.text;
             }
           });

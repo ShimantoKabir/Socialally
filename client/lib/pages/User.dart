@@ -147,7 +147,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                         ],
                       )
                     ),
-                    flex: 1,
+                    flex: 1
                   ),
                   // component body
                   Expanded(
@@ -236,90 +236,101 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                   return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
-                                      type: 1)
+                                      type: 1
+                                    )
                                   );
                                 }
-                              },
+                              }
                             ),
                             flex: 5
                           ),
                           Expanded(
-                            child: Column(
-                              children: [
-                                Container(
-                                  child: Text(
-                                    "Advertisement Job",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                ),
-                                Expanded(
-                                  child: Available(
-                                    eventHub: eventHub,
-                                    userInfo: userInfo,
-                                    type: 5
-                                  ),
-                                  flex: 4,
-                                ),
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    child: Container(
-                                      padding: EdgeInsets.all(20),
-                                      color: Colors.white70,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: 70.0,
-                                            width: 70.0,
-                                            decoration: new BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: new DecorationImage(
-                                                  fit: BoxFit.cover,
-                                                  image: profileImageWidget
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(userInfo['email']),
-                                          SizedBox(height: 20),
-                                          LinearProgressIndicator(
-                                            backgroundColor: Colors.grey,
-                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                                Colors.amber),
-                                            value: userInfo['profileCompleted'] / 100,
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(
-                                            "Profile Completed ${userInfo['profileCompleted']}%",
-                                            style:
-                                            TextStyle(fontWeight: FontWeight.bold),
-                                          ),
-                                          SizedBox(height: 20),
-                                          Visibility(
-                                              visible:
-                                              userInfo['profileCompleted'] != 100,
-                                              child: FlatButton(
-                                                onPressed: () {
-                                                  userNavigatorKey.currentState.pushNamed('/user/profile');
-                                                },
-                                                color: Colors.green,
-                                                padding:
-                                                EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                                child: Text(" Complete Now",
-                                                    style:
-                                                    TextStyle(color: Colors.white)),
-                                              )
-                                          )
-                                        ],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                    width: 1,
+                                    color: Colors.black12
+                                  )
+                                )
+                              ),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      "Advertisement Job",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15
                                       ),
                                     ),
+                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5)
                                   ),
-                                  flex: 3
-                                )
-                              ],
+                                  Expanded(
+                                    child: Available(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo,
+                                        type: 5
+                                    ),
+                                    flex: 4,
+                                  ),
+                                  Visibility(
+                                    visible:
+                                    userInfo['profileCompleted'] != 100,
+                                    child: Expanded(
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                            padding: EdgeInsets.all(20),
+                                            color: Colors.white70,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  height: 70.0,
+                                                  width: 70.0,
+                                                  decoration: new BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: new DecorationImage(
+                                                        fit: BoxFit.cover,
+                                                        image: profileImageWidget
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(userInfo['email']),
+                                                SizedBox(height: 20),
+                                                LinearProgressIndicator(
+                                                  backgroundColor: Colors.grey,
+                                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                                      Colors.amber),
+                                                  value: userInfo['profileCompleted'] / 100,
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(
+                                                  "Profile Completed ${userInfo['profileCompleted']}%",
+                                                  style:
+                                                  TextStyle(fontWeight: FontWeight.bold),
+                                                ),
+                                                SizedBox(height: 20),
+                                                FlatButton(
+                                                  onPressed: () {
+                                                    userNavigatorKey.currentState.pushNamed('/user/profile');
+                                                  },
+                                                  color: Colors.green,
+                                                  padding:
+                                                  EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                                  child: Text(" Complete Now",
+                                                      style:
+                                                      TextStyle(color: Colors.white)),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        flex: 3
+                                    )
+                                  )
+                                ],
+                              ),
                             ),
                             flex: 2
                           )

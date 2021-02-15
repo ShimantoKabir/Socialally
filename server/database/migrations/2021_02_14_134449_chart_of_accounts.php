@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AppConstants extends Migration
+class ChartOfAccounts extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class AppConstants extends Migration
      */
     public function up()
     {
-        Schema::create('AppConstants', function (Blueprint $table) {
+        Schema::create('ChartOfAccounts', function (Blueprint $table) {
             $table->id();
-            $table->string('appConstantName');
-            $table->string('appConstantStringValue')->nullable();
-            $table->integer('appConstantIntegerValue')->nullable();
-            $table->double('appConstantDoubleValue')->nullable();
-            $table->json('appConstantJsonValue')->nullable();
+            $table->integer('ledgerId');
+            $table->string('ledgerName');
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();
@@ -33,6 +30,6 @@ class AppConstants extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("AppConstants");
+        Schema::dropIfExists("ChartOfAccounts");
     }
 }

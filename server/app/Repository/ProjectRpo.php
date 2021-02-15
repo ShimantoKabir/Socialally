@@ -28,34 +28,55 @@ class ProjectRpo
         DB::beginTransaction();
         try {
 
-            $project = new Project();
-            $project->title = $rProject['title'];
-            $project->todoSteps = $rProject['todoSteps'];
-            $project->requiredProofs = $rProject['requiredProofs'];
-            $project->categoryId = $rProject['categoryId'];
-            $project->subCategoryId = $rProject['subCategoryId'];
-            $project->regionName = $rProject['regionName'];
-            $project->countryName = $rProject['countryName'];
-            $project->workerNeeded = $rProject['workerNeeded'];
-            $project->requiredScreenShots = $rProject['requiredScreenShots'];
-            $project->estimatedDay = $rProject['estimatedDay'];
-            $project->estimatedCost = $rProject['estimatedCost'];
-            $project->publishedBy = $rUserInfo['id'];
-            $project->save();
+            $rTransaction = [
+                "accountHolderId" => $rUserInfo['id'],
+                "debitAmount" => $rProject['estimatedCost'],
+                "creditAmount" => null,
+                "ledgerId" => 104,
+                "transactionId" => null,
+                "accountNumber" => null,
+                "paymentGatewayName" => null
+            ];
 
-            if (!is_null($rProject['imageString']) && !is_null($rProject['imageExt'])) {
-                $imageName = Uuid::uuid() . "." . $rProject['imageExt'];
-                self::uploadFileToFtp($rProject['imageString'], $project->id, $appUrl, $imageName, "img");
+            $balance = TransactionRpo::getBalance($rTransaction);
+
+            if ($rTransaction['debitAmount'] < $balance) {
+
+                TransactionRpo::saveTransaction($rTransaction);
+
+                $project = new Project();
+                $project->title = $rProject['title'];
+                $project->todoSteps = $rProject['todoSteps'];
+                $project->requiredProofs = $rProject['requiredProofs'];
+                $project->categoryId = $rProject['categoryId'];
+                $project->subCategoryId = $rProject['subCategoryId'];
+                $project->regionName = $rProject['regionName'];
+                $project->countryName = $rProject['countryName'];
+                $project->workerNeeded = $rProject['workerNeeded'];
+                $project->requiredScreenShots = $rProject['requiredScreenShots'];
+                $project->estimatedDay = $rProject['estimatedDay'];
+                $project->estimatedCost = $rProject['estimatedCost'];
+                $project->publishedBy = $rUserInfo['id'];
+                $project->save();
+
+                if (!is_null($rProject['imageString']) && !is_null($rProject['imageExt'])) {
+                    $imageName = Uuid::uuid() . "." . $rProject['imageExt'];
+                    self::uploadFileToFtp($rProject['imageString'], $project->id, $appUrl, $imageName, "img");
+                }
+
+                if (!is_null($rProject['fileString']) && !is_null($rProject['fileExt'])) {
+                    $fileName = Uuid::uuid() . "." . $rProject['fileExt'];
+                    self::uploadFileToFtp($rProject['fileString'], $project->id, $appUrl, $fileName, "file");
+                }
+
+                $res['id'] = $project->id;
+                $res['msg'] = "Job posted successfully!";
+                $res['code'] = 200;
+            } else {
+                $res['code'] = 404;
+                $res['msg'] = "Your job posting cost cross the balance!";
             }
 
-            if (!is_null($rProject['fileString']) && !is_null($rProject['fileExt'])) {
-                $fileName = Uuid::uuid() . "." . $rProject['fileExt'];
-                self::uploadFileToFtp($rProject['fileString'], $project->id, $appUrl, $fileName, "file");
-            }
-
-            $res['id'] = $project->id;
-            $res['msg'] = "Job posted successfully!";
-            $res['code'] = 200;
 
             DB::commit();
         } catch (Exception $e) {

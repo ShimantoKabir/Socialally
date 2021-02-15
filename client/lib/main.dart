@@ -12,7 +12,6 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         onGenerateRoute: RouterGenerator().generate,
         title: 'W-engine',
-        theme: getThemeData(textTheme),
         debugShowCheckedModeBanner: false);
   }
 }

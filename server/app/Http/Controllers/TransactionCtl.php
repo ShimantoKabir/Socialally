@@ -33,4 +33,9 @@ class TransactionCtl extends Controller
     {
         return $this->transactionRpo->update($request);
     }
+
+    public function getBalanceSummary(Request $request)
+    {
+        return $this->transactionRpo->getBalanceSummary($request);
+    }
 }

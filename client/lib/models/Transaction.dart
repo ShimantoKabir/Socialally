@@ -1,9 +1,11 @@
 class Transaction {
   int id;
-  int depositAmount;
-  int withdrawAmount;
+  double creditAmount;
+  double debitAmount;
+  double amount;
   int accountHolderId;
-  String transactionType;
+  int ledgerId;
+  String ledgerName;
   String transactionId;
   String accountNumber;
   String paymentGatewayName;
@@ -12,10 +14,12 @@ class Transaction {
 
   Transaction({
     this.id,
-    this.depositAmount,
-    this.withdrawAmount,
+    this.creditAmount,
+    this.debitAmount,
+    this.amount,
     this.accountHolderId,
-    this.transactionType,
+    this.ledgerId,
+    this.ledgerName,
     this.transactionId,
     this.accountNumber,
     this.paymentGatewayName,

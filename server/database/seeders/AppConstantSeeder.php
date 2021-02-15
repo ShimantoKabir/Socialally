@@ -21,12 +21,21 @@ class AppConstantSeeder extends Seeder
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
                 "appConstantIntegerValue" => 85,
+                "appConstantDoubleValue" => null
             ],
             [
                 "appConstantName" => "proofSubmissionStatus",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => json_encode(["Pending", "Accepted", "Denied"]),
                 "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "jobPostingCharge",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 0.1
             ],
             [
                 "appConstantName" => "adCostPlanList",
@@ -50,6 +59,7 @@ class AppConstantSeeder extends Seeder
                     ]
                 ]),
                 "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => null
             ]
         ];
 
@@ -61,7 +71,8 @@ class AppConstantSeeder extends Seeder
                 "appConstantName" => $val['appConstantName'],
                 "appConstantStringValue" => $val['appConstantStringValue'],
                 "appConstantJsonValue" => $val['appConstantJsonValue'],
-                "appConstantIntegerValue" => $val['appConstantIntegerValue']
+                "appConstantIntegerValue" => $val['appConstantIntegerValue'],
+                "appConstantDoubleValue" => $val['appConstantDoubleValue']
             ]);
         }
     }

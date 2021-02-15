@@ -159,16 +159,49 @@ class ProfileState extends State<Profile> {
                   ),
                 ),
                 entryField("First Name", firstNameCtl),
-                entryField("Last Name", lastNameCtl),
-                entryField("Contact Number", contactNumberCtl),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      showRequiredHeading("Last Name"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                          controller: lastNameCtl,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Color(0xfff3f3f4),
+                              filled: true))
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      showRequiredHeading("Contact Number"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                          controller: contactNumberCtl,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Color(0xfff3f3f4),
+                              filled: true))
+                    ],
+                  ),
+                ),
                 entryField("Password", passwordCtl),
                 SizedBox(
                   height: 5,
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Region",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Region"),
                 ),
                 SizedBox(
                   height: 10,
@@ -193,8 +226,7 @@ class ProfileState extends State<Profile> {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Country",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Country"),
                 ),
                 SizedBox(
                   height: 10,
@@ -229,7 +261,14 @@ class ProfileState extends State<Profile> {
                         });
                       },
                     ),
-                    Text('Agreed terms & condition')
+                    Text('Want news letter notification.'),
+                    Text(
+                      ' * ',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
                   ],
                 ),
                 Row(
@@ -253,7 +292,10 @@ class ProfileState extends State<Profile> {
                   children: [
                     OutlineButton(
                         onPressed: () {
-                          onSave(context);
+                          bool isInputVerified = verifyInput(context);
+                          if (isInputVerified) {
+                            onSave(context);
+                          }
                         },
                         child: Text("Save")),
                     OutlineButton(
@@ -308,12 +350,16 @@ class ProfileState extends State<Profile> {
 
     if (lastNameCtl.text.isEmpty) {
       userInfo['lastName'] = null;
+      isInputVerified = false;
+      errMsg = "Last name required!";
     } else {
       userInfo['lastName'] = lastNameCtl.text;
     }
 
     if (contactNumberCtl.text.isEmpty) {
       userInfo['contactNumber'] = null;
+      isInputVerified = false;
+      errMsg = "Contact number required!";
     } else {
       userInfo['contactNumber'] = contactNumberCtl.text;
     }
@@ -361,7 +407,6 @@ class ProfileState extends State<Profile> {
     if (!isInputVerified) {
       Alert.show(alertDialog, buildContext, Alert.ERROR, errMsg);
     }
-
     return isInputVerified;
   }
 
@@ -420,44 +465,41 @@ class ProfileState extends State<Profile> {
   }
 
   void onSave(BuildContext context) {
-    bool isInputVerified = verifyInput(context);
 
-    if (isInputVerified) {
-      var request = {"userInfo": userInfo};
+    var request = {"userInfo": userInfo};
 
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
+
+    HttpHandler().createPut("/users", request).then((res) {
       setState(() {
-        needToFreezeUi = true;
-        alertIcon = Alert.showIcon(Alert.LOADING);
-        alertText = Alert.LOADING_MSG;
+        needToFreezeUi = false;
       });
-
-      HttpHandler().createPut("/users", request).then((res) {
-        setState(() {
-          needToFreezeUi = false;
-        });
-        if (res.statusCode == 200) {
-          if (res.data['code'] == 200) {
-            Alert.show(alertDialog, context, Alert.SUCCESS, res.data['msg']);
-            userInfo = res.data['userInfo'];
-            MySharedPreferences.setStringValue(
-                'userInfo', jsonEncode(userInfo));
-            eventHub.fire("userInfo", userInfo);
-            setState(() {
-              showProfilePic(userInfo);
-            });
-          } else {
-            Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
-          }
+      if (res.statusCode == 200) {
+        if (res.data['code'] == 200) {
+          Alert.show(alertDialog, context, Alert.SUCCESS, res.data['msg']);
+          userInfo = res.data['userInfo'];
+          MySharedPreferences.setStringValue(
+              'userInfo', jsonEncode(userInfo));
+          eventHub.fire("userInfo", userInfo);
+          setState(() {
+            showProfilePic(userInfo);
+          });
         } else {
-          Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+          Alert.show(alertDialog, context, Alert.ERROR, res.data['msg']);
         }
-      }).catchError((err) {
-        setState(() {
-          needToFreezeUi = false;
-        });
+      } else {
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      setState(() {
+        needToFreezeUi = false;
       });
-    }
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
   }
 
   Future<void> onProfilePicUpload(BuildContext context) async {

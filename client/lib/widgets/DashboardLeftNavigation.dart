@@ -59,55 +59,54 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
   @override
   Widget build(BuildContext context) {
     return Visibility(
-        visible: isSideNavOpen,
-        child: Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 0.5,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 1, 0),
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      height: 100.0,
-                      width: 100.0,
-                      child: Image.asset(
-                        "assets/images/logo.png",
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child: TreeView(
-                          controller: treeViewController,
-                          allowParentSelect: true,
-                          supportParentDoubleTap: false,
-                          onNodeTap: (path) {
-                            setState(() {
-                              treeViewController = treeViewController
-                                  .copyWith(selectedKey: path);
-                              userNavigatorKey.currentState
-                                  .pushNamedAndRemoveUntil(
-                                  path, (route) => false
-                              );
-                            });
-                          },
-                          theme: tvt
-                      )
-                  )
-                ],
+      visible: isSideNavOpen,
+      child: Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              right: BorderSide(
+                color: Colors.grey,
+                width: 0.5,
               ),
             ),
           ),
-          flex: 1,
-        )
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 1, 0),
+            child: Column(
+              children: [
+                Center(
+                  child: Container(
+                    height: 100.0,
+                    width: 100.0,
+                    child: Image.asset(
+                      "assets/images/logo.png",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TreeView(
+                    controller: treeViewController,
+                    allowParentSelect: true,
+                    supportParentDoubleTap: false,
+                    onNodeTap: (path) {
+                      setState(() {
+                        treeViewController = treeViewController
+                            .copyWith(selectedKey: path);
+                        userNavigatorKey.currentState
+                            .pushNamedAndRemoveUntil(
+                            path, (route) => false
+                        );
+                      });
+                    },
+                  )
+                )
+              ],
+            ),
+          ),
+        ),
+        flex: 1,
+      )
     );
   }
 }

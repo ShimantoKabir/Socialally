@@ -42,7 +42,7 @@ class PostState extends State<Post> {
   String regionName;
   String countryName;
   int estimatedCost = 0;
-  int companyCharge = 20;
+  double companyCharge = 0.1;
   var fileInfo;
   bool needToFreezeUi;
   Widget alertIcon;
@@ -119,15 +119,21 @@ class PostState extends State<Post> {
       }
     }
 
-    estimatedCostCtl.text = estimatedCost.toString();
+    workerNeededCtl.addListener(() {
+      setState(() {
+        calculateEstimatedCost();
+        if(workerNeededCtl.text.isEmpty){
+          eachWorkerEarnCtl.clear();
+          estimatedCostCtl.clear();
+        }
+      });
+    });
+
     eachWorkerEarnCtl.addListener(() {
       setState(() {
-        if (eachWorkerEarnCtl.text.isNotEmpty &&
-            workerNeededCtl.text.isNotEmpty) {
-          int res = int.tryParse(eachWorkerEarnCtl.text) *
-                  int.tryParse(workerNeededCtl.text) +
-              companyCharge;
-          estimatedCostCtl.text = res.toString();
+        calculateEstimatedCost();
+        if(eachWorkerEarnCtl.text.isEmpty){
+          estimatedCostCtl.clear();
         }
       });
     });
@@ -167,9 +173,7 @@ class PostState extends State<Post> {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Todo Steps",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Todo Steps"),
                 ),
                 Divider(thickness: 1, color: Colors.green),
                 ListView.builder(
@@ -193,26 +197,24 @@ class PostState extends State<Post> {
                         icon: Icon(Icons.add),
                         onPressed: () {
                           setState(() {
-                            todoStepsControllers
-                                .add(new TextEditingController());
+                            todoStepsControllers.add(TextEditingController());
                           });
                         }),
                     IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          setState(() {
-                            if (todoStepsControllers.length > 0) {
-                              todoStepsControllers.removeLast();
-                            }
-                          });
-                        })
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          if (todoStepsControllers.length > 1) {
+                            todoStepsControllers.removeLast();
+                          }
+                        });
+                      }
+                    )
                   ],
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Required Proofs",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Required Proofs"),
                 ),
                 Divider(thickness: 1, color: Colors.green),
                 ListView.builder(
@@ -242,14 +244,15 @@ class PostState extends State<Post> {
                           });
                         }),
                     IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          setState(() {
-                            if (requiredProofsControllers.length > 0) {
-                              requiredProofsControllers.removeLast();
-                            }
-                          });
-                        })
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          if (requiredProofsControllers.length > 1) {
+                            requiredProofsControllers.removeLast();
+                          }
+                        });
+                      }
+                    )
                   ],
                 ),
                 Container(
@@ -257,25 +260,24 @@ class PostState extends State<Post> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        "Required Screenshots",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                      showRequiredHeading("Required Screenshots"),
                       SizedBox(
                         height: 10,
                       ),
                       TextField(
-                          controller: requiredScreenShotsCtl,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9]')),
-                          ],
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: requiredScreenShotsCtl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9]')
+                          ),
+                        ],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -284,48 +286,44 @@ class PostState extends State<Post> {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Category",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Category")
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<ProjectCategory>(
-                        value: defaultProjectCategory,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (ProjectCategory pc) {
-                          print("pc id ${pc.categoryId}");
-                          if (pc.categoryId != 0) {
-                            fetchSubCategoriesById(context, pc);
-                          } else {
-                            setState(() {
-                              defaultProjectCategory = new ProjectCategory(
-                                  id: 0,
-                                  categoryId: 0,
-                                  categoryName: "Select",
-                                  subCategoryName: "Select");
-                            });
-                            clearSubCategoryDropdown();
-                          }
-                        },
-                        items: projectCategoriesDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<ProjectCategory>(
+                    value: defaultProjectCategory,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: (ProjectCategory pc) {
+                      if (pc.categoryId != 0) {
+                        fetchSubCategoriesById(context, pc);
+                      } else {
+                        setState(() {defaultProjectCategory = new ProjectCategory(
+                            id: 0,
+                            categoryId: 0,
+                            categoryName: "Select",
+                            subCategoryName: "Select");
+                        });
+                        clearSubCategoryDropdown();
+                      }
+                    },
+                    items: projectCategoriesDropDownList
+                  )
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Sub Category",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Sub Category")
                 ),
                 SizedBox(
                   height: 10,
@@ -352,9 +350,7 @@ class PostState extends State<Post> {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Region",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Region")
                 ),
                 SizedBox(
                   height: 10,
@@ -386,54 +382,53 @@ class PostState extends State<Post> {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Text("Country",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: showRequiredHeading("Country")
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<String>(
-                        value: countryName,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (String newValue) {
-                          setState(() {
-                            countryName = newValue;
-                          });
-                        },
-                        items: countryDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                    value: countryName,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        countryName = newValue;
+                      });
+                    },
+                    items: countryDropDownList
+                  )
+                ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        "Worker Needed",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                      showRequiredHeading("Worker Needed"),
                       SizedBox(
                         height: 10,
                       ),
                       TextField(
-                          controller: workerNeededCtl,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9]')),
-                          ],
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: workerNeededCtl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9]')
+                          ),
+                        ],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -442,25 +437,26 @@ class PostState extends State<Post> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        "Each Worker Earn",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                      showRequiredHeading("Each Worker Earn"),
                       SizedBox(
                         height: 10,
                       ),
                       TextField(
-                          controller: eachWorkerEarnCtl,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9]')),
-                          ],
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: eachWorkerEarnCtl,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true
+                        ),
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9.]')
+                          )
+                        ],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -472,18 +468,22 @@ class PostState extends State<Post> {
                       Text(
                         "Estimated Cost",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
+                          fontWeight: FontWeight.bold,
+                            fontSize: 15
+                        ),
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       TextField(
-                          controller: estimatedCostCtl,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: estimatedCostCtl,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -492,25 +492,24 @@ class PostState extends State<Post> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        "Estimated Day",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                      showRequiredHeading("Estimated Day"),
                       SizedBox(
                         height: 10,
                       ),
                       TextField(
-                          controller: estimatedDayCtl,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9]')),
-                          ],
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: estimatedDayCtl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9]')
+                          ),
+                        ],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -518,68 +517,80 @@ class PostState extends State<Post> {
                   height: 20,
                 ),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlineButton(
-                          onPressed: () {
-                            onFileSelect(context, "img");
-                          },
-                          child: Text("Select Image")),
-                      Text(fileInfo["imageName"]),
-                      OutlineButton(
-                          onPressed: () {
-                            setState(() {
-                              fileInfo["imageExt"] = null;
-                              fileInfo["imageName"] = "No file selected yet!";
-                              fileInfo["imageString"] = null;
-                            });
-                          },
-                          child: Text("Clear"))
-                    ]),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlineButton(
+                      onPressed: () {
+                        onFileSelect(context, "img");
+                      },
+                      child: Text("Select Image")
+                    ),
+                    Text(fileInfo["imageName"]),
+                    OutlineButton(
+                      onPressed: () {
+                        setState(() {
+                          fileInfo["imageExt"] = null;
+                          fileInfo["imageName"] = "No file selected yet!";
+                          fileInfo["imageString"] = null;
+                        });
+                      },
+                      child: Text("Clear")
+                    )
+                  ]
+                ),
                 SizedBox(
                   height: 10,
                 ),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlineButton(
-                          onPressed: () {
-                            onFileSelect(context, "file");
-                          },
-                          child: Text("Select File")),
-                      Text(fileInfo["fileName"]),
-                      OutlineButton(
-                          onPressed: () {
-                            setState(() {
-                              fileInfo["fileExt"] = null;
-                              fileInfo["fileName"] = "No file selected yet!";
-                              fileInfo["fileString"] = null;
-                            });
-                          },
-                          child: Text("Clear"))
-                    ]),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlineButton(
+                      onPressed: () {
+                        onFileSelect(context, "file");
+                      },
+                      child: Text("Select File")
+                    ),
+                    Text(fileInfo["fileName"]),
+                    OutlineButton(
+                      onPressed: () {
+                        setState(() {
+                          fileInfo["fileExt"] = null;
+                          fileInfo["fileName"] = "No file selected yet!";
+                          fileInfo["fileString"] = null;
+                        });
+                      },
+                      child: Text("Clear")
+                    )
+                  ]
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlineButton(
-                          onPressed: () {
-                            if (userInfo['profileCompleted'] == 100) {
-                              onSave(context);
-                            } else {
-                              Alert.show(alertDialog, context, Alert.ERROR,
-                                  "To post a new job, you need to complete your profile 100%.");
-                            }
-                          },
-                          child: Text(project == null ? "Save" : "Update")),
-                      OutlineButton(
-                          onPressed: () {
-                            onReset(context);
-                          },
-                          child: Text("Reset"))
-                    ])
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlineButton(
+                      onPressed: () {
+                        if (userInfo['profileCompleted'] == 100) {
+                          bool isInputVerified = verifyInput(context);
+                          if(isInputVerified){
+                            onSave(context);
+                          }
+                        } else {
+                          Alert.show(alertDialog, context, Alert.ERROR,
+                              "To post a new job, you need to complete your profile 100%.");
+                        }
+                      },
+                      child: Text(project == null ? "Save" : "Update")
+                    ),
+                    OutlineButton(
+                      onPressed: () {
+                        onReset(context);
+                      },
+                      child: Text("Reset")
+                    )
+                  ]
+                )
               ]
             )
           )
@@ -599,19 +610,18 @@ class PostState extends State<Post> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
+          showRequiredHeading(title),
           SizedBox(
             height: 10,
           ),
           TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
+            controller: controller,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              fillColor: Color(0xfff3f3f4),
+              filled: true
+            )
+          )
         ],
       ),
     );
@@ -644,7 +654,7 @@ class PostState extends State<Post> {
             categoryName: null,
           );
           projectSubCategoriesDropDownList.add(
-              new DropdownMenuItem<ProjectCategory>(
+              DropdownMenuItem<ProjectCategory>(
                 value: pc,
                 child: Text(pc.subCategoryName),
             )
@@ -748,7 +758,7 @@ class PostState extends State<Post> {
         "countryName": countryName,
         "workerNeeded": int.parse(workerNeededCtl.text),
         "estimatedDay": int.parse(estimatedDayCtl.text),
-        "estimatedCost": int.parse(estimatedCostCtl.text),
+        "estimatedCost": double.parse(estimatedCostCtl.text),
         "requiredScreenShots": int.parse(requiredScreenShotsCtl.text),
         "fileString": fileInfo["fileString"],
         "fileExt": fileInfo["fileExt"],
@@ -774,6 +784,7 @@ class PostState extends State<Post> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
+          eventHub.fire("reloadBalance");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
@@ -824,11 +835,81 @@ class PostState extends State<Post> {
     }
   }
 
-
-
   @override
   void dispose() {
     super.dispose();
     eventHub.fire("clearProject");
+  }
+
+  bool verifyInput(BuildContext context) {
+
+    bool isInputVerified = true;
+    String errMsg;
+    bool isTodoStepsVerified = true;
+    bool isRequiredProofsVerified = true;
+
+    todoStepsControllers.forEach((element) {
+      if(element.text.isEmpty){
+        isTodoStepsVerified = false;
+      }
+    });
+
+    requiredProofsControllers.forEach((element) {
+      if(element.text.isEmpty){
+        isRequiredProofsVerified = false;
+      }
+    });
+
+    if (titleCtl.text.isEmpty) {
+      errMsg = "Please give a title!";
+      isInputVerified = false;
+    } else if(!isTodoStepsVerified){
+      errMsg = "Please fill up the todo steps!";
+      isInputVerified = false;
+    } else if(!isRequiredProofsVerified){
+      errMsg = "Please fill up the required proofs!";
+      isInputVerified = false;
+    } else if(requiredScreenShotsCtl.text.isEmpty){
+      errMsg = "Please give how many screen shot you need!";
+      isInputVerified = false;
+    } else if(defaultProjectCategory.categoryName == "Select"){
+      errMsg = "Please select an category!";
+      isInputVerified = false;
+    } else if(defaultProjectSubCategory.categoryName == "Select"){
+      errMsg = "Please select an sub category!";
+      isInputVerified = false;
+    } else if(countryName == "Select"){
+      errMsg = "Please select an country!";
+      isInputVerified = false;
+    } else if(regionName == "Select"){
+      errMsg = "Please select an region!";
+      isInputVerified = false;
+    } else if(workerNeededCtl.text.isEmpty){
+      errMsg = "Please give how many worker you needed!";
+      isInputVerified = false;
+    }else if(eachWorkerEarnCtl.text.isEmpty){
+      errMsg = "Please give how much each worker will earn!";
+      isInputVerified = false;
+    }else if(estimatedDayCtl.text.isEmpty){
+      errMsg = "Please give an estimated day!";
+      isInputVerified = false;
+    }
+
+    if (!isInputVerified) {
+      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    }
+    return isInputVerified;
+  }
+
+  void calculateEstimatedCost() {
+    if (workerNeededCtl.text.isNotEmpty
+        && eachWorkerEarnCtl.text.isNotEmpty) {
+      double ewe = double.tryParse(eachWorkerEarnCtl.text);
+      int wn = int.tryParse(workerNeededCtl.text);
+      double withoutCharge = ewe * wn;
+      double totalCharge = companyCharge * ewe * wn;
+      double res = totalCharge + withoutCharge;
+      estimatedCostCtl.text = res.toString();
+    }
   }
 }

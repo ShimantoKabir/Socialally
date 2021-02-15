@@ -42,7 +42,7 @@ class ProofSubmissionRpo
             $proofSubmission = new ProofSubmission();
             $proofSubmission->projectId = $rProofSubmission["projectId"];
             $proofSubmission->submittedBy = $rProofSubmission["submittedBy"];
-            // $proofSubmission->givenProofs = $rProofSubmission["givenProofs"];
+            $proofSubmission->givenProofs = $rProofSubmission["givenProofs"];
             $proofSubmission->givenScreenshotUrls = $givenScreenshotUrls;
             $proofSubmission->givenScreenshotUrls = [];
             $proofSubmission->save();

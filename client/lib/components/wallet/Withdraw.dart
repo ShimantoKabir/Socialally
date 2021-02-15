@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:client/constants.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
@@ -82,12 +81,7 @@ class WithdrawState extends State<Withdraw> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Payment Gateway",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15
-                  )
-              ),
+              showRequiredHeading("Payment Gateway"),
               SizedBox(
                 height: 10,
               ),
@@ -110,7 +104,7 @@ class WithdrawState extends State<Withdraw> {
                       items: paymentGatewayDropDownList
                   )
               ),
-              entryField("Receiver Account Number",receiverAccountNumberCtl),
+              entryField("Account Number",receiverAccountNumberCtl),
               Container(
                 padding: EdgeInsets.fromLTRB(2,10,10,10),
                 child: Text(
@@ -127,11 +121,7 @@ class WithdrawState extends State<Withdraw> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      "Amount (Dollar)",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
+                    showRequiredHeading("Amount (Dollar)"),
                     SizedBox(
                       height: 10,
                     ),
@@ -188,7 +178,10 @@ class WithdrawState extends State<Withdraw> {
                     OutlineButton(
                         onPressed: () {
                           if (userInfo['profileCompleted'] == 100) {
-                            onSave(context);
+                            bool isInputVerified = verifyInput();
+                            if(isInputVerified){
+                              onSave(context);
+                            }
                           } else {
                             Alert.show(alertDialog, context, Alert.ERROR,
                                 "To post a new job, you need to complete your profile 100%.");
@@ -197,7 +190,7 @@ class WithdrawState extends State<Withdraw> {
                         child: Text("Save")),
                     OutlineButton(
                         onPressed: () {
-
+                          onReset();
                         },
                         child: Text("Reset"))
                   ])
@@ -215,10 +208,7 @@ class WithdrawState extends State<Withdraw> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
+          showRequiredHeading(title),
           SizedBox(
             height: 10,
           ),
@@ -234,16 +224,15 @@ class WithdrawState extends State<Withdraw> {
   }
 
   void onSave(BuildContext context) {
-
     var request = {
       "transaction": {
         "accountNumber": receiverAccountNumberCtl.text,
-        "withdrawAmount": int.tryParse(amountDollarCtl.text),
-        "depositAmount": null,
+        "debitAmount": double.tryParse(amountDollarCtl.text),
+        "creditAmount": null,
         "accountHolderId": userInfo['id'],
         "transactionId": null,
         "paymentGatewayName": paymentGatewayName,
-        "transactionType": "withdraw"
+        "ledgerId": 102
       }
     };
 
@@ -263,6 +252,8 @@ class WithdrawState extends State<Withdraw> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
+          onReset();
+          eventHub.fire("reloadBalance");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
@@ -277,6 +268,35 @@ class WithdrawState extends State<Withdraw> {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
 
+  }
+
+  bool verifyInput() {
+    bool isInputVerified = true;
+    String errMsg;
+    if (paymentGatewayName == "Select") {
+      errMsg = "Please select a payment gateway!";
+      isInputVerified = false;
+    } else if(receiverAccountNumberCtl.text.isEmpty){
+      errMsg = "Please give an account number to withdraw!";
+      isInputVerified = false;
+    }  else if(amountDollarCtl.text.isEmpty){
+      errMsg = "Please give your deposit amount!";
+      isInputVerified = false;
+    }
+
+    if (!isInputVerified) {
+      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    }
+    return isInputVerified;
+  }
+
+  void onReset(){
+    setState(() {
+      paymentGatewayName = "Select";
+      receiverAccountNumberCtl.clear();
+      amountDollarCtl.clear();
+      amountTakeCtl.clear();
+    });
   }
 
 }

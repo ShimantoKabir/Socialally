@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:badges/badges.dart';
+import 'package:client/constants.dart';
 import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class DashboardTopNavigation extends StatefulWidget {
   DashboardTopNavigation({
@@ -48,6 +52,22 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
     this.userInfo,
   });
 
+  Future futureBalanceSummary;
+  double balance;
+  double withdrawAmount;
+
+
+  @override
+  void initState() {
+    super.initState();
+    balance = 0.0;
+    withdrawAmount = 0.0;
+    futureBalanceSummary = fetchBalanceSummary();
+    eventHub.on("reloadBalance", (dynamic data) {
+      fetchBalanceSummary();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -92,22 +112,6 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                       ),
                       visible: type == 1,
                     ),
-                    Visibility(
-                      child: FlatButton(
-                        onPressed: () => {
-
-                        },
-                        color: Colors.blue,
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                        child: Row(
-                          children: <Widget>[
-                            Text("Deposit  ${userInfo['totalDeposit']} \$ ",
-                                style: TextStyle(color: Colors.white))
-                          ],
-                        ),
-                      ),
-                      visible: type == 1,
-                    ),
                     SizedBox(width: 10),
                     Visibility(
                       child: FlatButton(
@@ -118,7 +122,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                         padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                         child: Row(
                           children: <Widget>[
-                            Text("Withdraw  ${userInfo['totalWithdraw']} \$ ",
+                            Text("Withdraw  $withdrawAmount\$ ",
                                 style: TextStyle(color: Colors.white))
                           ],
                         ),
@@ -136,7 +140,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                         child: Row(
                           // Replace with a Row for horizontal icon + text
                           children: <Widget>[
-                            Text("Balance  ${userInfo['totalDeposit'] - userInfo['totalWithdraw']} \$ ",
+                            Text("Balance  $balance\$ ",
                                 style: TextStyle(color: Colors.white))
                           ],
                         ),
@@ -212,5 +216,24 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
       ),
       flex: 1,
     );
+  }
+
+  Future<dynamic> fetchBalanceSummary() async {
+
+    String url = baseUrl + "/transactions/balance-summary-query?account-holder-id=${userInfo['id']}";
+
+    var response = await get(url);
+    if (response.statusCode == 200) {
+      var res = jsonDecode(response.body);
+      if (res['code'] == 200) {
+        setState(() {
+          balance = res['balance'];
+          withdrawAmount = res['withdrawTransaction']['debitAmount'];
+        });
+      }
+    }
+
+    return response;
+
   }
 }

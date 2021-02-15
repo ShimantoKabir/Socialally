@@ -13,16 +13,16 @@ class Transaction extends Model
 
     protected $fillable = [
         'id',
-        'depositAmount',
-        'withdrawAmount',
+        'creditAmount', // deposit 101
+        'debitAmount', // withdraw 102
         'accountHolderId',
-        'transactionType',
+        'ledgerId',
         'transactionId',
         'accountNumber',
         'paymentGatewayName',
         'status',
         'ip',
         'modifiedBy',
-        'createdAt',
+        'createdAt'
     ];
 }

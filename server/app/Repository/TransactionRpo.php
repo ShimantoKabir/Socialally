@@ -24,20 +24,30 @@ class TransactionRpo
         DB::beginTransaction();
         try {
 
-            $transaction = new Transaction();
-            $transaction->depositAmount = $rTransaction["depositAmount"];
-            $transaction->withdrawAmount = $rTransaction["withdrawAmount"];
-            $transaction->accountHolderId = $rTransaction["accountHolderId"];
-            $transaction->transactionType = $rTransaction["transactionType"];
-            $transaction->transactionId = $rTransaction["transactionId"];
-            $transaction->accountNumber = $rTransaction["accountNumber"];
-            $transaction->paymentGatewayName = $rTransaction["paymentGatewayName"];
-            $transaction->save();
-
-            if ($rTransaction["transactionType"] == "deposit") {
-                $msg = "Deposit request " . $rTransaction['depositAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
+            // deposit = creditAmount,101 , withdraw = debitAmount,102
+            if ($rTransaction['ledgerId'] == 101) {
+                self::saveTransaction($rTransaction);
+                $res['code'] = 200;
+                $res['msg'] = "Deposit successfully!";
             } else {
-                $msg = "Withdraw request " . $rTransaction['withdrawAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
+
+                $balance = self::getBalance($rTransaction);
+
+                if ($rTransaction['debitAmount'] < $balance) {
+                    self::saveTransaction($rTransaction);
+                    $res['code'] = 200;
+                    $res['msg'] = "Your withdrawal amount is waiting for admin approval!";
+                } else {
+                    $res['code'] = 404;
+                    $res['msg'] = "Your withdrawal amount cross the balance!";
+                }
+            }
+
+
+            if ($rTransaction["ledgerId"] == 101) {
+                $msg = "Deposit request " . $rTransaction['creditAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
+            } else {
+                $msg = "Withdraw request " . $rTransaction['debitAmount'] . "$ By " . $rTransaction["paymentGatewayName"] . ".";
             }
 
             Notification::create([
@@ -49,8 +59,6 @@ class TransactionRpo
             ]);
 
             DB::commit();
-            $res['code'] = 200;
-            $res['msg'] = "Transaction save successfully!";
         } catch (Exception $e) {
             DB::rollback();
             $res['code'] = $e->getCode();
@@ -58,6 +66,19 @@ class TransactionRpo
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public static function saveTransaction($rTransaction)
+    {
+        $transaction = new Transaction();
+        $transaction->creditAmount = $rTransaction["creditAmount"];
+        $transaction->debitAmount = $rTransaction["debitAmount"];
+        $transaction->accountHolderId = $rTransaction["accountHolderId"];
+        $transaction->ledgerId = $rTransaction["ledgerId"];
+        $transaction->transactionId = $rTransaction["transactionId"];
+        $transaction->accountNumber = $rTransaction["accountNumber"];
+        $transaction->paymentGatewayName = $rTransaction["paymentGatewayName"];
+        $transaction->save();
     }
 
     public function readByQuery(Request $request)
@@ -85,7 +106,24 @@ class TransactionRpo
 
             try {
 
-                $sql = "SELECT * FROM Transactions";
+                // deposit = creditAmount,101 , withdraw = debitAmount,102
+                $sql = "SELECT
+                            Transactions.id AS id,
+                            IFNULL(transactionId,'N/A') AS transactionId,
+                            IFNULL(Transactions.paymentGatewayName,'N/A') AS paymentGatewayName,
+                            ChartOfAccounts.ledgerName,
+                            IFNULL(accountNumber,'N/A') AS accountNumber,
+                            Transactions.status,
+                            Transactions.createdAt AS createdAt,
+                            ChartOfAccounts.ledgerId,
+                            Transactions.debitAmount,
+                            Transactions.creditAmount,
+                            IFNULL(Transactions.debitAmount,Transactions.creditAmount) AS amount 
+                        FROM
+                            Transactions 
+                            JOIN
+                            ChartOfAccounts 
+                            on Transactions.ledgerId = ChartOfAccounts.ledgerId";
 
                 if ($request->has('user-info-id')) {
                     $userInfoId = $request->query('user-info-id');
@@ -108,7 +146,6 @@ class TransactionRpo
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 
-
     public function update(Request $request)
     {
         $res = [
@@ -121,13 +158,13 @@ class TransactionRpo
         DB::beginTransaction();
         try {
 
-            if ($rTransaction["transactionType"] == "withdraw") {
+            if ($rTransaction["ledgerId"] == 102) {
                 $updateQuery = array(
                     "status" => $rTransaction["status"],
                     "transactionId" => $rTransaction["transactionId"]
                 );
                 $msg = "Your withdraw request "
-                    . $rTransaction['withdrawAmount']
+                    . $rTransaction['debitAmount']
                     . "$ By "
                     . $rTransaction["paymentGatewayName"] . " is "
                     . $rTransaction["status"];
@@ -136,7 +173,7 @@ class TransactionRpo
                     "status" => $rTransaction["status"]
                 );
                 $msg = "Your deposit request "
-                    . $rTransaction['depositAmount']
+                    . $rTransaction['creditAmount']
                     . "$ By "
                     . $rTransaction["paymentGatewayName"] . " is "
                     . $rTransaction["status"];
@@ -162,5 +199,88 @@ class TransactionRpo
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function getBalanceSummary(Request $request)
+    {
+
+        $res = [
+            "code" => "",
+            "msg" => ""
+        ];
+
+        $rTransaction = $request->transaction;
+
+        try {
+
+            if (!$request->has('account-holder-id')) {
+                $res['code'] = 404;
+                $res['msg'] = "Account holder id required!";
+            } else {
+
+                $depositTransaction = [
+                    "accountHolderId" => $request->query("account-holder-id"),
+                    "ledgerId" => 101
+                ];
+
+                $withdrawTransaction = [
+                    "accountHolderId" => $request->query("account-holder-id"),
+                    "ledgerId" => 102
+                ];
+
+                $earningTransaction = [
+                    "accountHolderId" => $request->query("account-holder-id"),
+                    "ledgerId" => 103
+                ];
+
+                $jobPostingTransaction = [
+                    "accountHolderId" => $request->query("account-holder-id"),
+                    "ledgerId" => 103
+                ];
+
+                $res['balance'] = self::getBalance($depositTransaction);
+                $res['depositTransaction'] = self::getAmountByLedger($depositTransaction);
+                $res['withdrawTransaction'] = self::getAmountByLedger($withdrawTransaction);
+                $res['earningTransaction'] = self::getAmountByLedger($earningTransaction);
+                $res['jobPostingTransaction'] = self::getAmountByLedger($jobPostingTransaction);
+                $res['code'] = 200;
+                $res['msg'] = "Balance summary getting successful!";
+            }
+        } catch (Exception $e) {
+            $res['code'] = $e->getCode();
+            $res['msg'] = $e->getMessage();
+        }
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public static function getBalance($rTransaction)
+    {
+
+        $sql = "SELECT
+                (IFNULL(SUM(creditAmount),0.0) - IFNULL(SUM(debitAmount),0.0)) AS balance 
+                FROM
+                    TRansactions 
+                WHERE
+                    accountHolderId = " . $rTransaction['accountHolderId'];
+
+        $res = DB::select(DB::raw($sql));
+
+        return $res[0]->balance;
+    }
+
+    public static function getAmountByLedger($rTransaction)
+    {
+
+        $sql = "SELECT
+            IFNULL(SUM(debitAmount),0.0) AS debitAmount,
+            IFNULL(SUM(creditAmount),0.0) AS creditAmount
+        FROM
+            TRansactions 
+        WHERE
+            accountHolderId = " . $rTransaction['accountHolderId'] . " AND ledgerId = " . $rTransaction['ledgerId'];
+
+        $res = DB::select(DB::raw($sql));
+
+        return $res[0];
     }
 }

@@ -227,16 +227,10 @@ class UserRpo
                         'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first(),
                         'adCostPlanList' => AppConstant::where("appConstantName", "adCostPlanList")
                             ->first()['appConstantJsonValue'],
-                        'totalWithdraw' => Transaction::where("accountHolderId", $userInfo['id'])
-                            ->where("transactionType", "withdraw")
-                            ->where("status", "Approved")
-                            ->sum("withdrawAmount"),
-                        'totalDeposit' => Transaction::where("accountHolderId", $userInfo['id'])
-                            ->where("transactionType", "deposit")
-                            ->where("status", "Approved")
-                            ->sum("depositAmount"),
                         "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
-                            ->where("isSeen", false)->count()
+                            ->where("isSeen", false)->count(),
+                        "jobPostingCharge" =>  AppConstant::where("appConstantName", "jobPostingCharge")
+                            ->first()['appConstantDoubleValue']
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(

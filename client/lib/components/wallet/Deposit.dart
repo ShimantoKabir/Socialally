@@ -68,8 +68,11 @@ class DepositState extends State<Deposit> {
     amountDollarCtl.addListener(() {
       setState(() {
         if (amountDollarCtl.text.isNotEmpty) {
-          int res = int.tryParse(amountDollarCtl.text) * takaPerDollar;
+          double res = double.tryParse(amountDollarCtl.text) * takaPerDollar;
           amountTakeCtl.text = res.toString();
+        }
+        if(amountDollarCtl.text.isEmpty){
+          amountTakeCtl.clear();
         }
       });
     });
@@ -85,12 +88,7 @@ class DepositState extends State<Deposit> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Payment Gateway",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15
-                )
-              ),
+              showRequiredHeading("Payment Gateway"),
               SizedBox(
                 height: 10,
               ),
@@ -137,7 +135,7 @@ class DepositState extends State<Deposit> {
                   ),
                 )
               ),
-              entryField("Transaction Number",transactionIdCtl),
+              entryField("Transaction Id",transactionIdCtl),
               entryField("Sender Account Number",senderAccountNumberCtl),
               Container(
                 padding: EdgeInsets.fromLTRB(2,10,10,10),
@@ -155,20 +153,18 @@ class DepositState extends State<Deposit> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      "Amount (Dollar)",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
+                    showRequiredHeading("Amount (Dollar)"),
                     SizedBox(
                       height: 10,
                     ),
                     TextField(
                         controller: amountDollarCtl,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(
+                            decimal: true
+                        ),
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9]')),
+                              RegExp(r'[0-9.]')),
                         ],
                         decoration: InputDecoration(
                             border: InputBorder.none,
@@ -216,7 +212,10 @@ class DepositState extends State<Deposit> {
                     OutlineButton(
                         onPressed: () {
                           if (userInfo['profileCompleted'] == 100) {
-                            onSave(context);
+                            bool isInputVerified = verifyInput();
+                            if(isInputVerified){
+                              onSave(context);
+                            }
                           } else {
                             Alert.show(alertDialog, context, Alert.ERROR,
                                 "To post a new job, you need to complete your profile 100%.");
@@ -225,7 +224,7 @@ class DepositState extends State<Deposit> {
                         child: Text("Save")),
                     OutlineButton(
                         onPressed: () {
-
+                          onReset();
                         },
                         child: Text("Reset"))
                   ])
@@ -243,10 +242,7 @@ class DepositState extends State<Deposit> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
+          showRequiredHeading(title),
           SizedBox(
             height: 10,
           ),
@@ -267,11 +263,11 @@ class DepositState extends State<Deposit> {
       "transaction": {
         "accountNumber": senderAccountNumberCtl.text,
         "transactionId": transactionIdCtl.text,
-        "depositAmount": int.tryParse(amountDollarCtl.text),
-        "withdrawAmount": null,
+        "creditAmount": double.tryParse(amountDollarCtl.text),
+        "debitAmount": null,
         "accountHolderId": userInfo['id'],
         "paymentGatewayName": paymentGatewayName,
-        "transactionType": "deposit"
+        "ledgerId": 101
       }
     };
 
@@ -291,6 +287,8 @@ class DepositState extends State<Deposit> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
+          onReset();
+          eventHub.fire("reloadBalance");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
@@ -305,6 +303,40 @@ class DepositState extends State<Deposit> {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
 
+  }
+
+  bool verifyInput() {
+    bool isInputVerified = true;
+    String errMsg;
+    if (paymentGatewayName == "Select") {
+      errMsg = "Please select a payment gateway!";
+      isInputVerified = false;
+    } else if(transactionIdCtl.text.isEmpty){
+      errMsg = "Please give the transaction id!";
+      isInputVerified = false;
+    } else if(senderAccountNumberCtl.text.isEmpty){
+      errMsg = "Please give your account number!";
+      isInputVerified = false;
+    } else if(amountDollarCtl.text.isEmpty){
+      errMsg = "Please give your deposit amount!";
+      isInputVerified = false;
+    }
+
+    if (!isInputVerified) {
+      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    }
+    return isInputVerified;
+  }
+
+  void onReset(){
+    setState(() {
+      paymentGatewayName = "Select";
+      transactionIdCtl.clear();
+      senderAccountNumberCtl.clear();
+      amountDollarCtl.clear();
+      amountTakeCtl.clear();
+      cashInNumber = null;
+    });
   }
 
 }

@@ -96,18 +96,11 @@ class HistoryState extends State<History> {
                           transactions.length, (index) => DataRow(
                           cells: [
                             DataCell(Text("${index+1}")),
-                            DataCell(
-                                Text(transactions[index].transactionId == null ?
-                                "N/A" : "${transactions[index].transactionId}")
-                            ),
+                            DataCell(Text(transactions[index].transactionId)),
                             DataCell(Text("${transactions[index].paymentGatewayName}")),
-                            DataCell(Text("${transactions[index].transactionType}")),
+                            DataCell(Text("${transactions[index].ledgerName}")),
                             DataCell(Text("${transactions[index].accountNumber}")),
-                            DataCell(Text(
-                                transactions[index].transactionType == "deposit" ?
-                                "${transactions[index].depositAmount}" :
-                                "${transactions[index].withdrawAmount}"
-                            )),
+                            DataCell(Text("${transactions[index].amount}")),
                             DataCell(Text("${transactions[index].status}")),
                             DataCell(Text("${transactions[index].createdAt}"))
                           ]
@@ -196,22 +189,26 @@ class HistoryState extends State<History> {
 
     List<Transaction> transactionList = [];
     String url = baseUrl + "/transactions/query?user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    print("url = $url");
 
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
 
+      print("res $res");
       List<dynamic> transactions = res['transactions'];
 
       transactions.asMap().forEach((key, value) {
         transactionList.add(new Transaction(
           createdAt: value["createdAt"],
-          transactionId: value["transactionId"],
-          withdrawAmount: value["withdrawAmount"],
-          depositAmount: value["depositAmount"],
+          transactionId: value["transactionId"].toString(),
+          debitAmount: value["debitAmount"],
+          creditAmount: value["creditAmount"],
           paymentGatewayName: value['paymentGatewayName'],
           accountNumber: value['accountNumber'].toString(),
-          transactionType: value['transactionType'],
+          ledgerId: value['ledgerId'],
+          ledgerName: value['ledgerName'],
+          amount: value['amount'],
           status: value['status']
         ));
       });

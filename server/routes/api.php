@@ -51,6 +51,8 @@ Route::put('/proof-submissions', [ProofSubmissionCtl::class, 'update']);
 Route::post('/transactions', [TransactionCtl::class, 'create']);
 Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
+Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBalanceSummary']);
+
 
 // notifications
 Route::get('/notifications/query', [NotificationCtl::class, 'readByQuery']);

@@ -59,105 +59,116 @@ RegExp passwordRegExp =
 
 List<Node> userDashboardMenus = [
   Node(
-      label: 'Available Job',
-      key: '/job/available',
-      icon: NodeIcon.fromIconData(Icons.extension)),
+    label: 'Available Job',
+    key: '/job/available',
+    icon: NodeIcon.fromIconData(Icons.extension)
+  ),
   Node(
     label: 'Job',
     key: '/job/mine',
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
-          label: 'Post',
-          key: '/job/post',
-          icon: NodeIcon.fromIconData(Icons.post_add)),
+        label: 'Post',
+        key: '/job/post',
+        icon: NodeIcon.fromIconData(Icons.post_add)
+      ),
       Node(
-          label: 'Posted',
-          key: '/job/posted',
-          icon: NodeIcon.fromIconData(Icons.event_available)),
+        label: 'Posted',
+        key: '/job/posted',
+        icon: NodeIcon.fromIconData(Icons.event_available)
+      ),
       Node(
-          label: 'Accept',
-          key: '/job/accept',
-          icon: NodeIcon.fromIconData(Icons.done_all_outlined)),
+        label: 'Accept',
+        key: '/job/accept',
+        icon: NodeIcon.fromIconData(Icons.done_all_outlined)
+      ),
       Node(
-          label: 'Applied',
-          key: '/job/applied',
-          icon: NodeIcon.fromIconData(Icons.pending_actions_sharp))
+        label: 'Applied',
+        key: '/job/applied',
+        icon: NodeIcon.fromIconData(Icons.pending_actions_sharp)
+      )
     ],
   ),
   Node(
-      label: 'Wallet',
-      key: 'lol',
-      icon: NodeIcon.fromIconData(Icons.monetization_on),
-      children: [
-        Node(
-          label: 'Deposit',
-          key: '/wallet/deposit',
-          icon: NodeIcon.fromIconData(Icons.arrow_downward_sharp),
-        ),
-        Node(
-          label: 'Withdraw',
-          key: '/wallet/withdraw',
-          icon: NodeIcon.fromIconData(Icons.arrow_upward),
-        ),
-        Node(
-          label: 'History',
-          key: '/wallet/history',
-          icon: NodeIcon.fromIconData(Icons.history),
-        )
-      ]
+    label: 'Wallet',
+    key: 'lol',
+    icon: NodeIcon.fromIconData(Icons.monetization_on),
+    children: [
+      Node(
+        label: 'Deposit',
+        key: '/wallet/deposit',
+        icon: NodeIcon.fromIconData(Icons.arrow_downward_sharp),
+      ),
+      Node(
+        label: 'Withdraw',
+        key: '/wallet/withdraw',
+        icon: NodeIcon.fromIconData(Icons.arrow_upward),
+      ),
+      Node(
+        label: 'History',
+        key: '/wallet/history',
+        icon: NodeIcon.fromIconData(Icons.history),
+      )
+    ]
   ),
   Node(
-      label: 'Advertisement',
-      key: '/advertisement',
-      icon: NodeIcon.fromIconData(Icons.account_tree),
-      children: [
-        Node(
-          label: 'Send',
-          key: '/advertisement/send',
-          icon: NodeIcon.fromIconData(Icons.send_to_mobile),
-        ),
-        Node(
-          label: 'Job',
-          key: '/advertisement/job',
-          icon: NodeIcon.fromIconData(Icons.pending_actions_sharp),
-        )
-      ]
+    label: 'Advertisement',
+    key: '/advertisement',
+    icon: NodeIcon.fromIconData(Icons.account_tree),
+    children: [
+      Node(
+        label: 'Send',
+        key: '/advertisement/send',
+        icon: NodeIcon.fromIconData(Icons.send_to_mobile),
+      ),
+      Node(
+        label: 'Job',
+        key: '/advertisement/job',
+        icon: NodeIcon.fromIconData(Icons.pending_actions_sharp),
+      )
+    ]
   ),
   Node(
-      label: 'Plan & Earn',
-      key: '8',
-      icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)),
+    label: 'Plan & Earn',
+    key: '8',
+    icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)
+  ),
   Node(
-      label: 'Support',
-      key: '9',
-      icon: NodeIcon.fromIconData(Icons.support)),
+    label: 'Support',
+    key: '9',
+    icon: NodeIcon.fromIconData(Icons.support)
+  ),
   Node(
-      label: 'FAQ',
-      key: '10',
-      icon: NodeIcon.fromIconData(Icons.question_answer))
+    label: 'FAQ',
+    key: '10',
+    icon: NodeIcon.fromIconData(Icons.question_answer)
+  )
 ];
 
 List<Node> adminDashboardMenus = [
   Node(
-      label: 'Dashboard',
-      key: '/admin/dashboard',
-      icon: NodeIcon.fromIconData(Icons.dashboard)),
+    label: 'Dashboard',
+    key: '/admin/dashboard',
+    icon: NodeIcon.fromIconData(Icons.dashboard)
+  ),
   Node(
     label: 'Transaction',
     key: '/transaction',
     icon: NodeIcon.fromIconData(Icons.monetization_on_sharp),
     children: [
       Node(
-          label: 'Requisition',
-          key: '/transactions/requisition',
-          icon: NodeIcon.fromIconData(Icons.request_page)),
+        label: 'Requisition',
+        key: '/transactions/requisition',
+        icon: NodeIcon.fromIconData(Icons.request_page)
+      ),
       Node(
-          label: 'History',
-          key: '/job/posted',
-          icon: NodeIcon.fromIconData(Icons.history))
+        label: 'History',
+        key: '/job/posted',
+        icon: NodeIcon.fromIconData(Icons.history)
+      )
     ],
-  ),
+  )
 ];
 
 TreeViewTheme tvt = TreeViewTheme(
@@ -176,7 +187,10 @@ TreeViewTheme tvt = TreeViewTheme(
     size: 18,
     color: Colors.grey.shade800,
   ),
-  colorScheme: ColorScheme.light(onSurface: Colors.green,surface: Colors.green),
+  colorScheme: ColorScheme.light(
+    onSurface: Colors.green,
+    surface: Colors.green
+  )
 );
 
 List<DropdownMenuItem<String>> regionDropDownList = [
@@ -204,7 +218,11 @@ List<DropdownMenuItem<String>> countryDropDownList = [
 
 List<DropdownMenuItem<ProjectCategory>> projectCategoriesDropDownList = [
   ProjectCategory(
-      id: 0, categoryId: 0, categoryName: "Select", subCategoryName: "Select")
+    id: 0,
+    categoryId: 0,
+    categoryName: "Select",
+    subCategoryName: "Select"
+  )
 ].map<DropdownMenuItem<ProjectCategory>>((ProjectCategory projectCategory) {
   return DropdownMenuItem<ProjectCategory>(
     value: projectCategory,
@@ -242,3 +260,33 @@ List<DropdownMenuItem<dynamic>> adCostPlanDropDownList = [
     child: Text("${value['day']} day = ${value['cost']}")
   );
 }).toList();
+
+Widget showRequiredHeading(String title){
+  return RichText(
+      text: TextSpan(
+        style: TextStyle(
+            letterSpacing: 0.5,
+            height: 1.5,
+            color: Colors.black
+        ),
+        children: <TextSpan>[
+          TextSpan(
+              text: title,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black
+              )
+          ),
+          TextSpan(
+              text: " *",
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red
+              )
+          )
+        ],
+      )
+  );
+}

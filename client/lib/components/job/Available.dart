@@ -47,8 +47,6 @@ class AvailableState extends State<Available> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize =  MediaQuery.of(context).size;
-    print("screenSize = $screenSize");
     return Scaffold(
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -83,7 +81,7 @@ class AvailableState extends State<Available> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.fromLTRB(10,5,10,5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -92,7 +90,7 @@ class AvailableState extends State<Available> {
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 20
+                                      fontSize: 15
                                   ),
                                 ),
                                 Text(
@@ -102,115 +100,131 @@ class AvailableState extends State<Available> {
                             ),
                             decoration: headingDecoration(),
                           ),
+                          SizedBox(height: 5),
                           Padding(
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.fromLTRB(15,0,15,0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  width: 200,
-                                  padding: EdgeInsets.all(5),
-                                  child: Column(
-                                    children: [
-                                      Text("${projects[index].totalApplied}/${projects[index].workerNeeded} Applied"),
-                                      SizedBox(height: 5),
-                                      LinearProgressIndicator(
-                                        backgroundColor: Colors.grey,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.amber),
-                                        value: projects[index].totalApplied / projects[index].workerNeeded,
-                                      )
-                                    ],
-                                  ),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(color: Colors.grey)
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 200,
+                                      padding: EdgeInsets.all(3),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(height: 3),
+                                          LinearProgressIndicator(
+                                            backgroundColor: Colors.grey,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                                Colors.amber),
+                                            value: projects[index].totalApplied / projects[index].workerNeeded,
+                                          )
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(color: Colors.grey)
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      "${projects[index].totalApplied}/${projects[index].workerNeeded} Applied",
+                                      style: TextStyle(
+                                          fontSize: 12
+                                      ),
+                                    )
+                                  ],
                                 ),
                                 Container(
-                                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text("${eachWorkerEarn.round()}"),
-                                      SizedBox(width: 2),
-                                      Icon(Icons.monetization_on, color: Colors.green, size: 25)
-                                    ],
-                                  ),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(color: Colors.grey)
-                                  ),
+                                  child: Text(
+                                    "${eachWorkerEarn.round()}\$",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.lightGreen
+                                    ),
+                                  )
                                 )
                               ],
                             )
                           ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: Text(
-                              "Todo Steps",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
-                              ),
-                            ),
-                            decoration: headingDecoration(),
-                          ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 5),
                           ListView.builder(
-                              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemCount: projects[index].todoSteps.length,
-                              itemBuilder: (context, j) {
-                                if(projects[index].todoSteps.length == 0){
-                                  return Text("No todo step found!");
-                                }else {
-                                  return Text("${j+1}. ${projects[index].todoSteps[j]}");
-                                }
+                            padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: 1,
+                            itemBuilder: (context, j) {
+                              if(projects[index].todoSteps.length == 0){
+                                return Text("No todo step found!");
+                              }else {
+                                return RichText(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                        letterSpacing: 0.5,
+                                        height: 1.5,
+                                        color: Colors.black
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(text: "Todo Steps: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueGrey
+                                        )
+                                      ),
+                                      TextSpan(text: "${projects[index].todoSteps[j]}")
+                                    ],
+                                  ),
+                                );
                               }
+                            }
                           ),
-                          SizedBox(height: 10),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: Text(
-                              "Required Proofs",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
-                              ),
-                            ),
-                            decoration: headingDecoration(),
-                          ),
-                          SizedBox(height: 10),
                           ListView.builder(
-                              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemCount: projects[index].requiredProofs.length,
-                              itemBuilder: (context, j) {
-                                if(projects[index].requiredProofs.length == 0){
-                                  return Text("No required proof found!");
-                                }else {
-                                  return Text("${j+1}. ${projects[index].requiredProofs[j]}");
-                                }
+                            padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: 1,
+                            itemBuilder: (context, j) {
+                              if(projects[index].requiredProofs.length == 0){
+                                return Text("No required proof found!");
+                              }else {
+                                return RichText(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                        letterSpacing: 0.5,
+                                        height: 1.5,
+                                        color: Colors.black
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(text: "Required Proofs: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueGrey
+                                        )
+                                      ),
+                                      TextSpan(
+                                        text: "${projects[index].requiredProofs[j]}"
+                                      )
+                                    ],
+                                  ),
+                                );
                               }
+                            }
                           ),
-                          SizedBox(height: 20),
+                          SizedBox(height: 5),
                           Visibility(
                             child: Container(
-                              padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
+                              padding: EdgeInsets.fromLTRB(15, 0, 15,0),
                               child: Text(
                                 "Status: ${projects[index].status}",
                                 style: TextStyle(
-                                    color: projects[index].status == "Pending" ?
-                                    Colors.blue :
-                                    projects[index].status == "Accepted" ?
-                                    Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold
+                                  color: projects[index].status == "Pending" ?
+                                  Colors.blue :
+                                  projects[index].status == "Accepted" ?
+                                  Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold
                                 ),
                               ),
                               alignment: Alignment.bottomLeft,
@@ -219,48 +233,33 @@ class AvailableState extends State<Available> {
                           ),
                           Visibility(
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(20,0,20,5),
+                              padding: EdgeInsets.fromLTRB(15,0,15,0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                      "Budget: ${projects[index].estimatedCost}\$"),
                                   Text(
                                     "Estimated Day: ${projects[index].estimatedDay}",
                                     textAlign: TextAlign.right,
                                   ),
                                   Text(
-                                      "Worker Needed: ${projects[index].workerNeeded}")
+                                      "${projects[index].categoryName}/${projects[index].subCategoryName}"
+                                  ),
+                                  Text(
+                                    type == 2 ?
+                                    "Applied By: ${projects[index].applicantName}" :
+                                    "Published By: ${projects[index].publisherName}",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  )
                                 ],
                               ),
                             ),
                             visible: type != 5,
                           ),
-                          Visibility(
-                            visible: type != 5,
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(20,0,20,5),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      "Category: ${projects[index].categoryName}"),
-                                  Text(
-                                    "Sub Category: ${projects[index].subCategoryName}",
-                                    textAlign: TextAlign.right,),
-                                  Text(
-                                      type == 2 ? "Applied By: ${projects[index].applicantName}" : "Published By: ${projects[index].publisherName}",
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.bold
-                                      )
-                                  )
-                                ],
-                              ),
-                            )
-                          ),
                           Padding(
-                            padding: EdgeInsets.all(16),
+                            padding: EdgeInsets.fromLTRB(15,5,15,10),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -271,15 +270,18 @@ class AvailableState extends State<Available> {
                                         openFile(projects[index].fileUrl,context)
                                       },
                                       color: Colors.green,
-                                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                                       child: Row(
                                         // Replace with a Row for horizontal icon + text
                                         children: <Widget>[
                                           Icon(Icons.file_download,
-                                              size: 15,
+                                              size: 10,
                                               color: Colors.white),
                                           Text(" Instruction File",
-                                              style: TextStyle(color: Colors.white))
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10
+                                              )
+                                          )
                                         ],
                                       ),
                                     )
@@ -295,15 +297,19 @@ class AvailableState extends State<Available> {
                                       }
                                     },
                                     color: Colors.green,
-                                    padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                                     child: Row(
                                       children: <Widget>[
-                                        Text(type == 1 ? " Submit " : type == 2
-                                            ? " Investigate " : type == 5
-                                            ? " Submit " : " Update ",
-                                            style: TextStyle(color: Colors.white)),
+                                        Text(
+                                          type == 1 ? " Apply " : type == 2
+                                          ? " Investigate " : type == 5
+                                          ? " Submit " : " Update ",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10
+                                          )
+                                        ),
                                         Icon(Icons.arrow_forward_ios,
-                                            size: 15,
+                                            size: 10,
                                             color: Colors.white)
                                       ],
                                     ),
@@ -496,7 +502,7 @@ class AvailableState extends State<Available> {
       border: Border(
           bottom:  BorderSide(
             color: Colors.green,
-            width: 2.0,
+            width: 1.0,
           )
       ),
     );

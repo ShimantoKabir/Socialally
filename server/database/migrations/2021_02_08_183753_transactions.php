@@ -15,13 +15,13 @@ class Transactions extends Migration
     {
         Schema::create('Transactions', function (Blueprint $table) {
             $table->id();
-            $table->integer('depositAmount')->nullable();
-            $table->integer('withdrawAmount')->nullable();
+            $table->double('creditAmount')->nullable()->comment("deposit, income, 101");
+            $table->double('debitAmount')->nullable()->comment("withdraw, expanse, 102");
             $table->integer('accountHolderId');
-            $table->string('transactionType');
+            $table->integer('ledgerId');
             $table->string('transactionId')->nullable();
-            $table->string('accountNumber');
-            $table->string('paymentGatewayName');
+            $table->string('accountNumber')->nullable();
+            $table->string('paymentGatewayName')->nullable();
             $table->string('status')->default("Pending")->comment("Pending, Accepted, Declined");
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();

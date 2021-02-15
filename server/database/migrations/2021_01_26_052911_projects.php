@@ -31,7 +31,7 @@ class Projects extends Migration
             $table->integer('publishedBy');
             $table->integer('adCost')->nullable();
             $table->integer('adDuration')->nullable();
-            $table->dateTime("addPublishDate")->nullable();
+            $table->dateTime("adPublishDate")->nullable();
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();

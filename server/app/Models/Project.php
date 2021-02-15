@@ -31,7 +31,7 @@ class Project extends Model
         'imageUrl',
         'adCost',
         'adDuration',
-        'addPublishDate',
+        'adPublishDate',
         'ip',
         'modifiedBy',
         'createdAt',
