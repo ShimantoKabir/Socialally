@@ -261,7 +261,7 @@ class ProfileState extends State<Profile> {
                         });
                       },
                     ),
-                    Text('Want news letter notification.'),
+                    Text('Terms and conditions.'),
                     Text(
                       ' * ',
                       style: TextStyle(

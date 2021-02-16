@@ -55,20 +55,8 @@ class PostState extends State<Post> {
     alertText = "No operation running.";
     alertIcon = Container();
 
-    todoStepsControllers.add(new TextEditingController());
-    requiredProofsControllers.add(new TextEditingController());
-
-    defaultProjectCategory = new ProjectCategory(
-        id: 0,
-        categoryId: 0,
-        categoryName: "Select",
-        subCategoryName: "Select");
-
-    defaultProjectSubCategory = new ProjectCategory(
-        id: 0,
-        categoryId: 0,
-        categoryName: "Select",
-        subCategoryName: "Select");
+    clearListControllers();
+    resetCategories();
 
     List<dynamic> projectCategories = userInfo['projectCategories'];
     projectCategories.asMap().forEach((key, projectCategory) {
@@ -153,6 +141,66 @@ class PostState extends State<Post> {
       eventHub.fire("viewTitle", "Post Job");
     }else {
       eventHub.fire("viewTitle", "Update Job");
+      estimatedDayCtl.text = project.estimatedDay.toString();
+      // titleCtl.text = project.title;
+      // todoStepsControllers.clear();
+      // requiredProofsControllers.clear();
+      // project.todoSteps.forEach((element) {
+      //   TextEditingController textEditingController = new TextEditingController();
+      //   textEditingController.text = element;
+      //   todoStepsControllers.add(textEditingController);
+      // });
+      //
+      // project.requiredProofs.forEach((element) {
+      //   TextEditingController textEditingController = new TextEditingController();
+      //   textEditingController.text = element;
+      //   requiredProofsControllers.add(textEditingController);
+      // });
+      //
+      // requiredScreenShotsCtl.text = project.requiredScreenShots.toString();
+      //
+      // projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
+      //   value: ProjectCategory(
+      //       id: 0,
+      //       categoryId: project.categoryId,
+      //       categoryName: project.categoryName,
+      //       subCategoryName: "Select"
+      //   ),
+      //   child: Text(project.categoryName),
+      // ));
+      //
+      // defaultProjectCategory = ProjectCategory(
+      //     id: 0,
+      //     categoryId: project.categoryId,
+      //     categoryName: project.categoryName,
+      //     subCategoryName: "Select"
+      // );
+      //
+      // projectSubCategoriesDropDownList.clear();
+      //
+      // projectSubCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
+      //   value: ProjectCategory(
+      //       id: project.subCategoryId,
+      //       categoryId: 0,
+      //       categoryName: "Select",
+      //       subCategoryName: project.subCategoryName
+      //   ),
+      //   child: Text(project.subCategoryName),
+      // ));
+      //
+      // defaultProjectSubCategory = ProjectCategory(
+      //     id: project.subCategoryId,
+      //     categoryId: 0,
+      //     categoryName: "Select",
+      //     subCategoryName: project.subCategoryName
+      // );
+      //
+      // regionName = project.regionName;
+      // countryName = project.countryName;
+      //
+      // workerNeededCtl.text = project.workerNeeded.toString();
+      // eachWorkerEarnCtl.text = (project.estimatedCost/project.workerNeeded).toString();
+
     }
 
   }
@@ -165,7 +213,7 @@ class PostState extends State<Post> {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(10),
           child: Center(
-            child: Column(
+            child: project == null ? Column(
               children: [
                 entryField("Title", titleCtl),
                 SizedBox(
@@ -186,31 +234,35 @@ class PostState extends State<Post> {
                           padding: EdgeInsets.all(5),
                           child: TextField(
                               controller: todoStepsControllers[index],
+                              readOnly: project == null ? false : true,
                               decoration: InputDecoration(
                                   border: InputBorder.none,
                                   fillColor: Color(0xfff3f3f4),
                                   filled: true)));
                     }),
-                Row(
-                  children: [
-                    IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            todoStepsControllers.add(TextEditingController());
-                          });
-                        }),
-                    IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        setState(() {
-                          if (todoStepsControllers.length > 1) {
-                            todoStepsControllers.removeLast();
+                Visibility(
+                  child: Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              todoStepsControllers.add(TextEditingController());
+                            });
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              if (todoStepsControllers.length > 1) {
+                                todoStepsControllers.removeLast();
+                              }
+                            });
                           }
-                        });
-                      }
-                    )
-                  ],
+                      )
+                    ],
+                  ),
+                  visible: project == null
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
@@ -233,27 +285,30 @@ class PostState extends State<Post> {
                                 filled: true)),
                       );
                     }),
-                Row(
-                  children: [
-                    IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            requiredProofsControllers
-                                .add(new TextEditingController());
-                          });
-                        }),
-                    IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        setState(() {
-                          if (requiredProofsControllers.length > 1) {
-                            requiredProofsControllers.removeLast();
+                Visibility(
+                  child: Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              requiredProofsControllers
+                                  .add(new TextEditingController());
+                            });
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              if (requiredProofsControllers.length > 1) {
+                                requiredProofsControllers.removeLast();
+                              }
+                            });
                           }
-                        });
-                      }
-                    )
-                  ],
+                      )
+                    ],
+                  ),
+                  visible: project == null
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
@@ -302,19 +357,19 @@ class PostState extends State<Post> {
                     value: defaultProjectCategory,
                     isExpanded: true,
                     underline: SizedBox(),
-                    onChanged: (ProjectCategory pc) {
+                    onChanged: project == null ? (ProjectCategory pc) {
                       if (pc.categoryId != 0) {
                         fetchSubCategoriesById(context, pc);
                       } else {
                         setState(() {defaultProjectCategory = new ProjectCategory(
-                            id: 0,
-                            categoryId: 0,
-                            categoryName: "Select",
-                            subCategoryName: "Select");
+                          id: 0,
+                          categoryId: 0,
+                          categoryName: "Select",
+                          subCategoryName: "Select");
                         });
                         clearSubCategoryDropdown();
                       }
-                    },
+                    } : null,
                     items: projectCategoriesDropDownList
                   )
                 ),
@@ -329,22 +384,24 @@ class PostState extends State<Post> {
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<ProjectCategory>(
-                        value: defaultProjectSubCategory,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (ProjectCategory pc) {
-                          setState(() {
-                            defaultProjectSubCategory = pc;
-                          });
-                        },
-                        items: projectSubCategoriesDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<ProjectCategory>(
+                    value: defaultProjectSubCategory,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: project == null ? (ProjectCategory pc) {
+                      setState(() {
+                        defaultProjectSubCategory = pc;
+                      });
+                    } : null,
+                    items: projectSubCategoriesDropDownList
+                  )
+                ),
                 SizedBox(
                   height: 20,
                 ),
@@ -356,27 +413,29 @@ class PostState extends State<Post> {
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<String>(
-                        value: regionName,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (String rn) {
-                          if (rn == "Select") {
-                            setState(() {
-                              regionName = "Select";
-                            });
-                            clearCountryDropdown();
-                          } else {
-                            fetchCountriesByRegion(context, rn);
-                          }
-                        },
-                        items: regionDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                    value: regionName,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: project == null ? (String rn) {
+                      if (rn == "Select") {
+                        setState(() {
+                          regionName = "Select";
+                        });
+                        clearCountryDropdown();
+                      } else {
+                        fetchCountriesByRegion(context, rn);
+                      }
+                    } : null,
+                    items: regionDropDownList
+                  )
+                ),
                 SizedBox(
                   height: 20,
                 ),
@@ -398,11 +457,11 @@ class PostState extends State<Post> {
                     value: countryName,
                     isExpanded: true,
                     underline: SizedBox(),
-                    onChanged: (String newValue) {
+                    onChanged: project == null ? (String newValue) {
                       setState(() {
                         countryName = newValue;
                       });
-                    },
+                    } : null,
                     items: countryDropDownList
                   )
                 ),
@@ -416,6 +475,7 @@ class PostState extends State<Post> {
                         height: 10,
                       ),
                       TextField(
+                        readOnly: project == null ? false : true,
                         controller: workerNeededCtl,
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -442,6 +502,7 @@ class PostState extends State<Post> {
                         height: 10,
                       ),
                       TextField(
+                        readOnly: project == null ? false : true,
                         controller: eachWorkerEarnCtl,
                         keyboardType: TextInputType.numberWithOptions(
                           decimal: true
@@ -529,9 +590,7 @@ class PostState extends State<Post> {
                     OutlineButton(
                       onPressed: () {
                         setState(() {
-                          fileInfo["imageExt"] = null;
-                          fileInfo["imageName"] = "No file selected yet!";
-                          fileInfo["imageString"] = null;
+                          clearImage();
                         });
                       },
                       child: Text("Clear")
@@ -554,9 +613,7 @@ class PostState extends State<Post> {
                     OutlineButton(
                       onPressed: () {
                         setState(() {
-                          fileInfo["fileExt"] = null;
-                          fileInfo["fileName"] = "No file selected yet!";
-                          fileInfo["fileString"] = null;
+                          clearFile();
                         });
                       },
                       child: Text("Clear")
@@ -585,13 +642,49 @@ class PostState extends State<Post> {
                     ),
                     OutlineButton(
                       onPressed: () {
-                        onReset(context);
+                        onReset();
                       },
                       child: Text("Reset")
                     )
                   ]
                 )
               ]
+            ) :
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      showRequiredHeading("Estimated Day"),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                          controller: estimatedDayCtl,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9]')
+                            ),
+                          ],
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Color(0xfff3f3f4),
+                              filled: true
+                          )
+                      )
+                    ],
+                  ),
+                ),
+                OutlineButton(
+                    onPressed: () {
+                      onUpdate(context);
+                    },
+                    child: Text("Update")
+                )
+              ],
             )
           )
         ),
@@ -616,6 +709,7 @@ class PostState extends State<Post> {
           ),
           TextField(
             controller: controller,
+            readOnly: project == null ? false : true,
             decoration: InputDecoration(
               border: InputBorder.none,
               fillColor: Color(0xfff3f3f4),
@@ -784,6 +878,8 @@ class PostState extends State<Post> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
+          onReset();
+          eventHub.fire("redirectToPostedJob");
           eventHub.fire("reloadBalance");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
@@ -799,8 +895,6 @@ class PostState extends State<Post> {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
   }
-
-  void onReset(BuildContext context) {}
 
   Future<void> onFileSelect(BuildContext context, String fileType) async {
     FilePickerResult result = await FilePicker.platform.pickFiles(
@@ -833,12 +927,6 @@ class PostState extends State<Post> {
     } else {
       Alert.show(alertDialog, context, Alert.ERROR, "No file selected!");
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    eventHub.fire("clearProject");
   }
 
   bool verifyInput(BuildContext context) {
@@ -912,4 +1000,112 @@ class PostState extends State<Post> {
       estimatedCostCtl.text = res.toString();
     }
   }
+
+  void clearListControllers() {
+
+    todoStepsControllers.clear();
+    requiredProofsControllers.clear();
+    todoStepsControllers.add(TextEditingController());
+    requiredProofsControllers.add(TextEditingController());
+
+  }
+
+  void onReset() {
+
+    setState(() {
+      titleCtl.clear();
+      clearListControllers();
+      requiredScreenShotsCtl.clear();
+      resetCategories();
+      regionName = "Select";
+      countryName = "Select";
+      workerNeededCtl.clear();
+      eachWorkerEarnCtl.clear();
+      estimatedCostCtl.clear();
+      estimatedDayCtl.clear();
+      clearFile();
+      clearImage();
+    });
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    eventHub.fire("clearProject");
+  }
+
+  void resetCategories() {
+    defaultProjectCategory = ProjectCategory(
+      id: 0,
+      categoryId: 0,
+      categoryName: "Select",
+      subCategoryName: "Select"
+    );
+    defaultProjectSubCategory = ProjectCategory(
+      id: 0,
+      categoryId: 0,
+      categoryName: "Select",
+      subCategoryName: "Select"
+    );
+  }
+
+  void clearImage() {
+    fileInfo["imageExt"] = null;
+    fileInfo["imageName"] = "No file selected yet!";
+    fileInfo["imageString"] = null;
+  }
+
+  void clearFile() {
+    fileInfo["fileExt"] = null;
+    fileInfo["fileName"] = "No file selected yet!";
+    fileInfo["fileString"] = null;
+  }
+
+  void onUpdate(BuildContext context) {
+
+    var request = {
+      "project": {
+        "id": project.id,
+        "estimatedDay": int.parse(estimatedDayCtl.text),
+      }
+    };
+
+    String url = baseUrl + '/projects';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
+
+    put(url, headers: headers, body: json.encode(request)).then((response) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body['code'] == 200) {
+          setState(() {
+            estimatedDayCtl.clear();
+          });
+          eventHub.fire("redirectToPostedJob");
+          Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
+
+  }
+
+
 }

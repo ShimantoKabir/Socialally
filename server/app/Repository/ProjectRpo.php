@@ -33,6 +33,7 @@ class ProjectRpo
                 "debitAmount" => $rProject['estimatedCost'],
                 "creditAmount" => null,
                 "ledgerId" => 104,
+                "status" => "Approved",
                 "transactionId" => null,
                 "accountNumber" => null,
                 "paymentGatewayName" => null
@@ -197,7 +198,7 @@ class ProjectRpo
 
                 if ($type == 1) { // job accept published by me
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
                 } else if ($type == 2) { // job approve request
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
                     $sql = $sql . " ORDER BY p.id DESC ";
@@ -329,19 +330,87 @@ class ProjectRpo
         DB::beginTransaction();
         try {
 
-            Project::where('id', $rProject['id'])->update(array(
-                'adCost' => $rProject['adCost'],
-                'adDuration' => $rProject['adDuration'],
-                'adPublishDate' => date('Y-m-d H:i:s'),
-            ));
+            $rTransaction = [
+                "accountHolderId" => $rProject['publishedBy'],
+                "debitAmount" => $rProject['adCost'],
+                "creditAmount" => null,
+                "ledgerId" => 105,
+                "status" => "Approved",
+                "transactionId" => null,
+                "accountNumber" => null,
+                "paymentGatewayName" => null
+            ];
+
+            $balance = TransactionRpo::getBalance($rTransaction);
+
+            $sql = "SELECT
+                    * 
+                FROM
+                    Projects
+                WHERE
+                    publishedBy = " . $rProject['publishedBy'] . "
+                    AND id = " . $rProject['id'] . "
+                    AND NOW() BETWEEN adPublishDate AND DATE_ADD(adPublishDate, INTERVAL adDuration DAY)";
+
+            $runningJobAdvertisements = DB::select(DB::raw($sql));
+
+            if (count($runningJobAdvertisements) > 0) {
+
+                $res['code'] = 404;
+                $res['msg'] = "Job already in advertisement period!";
+            } else if ($rTransaction['debitAmount'] < $balance) {
+
+                TransactionRpo::saveTransaction($rTransaction);
+
+                Project::where('id', $rProject['id'])->update(array(
+                    'adCost' => $rProject['adCost'],
+                    'adDuration' => $rProject['adDuration'],
+                    'adPublishDate' => date('Y-m-d H:i:s'),
+                ));
+
+                $res['code'] = 200;
+                $res['msg'] = "Job advertised successfully!";
+            } else {
+
+                $res['code'] = 404;
+                $res['msg'] = "Your job advertisement cost cross the balance!";
+            }
 
             DB::commit();
-            $res['code'] = 200;
-            $res['msg'] = "Job advertised successfully!";
         } catch (Exception $e) {
             DB::rollBack();
             $res['msg'] = $e->getMessage();
             $res['code'] = 404;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function update(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rProject = $request->project;
+        DB::beginTransaction();
+        try {
+
+            Project::where("id", $rProject['id'])
+                ->update(array(
+                    "estimatedDay" => $rProject['estimatedDay']
+                ));
+
+            $res['msg'] = "Job updated successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 200;
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);

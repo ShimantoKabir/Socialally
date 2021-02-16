@@ -14,7 +14,7 @@ class Project {
   int workerNeeded;
   int requiredScreenShots;
   int estimatedDay;
-  int estimatedCost;
+  double estimatedCost;
   String imageUrl;
   String fileUrl;
   int type;

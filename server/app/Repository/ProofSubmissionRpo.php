@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use Exception;
+use App\Models\Project;
 use Faker\Provider\Uuid;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class ProofSubmissionRpo
             $proofSubmission->submittedBy = $rProofSubmission["submittedBy"];
             $proofSubmission->givenProofs = $rProofSubmission["givenProofs"];
             $proofSubmission->givenScreenshotUrls = $givenScreenshotUrls;
-            $proofSubmission->givenScreenshotUrls = [];
+            $proofSubmission->givenScreenshotUrls = $givenScreenshotUrls;
             $proofSubmission->save();
 
             Notification::create([
@@ -76,6 +77,7 @@ class ProofSubmissionRpo
         ];
 
         $rProofSubmission = $request->proofSubmission;
+        $companyCharge = 0.1;
 
         DB::beginTransaction();
         try {
@@ -83,6 +85,27 @@ class ProofSubmissionRpo
             ProofSubmission::where('id', $rProofSubmission['id'])->update(array(
                 'status' => $rProofSubmission['status'],
             ));
+
+            $project = Project::where("id", $rProofSubmission['projectId'])->first();
+
+            if ($rProofSubmission['status'] == "Approved") {
+
+                $x = $project['workerNeeded'] * $companyCharge;
+                $eachWorkerEarn = $project['estimatedCost'] / ($project['workerNeeded'] + $x);
+
+                $rTransaction = [
+                    "creditAmount" => $eachWorkerEarn,
+                    "debitAmount" => null,
+                    "accountHolderId" => $rProofSubmission["submittedBy"],
+                    "ledgerId" => 103,
+                    "status" => $rProofSubmission["status"],
+                    "transactionId" => null,
+                    "accountNumber" => null,
+                    "paymentGatewayName" => null,
+                ];
+
+                TransactionRpo::saveTransaction($rTransaction);
+            }
 
             Notification::create([
                 "message" => $rProofSubmission["publisherName"] . " has " . $rProofSubmission['status'] . " your job proof.",

@@ -25,7 +25,7 @@ class Projects extends Migration
             $table->integer('workerNeeded');
             $table->integer('requiredScreenShots')->nullable();
             $table->integer('estimatedDay');
-            $table->integer('estimatedCost');
+            $table->double('estimatedCost');
             $table->string('fileUrl')->nullable();
             $table->string('imageUrl')->nullable();
             $table->integer('publishedBy');

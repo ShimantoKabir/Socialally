@@ -1,3 +1,4 @@
+import 'package:client/models/AdCostPlan.dart';
 import 'package:client/models/ProjectCategory.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-const baseUrl = "http://127.0.0.1:8000/api";
-// const baseUrl = "http://workersengine.com/server/public/api";
+//const baseUrl = "http://127.0.0.1:8000/api";
+const baseUrl = "http://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -118,14 +119,24 @@ List<Node> userDashboardMenus = [
     icon: NodeIcon.fromIconData(Icons.account_tree),
     children: [
       Node(
-        label: 'Send',
-        key: '/advertisement/send',
+        label: 'Job',
+        key: '/advertisement/job',
         icon: NodeIcon.fromIconData(Icons.send_to_mobile),
       ),
       Node(
-        label: 'Job',
-        key: '/advertisement/job',
-        icon: NodeIcon.fromIconData(Icons.pending_actions_sharp),
+        label: 'Advertised Job',
+        key: '/advertisement/advertised/job',
+        icon: NodeIcon.fromIconData(Icons.description),
+      ),
+      Node(
+        label: 'Any',
+        key: '/advertisement/any',
+        icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
+      ),
+      Node(
+        label: 'Advertised Job',
+        key: '/advertisement/advertised/any',
+        icon: NodeIcon.fromIconData(Icons.mobile_friendly),
       )
     ]
   ),
@@ -249,15 +260,12 @@ List<DropdownMenuItem<String>> paymentGatewayDropDownList = [
   );
 }).toList();
 
-List<DropdownMenuItem<dynamic>> adCostPlanDropDownList = [
-  {
-    "day" : 0,
-    "cost" : 0
-  }
-].map<DropdownMenuItem<dynamic>>((var value) {
-  return DropdownMenuItem<dynamic>(
-    value: value,
-    child: Text("${value['day']} day = ${value['cost']}")
+List<DropdownMenuItem<AdCostPlan>> adCostPlanDropDownList = [
+  AdCostPlan(txt: "Select",day: 0,cost: 0)
+].map<DropdownMenuItem<AdCostPlan>>((var plan) {
+  return DropdownMenuItem<AdCostPlan>(
+    value: plan,
+    child: Text(plan.txt)
   );
 }).toList();
 

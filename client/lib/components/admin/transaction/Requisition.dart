@@ -101,7 +101,6 @@ class RequisitionState extends State<Requisition> {
                             ],
                             rows: List<DataRow>.generate(
                                 transactions.length, (index) => DataRow(
-
                                 onSelectChanged: (value){
                                   print("tans = ${transactions[index].accountHolderId}");
                                   if(!needToFreezeUi){
@@ -114,17 +113,12 @@ class RequisitionState extends State<Requisition> {
                                 cells: [
                                   DataCell(Text("${index+1}")),
                                   DataCell(
-                                      Text(transactions[index].transactionId == null ?
-                                      "N/A" : "${transactions[index].transactionId}")
+                                      Text("${transactions[index].transactionId}")
                                   ),
                                   DataCell(Text("${transactions[index].paymentGatewayName}")),
                                   DataCell(Text("${transactions[index].ledgerName}")),
                                   DataCell(Text("${transactions[index].accountNumber}")),
-                                  DataCell(Text(
-                                      transactions[index].ledgerId == 101 ?
-                                      "${transactions[index].creditAmount}" :
-                                      "${transactions[index].debitAmount}"
-                                  )),
+                                  DataCell(Text("${transactions[index].amount}")),
                                   DataCell(Text("${transactions[index].status}")),
                                   DataCell(Text("${transactions[index].createdAt}"))
                                 ]
@@ -157,11 +151,7 @@ class RequisitionState extends State<Requisition> {
                               children: [
                                 Text("Type: ${transaction.ledgerName}"),
                                 SizedBox(height: 10),
-                                Text(
-                                  transaction.ledgerId == 101 ?
-                                  "Amount: ${transaction.creditAmount}" :
-                                  "Amount: ${transaction.debitAmount}"
-                                ),
+                                Text("Amount: ${transaction.creditAmount}"),
                                 SizedBox(height: 10),
                                 Text("Account Number: ${transaction.accountNumber}"),
                                 SizedBox(height: 10),
@@ -187,9 +177,9 @@ class RequisitionState extends State<Requisition> {
                                 Visibility(
                                   child: OutlineButton(
                                     onPressed: (){
-                                      onUpdate(context,"Denied",transactions);
+                                      onUpdate(context,"Declined",transactions);
                                     },
-                                    child: Text("Denied"),
+                                    child: Text("Declined"),
                                   ),
                                   visible: transaction.status == "Pending",
                                 ),
@@ -304,12 +294,13 @@ class RequisitionState extends State<Requisition> {
           id: value["id"],
           createdAt: value["createdAt"],
           transactionId: value["transactionId"],
-          debitAmount: value["debitAmount"],
+          amount: value["amount"],
           creditAmount: value["creditAmount"],
           paymentGatewayName: value['paymentGatewayName'],
           accountHolderId: value['accountHolderId'],
           accountNumber: value['accountNumber'].toString(),
-            ledgerId: value['ledgerId'],
+          ledgerId: value['ledgerId'],
+          ledgerName: value['ledgerName'],
           status: value['status']
         ));
       });

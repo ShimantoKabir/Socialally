@@ -99,19 +99,19 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                 padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
                 child: Row(
                   children: [
-                    Visibility(
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.refresh,
-                          size: 20,
-                          color: Colors.black
-                        ),
-                        onPressed: (){
-
-                        },
-                      ),
-                      visible: type == 1,
-                    ),
+                    // Visibility(
+                    //   child: IconButton(
+                    //     icon: Icon(
+                    //       Icons.refresh,
+                    //       size: 20,
+                    //       color: Colors.black
+                    //     ),
+                    //     onPressed: (){
+                    //
+                    //     },
+                    //   ),
+                    //   visible: type == 1,
+                    // ),
                     SizedBox(width: 10),
                     Visibility(
                       child: FlatButton(

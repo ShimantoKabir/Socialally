@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\NotificationCtl;
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\UserInfoCtl;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionCtl;
+use App\Http\Controllers\NotificationCtl;
+use App\Http\Controllers\AdvertisementCtl;
 use App\Http\Controllers\ProjectCategoryCtl;
 use App\Http\Controllers\ProofSubmissionCtl;
 
@@ -42,6 +43,7 @@ Route::get('/projects', [ProjectCtl::class, 'read']);
 Route::get('/projects/title-query', [ProjectCtl::class, 'readByTitle']);
 // -- ?title=tile&user-info-id=2
 Route::put('/projects/advertisements', [ProjectCtl::class, 'addAdToProject']);
+Route::put('/projects', [ProjectCtl::class, 'update']);
 
 // proof submission
 Route::post('/proof-submissions', [ProofSubmissionCtl::class, 'create']);
@@ -53,7 +55,10 @@ Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
 Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBalanceSummary']);
 
-
 // notifications
 Route::get('/notifications/query', [NotificationCtl::class, 'readByQuery']);
 Route::put('/notifications', [NotificationCtl::class, 'update']);
+
+// advertisements
+Route::get('/advertisements/query', [AdvertisementCtl::class, 'readByQuery']);
+Route::post('/advertisements', [AdvertisementCtl::class, 'create']);

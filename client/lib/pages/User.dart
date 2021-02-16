@@ -2,7 +2,9 @@ import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/Post.dart';
-import 'package:client/components/user/advertisement/AdvertisementSender.dart';
+import 'package:client/components/user/advertisement/AdvertisedAny.dart';
+import 'package:client/components/user/advertisement/AnyAdvertisementSender.dart';
+import 'package:client/components/user/advertisement/JobAdvertisementSender.dart';
 import 'package:client/components/wallet/Deposit.dart';
 import 'package:client/components/wallet/History.dart';
 import 'package:client/components/wallet/Withdraw.dart';
@@ -92,6 +94,34 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
     eventHub.on("clearProject", (dynamic data) {
       setState(() {
         project = null;
+      });
+    });
+
+    eventHub.on("redirectToAppliedJob", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/job/applied");
+      });
+    });
+
+    eventHub.on("redirectToPostedJob", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/job/posted");
+      });
+    });
+
+    eventHub.on("redirectToWalletHistory", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/wallet/history");
+      });
+    });
+
+    eventHub.on("redirectToJobAd", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/advertisement/job");
       });
     });
 
@@ -214,16 +244,27 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                       eventHub: eventHub,
                                       userInfo: userInfo)
                                   );
-                                }else if(settings.name == "/advertisement/send"){
-                                  return MaterialPageRoute(builder: (context) => AdvertisementSender(
+                                }else if(settings.name == "/advertisement/job"){
+                                  return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
                                       eventHub: eventHub,
                                       userInfo: userInfo)
                                   );
-                                }else if(settings.name == "/advertisement/job"){
+                                }else if(settings.name == "/advertisement/advertised/job"){
                                   return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
                                       type: 5)
+                                  );
+                                }else if(settings.name == "/advertisement/any"){
+                                  return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo)
+                                  );
+                                }else if(settings.name == "/advertisement/advertised/any"){
+                                  return MaterialPageRoute(builder: (context) => AdvertisedAny(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 2)
                                   );
                                 }else if(settings.name == "/users/notifications"){
                                   return MaterialPageRoute(builder: (context) => NotificationComponent(
@@ -258,7 +299,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                 children: [
                                   Container(
                                     child: Text(
-                                      "Advertisement Job",
+                                      "Advertisement",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15
@@ -267,10 +308,10 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     padding: EdgeInsets.fromLTRB(0, 5, 0, 5)
                                   ),
                                   Expanded(
-                                    child: Available(
+                                    child: AdvertisedAny(
                                         eventHub: eventHub,
                                         userInfo: userInfo,
-                                        type: 5
+                                        type: 1
                                     ),
                                     flex: 4,
                                   ),

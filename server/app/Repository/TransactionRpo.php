@@ -77,6 +77,7 @@ class TransactionRpo
         $transaction->ledgerId = $rTransaction["ledgerId"];
         $transaction->transactionId = $rTransaction["transactionId"];
         $transaction->accountNumber = $rTransaction["accountNumber"];
+        $transaction->status = $rTransaction["status"];
         $transaction->paymentGatewayName = $rTransaction["paymentGatewayName"];
         $transaction->save();
     }
@@ -109,6 +110,7 @@ class TransactionRpo
                 // deposit = creditAmount,101 , withdraw = debitAmount,102
                 $sql = "SELECT
                             Transactions.id AS id,
+                            Transactions.accountHolderId AS accountHolderId,
                             IFNULL(transactionId,'N/A') AS transactionId,
                             IFNULL(Transactions.paymentGatewayName,'N/A') AS paymentGatewayName,
                             ChartOfAccounts.ledgerName,
@@ -257,10 +259,12 @@ class TransactionRpo
     {
 
         $sql = "SELECT
-                (IFNULL(SUM(creditAmount),0.0) - IFNULL(SUM(debitAmount),0.0)) AS balance 
+                    TRUNCATE((IFNULL(SUM(creditAmount),0.0) - IFNULL(SUM(debitAmount),0.0)),3) AS balance
                 FROM
-                    TRansactions 
+                    Transactions 
                 WHERE
+                    status = 'Approved'
+                AND
                     accountHolderId = " . $rTransaction['accountHolderId'];
 
         $res = DB::select(DB::raw($sql));
@@ -275,8 +279,10 @@ class TransactionRpo
             IFNULL(SUM(debitAmount),0.0) AS debitAmount,
             IFNULL(SUM(creditAmount),0.0) AS creditAmount
         FROM
-            TRansactions 
+            Transactions 
         WHERE
+            status = 'Approved'
+        AND
             accountHolderId = " . $rTransaction['accountHolderId'] . " AND ledgerId = " . $rTransaction['ledgerId'];
 
         $res = DB::select(DB::raw($sql));

@@ -31,13 +31,19 @@ class AvailableState extends State<Available> {
   String alertText;
   bool needToFreezeUi;
   int pageIndex = 0;
-  int perPage = 2;
+  int perPage = 5;
   int pageNumber = 0;
+  double companyCharge = 0.1;
 
   @override
   void initState() {
     super.initState();
-    eventHub.fire("viewTitle", type == 1 ? "Available Job" : type == 2 ? "Accept Job" : "Posted Job");
+    eventHub.fire("viewTitle",
+      type == 1 ? "Available Job" :
+      type == 2 ? "Accept Job" :
+      type == 3 ? "Posted Job" :
+      type == 4 ? "Applied Job" : "Advertisement Job"
+    );
     futureProjects = fetchAvailableJob();
     alertText = "No operation running.";
     alertIcon = Container();
@@ -63,7 +69,7 @@ class AvailableState extends State<Available> {
                       type == 2 ? "No job found to accept!" :
                       type == 3 ? "You didn't post any job yet!" :
                       type == 4 ? "You didn't applied any job yet!" :
-                      "No advertisement job fount!"
+                      "No advertisement job found!"
                     ),
                   ),
                 );
@@ -73,7 +79,9 @@ class AvailableState extends State<Available> {
                   shrinkWrap: true,
                   itemCount: projects.length,
                   itemBuilder: (context, index) {
-                    var eachWorkerEarn = projects[index].estimatedCost/projects[index].workerNeeded;
+                    double x = projects[index].workerNeeded * companyCharge;
+                    double eachWorkerEarn = projects[index].estimatedCost/
+                        (projects[index].workerNeeded + x);
                     return Card(
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -138,7 +146,7 @@ class AvailableState extends State<Available> {
                                 ),
                                 Container(
                                   child: Text(
-                                    "${eachWorkerEarn.round()}\$",
+                                    "$eachWorkerEarn\$",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.lightGreen
@@ -222,7 +230,7 @@ class AvailableState extends State<Available> {
                                 style: TextStyle(
                                   color: projects[index].status == "Pending" ?
                                   Colors.blue :
-                                  projects[index].status == "Accepted" ?
+                                  projects[index].status == "Approved" ?
                                   Colors.green : Colors.red,
                                   fontWeight: FontWeight.bold
                                 ),

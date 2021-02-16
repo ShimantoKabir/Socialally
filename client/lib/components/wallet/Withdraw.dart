@@ -229,6 +229,7 @@ class WithdrawState extends State<Withdraw> {
         "accountNumber": receiverAccountNumberCtl.text,
         "debitAmount": double.tryParse(amountDollarCtl.text),
         "creditAmount": null,
+        "status": "Pending",
         "accountHolderId": userInfo['id'],
         "transactionId": null,
         "paymentGatewayName": paymentGatewayName,
@@ -254,6 +255,7 @@ class WithdrawState extends State<Withdraw> {
         if (body['code'] == 200) {
           onReset();
           eventHub.fire("reloadBalance");
+          eventHub.fire("redirectToWalletHistory");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);

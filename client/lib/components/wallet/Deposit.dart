@@ -211,14 +211,9 @@ class DepositState extends State<Deposit> {
                   children: [
                     OutlineButton(
                         onPressed: () {
-                          if (userInfo['profileCompleted'] == 100) {
-                            bool isInputVerified = verifyInput();
-                            if(isInputVerified){
-                              onSave(context);
-                            }
-                          } else {
-                            Alert.show(alertDialog, context, Alert.ERROR,
-                                "To post a new job, you need to complete your profile 100%.");
+                          bool isInputVerified = verifyInput();
+                          if(isInputVerified){
+                            onSave(context);
                           }
                         },
                         child: Text("Save")),
@@ -265,6 +260,7 @@ class DepositState extends State<Deposit> {
         "transactionId": transactionIdCtl.text,
         "creditAmount": double.tryParse(amountDollarCtl.text),
         "debitAmount": null,
+        "status": "Pending",
         "accountHolderId": userInfo['id'],
         "paymentGatewayName": paymentGatewayName,
         "ledgerId": 101
@@ -289,6 +285,7 @@ class DepositState extends State<Deposit> {
         if (body['code'] == 200) {
           onReset();
           eventHub.fire("reloadBalance");
+          eventHub.fire("redirectToWalletHistory");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);

@@ -22,7 +22,7 @@ class Transactions extends Migration
             $table->string('transactionId')->nullable();
             $table->string('accountNumber')->nullable();
             $table->string('paymentGatewayName')->nullable();
-            $table->string('status')->default("Pending")->comment("Pending, Accepted, Declined");
+            $table->string('status')->default("Pending")->comment("Pending, Approved, Declined");
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

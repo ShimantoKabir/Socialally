@@ -39,7 +39,8 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
   Widget alertIcon;
   String alertText;
   bool needToFreezeUi;
-  var eachWorkerEarn;
+  double eachWorkerEarn;
+  double companyCharge = 0.1;
 
   @override
   void initState() {
@@ -48,20 +49,25 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
     alertIcon = Container();
     needToFreezeUi = false;
     eventHub.fire("viewTitle", project.type == 1 ? "Proof Submission" : "Proof Investigation");
-    givenProofsControllers.add(new TextEditingController());
-    eachWorkerEarn = project.estimatedCost/project.workerNeeded;
+    clearGivenProofs();
+
+    double x = project.workerNeeded * companyCharge;
+    eachWorkerEarn = project.estimatedCost/ (project.workerNeeded + x);
 
     if(project.type == 2){
 
       givenProofsControllers.clear();
       project.givenProofs.forEach((element) {
-        TextEditingController t = new TextEditingController();
+        TextEditingController t = TextEditingController();
         t.text = element;
         givenProofsControllers.add(t);
       });
 
+      print("project ${project.id}");
+
       project.givenScreenshotUrls.forEach((element) {
-        givenScreenShots.add(new ProofSubmission(imageUrl: element));
+        print("el = $element");
+        givenScreenShots.add(ProofSubmission(imageUrl: element));
       });
 
     }
@@ -128,7 +134,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("${eachWorkerEarn.round()}"),
+                        Text("$eachWorkerEarn\$"),
                         SizedBox(width: 5),
                         Icon(Icons.monetization_on, color: Colors.green, size: 25)
                       ],
@@ -223,8 +229,14 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: Text("Given Proofs",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                child: project.type == 1 ? showRequiredHeading("Given Proofs") :
+                Text(
+                  "Given Proofs",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15
+                  )
+                ),
               ),
               Divider(thickness: 1, color: Colors.green),
               ListView.builder(
@@ -260,7 +272,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                         icon: Icon(Icons.remove),
                         onPressed: () {
                           setState(() {
-                            if (givenProofsControllers.length > 0) {
+                            if (givenProofsControllers.length > 1) {
                               givenProofsControllers.removeLast();
                             }
                           });
@@ -271,8 +283,22 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: Text("Given Screenshots (${project.requiredScreenShots}/${givenScreenShots.length})",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                child: Row(
+                  children: [
+                    Text("Given Screenshots (${project.requiredScreenShots}/${givenScreenShots.length})",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Visibility(
+                      visible: project.type == 1,
+                      child: Text(
+                        " * ",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                            color: Colors.red
+                        )
+                      )
+                    )
+                  ],
+                ),
               ),
               Visibility(
                 visible: givenScreenShots.length == 0,
@@ -326,25 +352,25 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                 child: Row(
                   children: [
                     IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          if (project.requiredScreenShots <= givenScreenShots.length) {
-                            Alert.show(alertDialog, context, Alert.ERROR,
-                                "You can't add more then "
-                                    "${project.requiredScreenShots} screenshots.");
-                          }else {
-                            onFileSelect(context);
-                          }
-                        }),
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      if (project.requiredScreenShots <= givenScreenShots.length) {
+                        Alert.show(alertDialog, context, Alert.ERROR,
+                            "You can't add more then "
+                                "${project.requiredScreenShots} screenshots.");
+                      }else {
+                        onFileSelect(context);
+                      }
+                    }),
                     IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          setState(() {
-                            if (givenScreenShots.length > 0) {
-                              givenScreenShots.removeLast();
-                            }
-                          });
-                        })
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      setState(() {
+                        if (givenScreenShots.length > 0) {
+                          givenScreenShots.removeLast();
+                        }
+                      });
+                    })
                   ],
                 )
               ),
@@ -359,7 +385,10 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                       OutlineButton(
                           onPressed: () {
                             if (userInfo['profileCompleted'] == 100) {
-                              onSave(context);
+                              bool isInputVerified = verifyInput(context);
+                              if(isInputVerified){
+                                onSave(context);
+                              }
                             } else {
                               Alert.show(alertDialog, context, Alert.ERROR,
                                   "To post a new job, you need to complete your profile 100%.");
@@ -368,7 +397,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                           child: Text("Save")),
                       OutlineButton(
                           onPressed: () {
-
+                            onReset();
                           },
                           child: Text("Reset")
                       )
@@ -382,7 +411,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                   children: [
                     OutlineButton(
                         onPressed: () {
-                          onProofSubmissionStatusChange(context,"Accepted");
+                          onProofSubmissionStatusChange(context,"Approved");
                         },
                         child: Text("Accept")),
                     OutlineButton(
@@ -501,6 +530,8 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
+          onReset();
+          eventHub.fire("redirectToAppliedJob");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         }else {
           Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
@@ -522,6 +553,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       "proofSubmission": {
         "id": project.proofSubmissionId,
         "status": status,
+        "projectId" : project.id,
         "submittedBy": project.submittedBy,
         "publisherName": project.publisherName,
         "publishedBy": project.publishedBy,
@@ -558,6 +590,50 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       });
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
+
+  }
+
+  bool verifyInput(BuildContext context) {
+
+    bool isInputVerified = true;
+    String errMsg;
+    bool isGivenProofsVerified = true;
+
+    givenProofsControllers.forEach((element) {
+      if(element.text.isEmpty){
+        isGivenProofsVerified = false;
+      }
+    });
+
+    if(!isGivenProofsVerified){
+      isInputVerified = false;
+      errMsg = "Given proof required!";
+    }else if(project.requiredScreenShots != givenScreenShots.length){
+      isInputVerified = false;
+      errMsg = "Your must provide ${project.requiredScreenShots} screen shots!";
+    }
+
+    if (!isInputVerified) {
+      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    }
+
+    return isInputVerified;
+
+  }
+
+  void onReset() {
+
+    setState(() {
+      clearGivenProofs();
+      givenScreenShots.clear();
+    });
+
+  }
+
+  void clearGivenProofs() {
+
+    givenProofsControllers.clear();
+    givenProofsControllers.add(TextEditingController());
 
   }
 
