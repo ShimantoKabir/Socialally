@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DefaultButton extends StatelessWidget {
-  final String text;
-  final Function press;
+  final data;
+  final Function onClick;
   const DefaultButton({
     Key key,
-    this.text,
-    this.press,
+    this.data,
+    this.onClick,
   }) : super(key: key);
 
   @override
@@ -14,14 +14,18 @@ class DefaultButton extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
       child: FlatButton(
-        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+        padding: EdgeInsets.symmetric(
+            horizontal: data['padding'] + 10,
+            vertical: data['padding']
+        ),
         color: Colors.yellow,
-        onPressed: press,
+        onPressed: onClick,
         child: Text(
-          text.toUpperCase(),
+          data['title'].toUpperCase(),
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.red
+            color: Colors.red,
+            fontSize: data['fontSize']
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:client/constants.dart';
+import 'package:client/widgets/WelcomeNavBar.dart';
 import 'package:flutter/material.dart';
 import 'package:client/utilities/HttpHandler.dart';
 import 'package:client/utilities/Alert.dart';
@@ -26,38 +27,40 @@ class RegistrationState extends State<Registration> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      body: Center(
-        child: Container(
-          height: screenSize.height,
-          width: 500,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(height: screenSize.height * 0.05),
-                logo(),
-                Divider(
-                  color: Colors.lightGreenAccent,
-                  thickness: 1,
-                ),
-                SizedBox(height: 20),
-                emailPasswordWidget(),
-                SizedBox(height: 20),
-                submitButton(context),
-                SizedBox(height: 20),
-                divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [facebookButton(), googleButton()],
-                ),
-                SizedBox(height: screenSize.height * .005),
-                createLoginLabel(),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            WelcomeNavBar(),
+            Container(
+              width: 500,
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  SizedBox(height: screenSize.height * 0.05),
+                  logo(),
+                  Divider(
+                    color: Colors.lightGreenAccent,
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 20),
+                  emailPasswordWidget(),
+                  SizedBox(height: 20),
+                  submitButton(context),
+                  SizedBox(height: 20),
+                  divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [facebookButton(), googleButton()],
+                  ),
+                  SizedBox(height: screenSize.height * .005),
+                  createLoginLabel(),
+                ],
+              ),
             ),
-          )
-        )
+          ],
+        ),
       )
     );
   }

@@ -134,7 +134,7 @@ List<Node> userDashboardMenus = [
         icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
       ),
       Node(
-        label: 'Advertised Job',
+        label: 'Advertised Any',
         key: '/advertisement/advertised/any',
         icon: NodeIcon.fromIconData(Icons.mobile_friendly),
       )

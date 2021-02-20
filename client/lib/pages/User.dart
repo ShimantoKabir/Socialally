@@ -45,6 +45,8 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   var userNavigatorKey = GlobalKey<NavigatorState>();
   bool isSideNavOpen = true;
 
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -125,268 +127,300 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
       });
     });
 
+    eventHub.on("openAndCloseSideNav", (dynamic data) {
+      if(data['screenWidth'] > 960){
+        setState(() {
+          isSideNavOpen = !isSideNavOpen;
+        });
+      }else {
+        if (scaffoldKey.currentState.isDrawerOpen) {
+          scaffoldKey.currentState.openEndDrawer();
+        } else {
+          scaffoldKey.currentState.openDrawer();
+        }
+      }
+    });
+
     showProfilePic(userInfo);
   }
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: scaffoldKey,
+      drawer: Visibility(
+        child: DashboardLeftNavigation(
+          type: 1,
+          eventHub: eventHub,
+          treeViewController: treeViewController,
+          userNavigatorKey: userNavigatorKey
+        ),
+        visible: width < 960,
+      ),
       body: Row(
         children: [
           // side menu bar
-          DashboardLeftNavigation(
-              type: 1,
+          Visibility(
+            child: DashboardLeftNavigation(
+              type: 2,
               eventHub: eventHub,
               treeViewController: treeViewController,
               userNavigatorKey: userNavigatorKey
+            ),
+            visible: width > 960 && isSideNavOpen,
           ),
           // body with top menu bar, title and body
-          Expanded(
-            child: Container(
-              child: Column(
-                children: [
-                  // top menu bar
-                  DashboardTopNavigation(
-                    type: 1,
-                    eventHub: eventHub,
-                    totalUnseenNotification: userInfo["totalUnseenNotification"],
-                    userNavigatorKey: userNavigatorKey,
-                    userInfo: userInfo
-                  ),
-                  // component tile
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.all(5),
-                      color: Colors.black12,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            onPressed: (){
-                              if(userNavigatorKey.currentState.canPop()){
-                                userNavigatorKey.currentState.pop();
-                              }
-                            }
-                          ),
-                          Text(
-                            viewTitle,
-                            style: TextStyle(fontSize: 20),
-                          )
-                        ],
-                      )
+          Visibility(
+            visible: true,
+            child: Expanded(
+              child: Container(
+                child: Column(
+                  children: [
+                    // top menu bar
+                    DashboardTopNavigation(
+                        type: 1,
+                        eventHub: eventHub,
+                        totalUnseenNotification: userInfo["totalUnseenNotification"],
+                        userNavigatorKey: userNavigatorKey,
+                        userInfo: userInfo
                     ),
-                    flex: 1
-                  ),
-                  // component body
-                  Expanded(
-                    child: Container(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Navigator(
-                              key: userNavigatorKey,
-                              onGenerateRoute: (settings){
-                                if(settings.name == "/user/profile"){
-                                  return MaterialPageRoute(builder: (context) => Profile(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                  ));
-                                } else if(settings.name == "/job/post"){
-                                  return MaterialPageRoute(builder: (context) => Post(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      project: project
-                                  ));
-                                } else if(settings.name == "/job/available"){
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 1)
-                                  );
-                                }else if(settings.name == "/job/accept"){
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 2)
-                                  );
-                                } else if(settings.name == "/job/posted"){
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 3)
-                                  );
-                                }else if(settings.name == "/job/applied"){
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 4)
-                                  );
-                                } else if(settings.name == "/job/submit"){
-                                  return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      project: project)
-                                  );
-                                }else if(settings.name == "/wallet/deposit"){
-                                  return MaterialPageRoute(builder: (context) => Deposit(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo)
-                                  );
-                                }else if(settings.name == "/wallet/withdraw"){
-                                  return MaterialPageRoute(builder: (context) => Withdraw(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo)
-                                  );
-                                }else if(settings.name == "/wallet/history"){
-                                  return MaterialPageRoute(builder: (context) => History(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo)
-                                  );
-                                }else if(settings.name == "/advertisement/job"){
-                                  return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo)
-                                  );
-                                }else if(settings.name == "/advertisement/advertised/job"){
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 5)
-                                  );
-                                }else if(settings.name == "/advertisement/any"){
-                                  return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo)
-                                  );
-                                }else if(settings.name == "/advertisement/advertised/any"){
-                                  return MaterialPageRoute(builder: (context) => AdvertisedAny(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 2)
-                                  );
-                                }else if(settings.name == "/users/notifications"){
-                                  return MaterialPageRoute(builder: (context) => NotificationComponent(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 1
-                                    )
-                                  );
-                                }  else {
-                                  return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 1
-                                    )
-                                  );
+                    // component title
+                    Container(
+                        height: 50,
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.all(5),
+                        color: Colors.black12,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.arrow_back_ios),
+                                onPressed: (){
+                                  if(userNavigatorKey.currentState.canPop()){
+                                    userNavigatorKey.currentState.pop();
+                                  }
                                 }
-                              }
                             ),
-                            flex: 5
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                    width: 1,
-                                    color: Colors.black12
-                                  )
-                                )
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      "Advertisement",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15
-                                      ),
+                            Text(
+                              viewTitle,
+                              style: TextStyle(fontSize: 20),
+                            )
+                          ],
+                        )
+                    ),
+                    // component body
+                    Expanded(
+                      child: Container(
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: Navigator(
+                                    key: userNavigatorKey,
+                                    onGenerateRoute: (settings){
+                                      if(settings.name == "/user/profile"){
+                                        return MaterialPageRoute(builder: (context) => Profile(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      } else if(settings.name == "/job/post"){
+                                        return MaterialPageRoute(builder: (context) => Post(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            project: project
+                                        ));
+                                      } else if(settings.name == "/job/available"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 1)
+                                        );
+                                      }else if(settings.name == "/job/accept"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 2)
+                                        );
+                                      } else if(settings.name == "/job/posted"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 3)
+                                        );
+                                      }else if(settings.name == "/job/applied"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 4)
+                                        );
+                                      } else if(settings.name == "/job/submit"){
+                                        return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            project: project)
+                                        );
+                                      }else if(settings.name == "/wallet/deposit"){
+                                        return MaterialPageRoute(builder: (context) => Deposit(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo)
+                                        );
+                                      }else if(settings.name == "/wallet/withdraw"){
+                                        return MaterialPageRoute(builder: (context) => Withdraw(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo)
+                                        );
+                                      }else if(settings.name == "/wallet/history"){
+                                        return MaterialPageRoute(builder: (context) => History(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo)
+                                        );
+                                      }else if(settings.name == "/advertisement/job"){
+                                        return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo)
+                                        );
+                                      }else if(settings.name == "/advertisement/advertised/job"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 5)
+                                        );
+                                      }else if(settings.name == "/advertisement/any"){
+                                        return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo)
+                                        );
+                                      }else if(settings.name == "/advertisement/advertised/any"){
+                                        return MaterialPageRoute(builder: (context) => AdvertisedAny(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 2)
+                                        );
+                                      }else if(settings.name == "/users/notifications"){
+                                        return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 1
+                                        )
+                                        );
+                                      }  else {
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 1
+                                        )
+                                        );
+                                      }
+                                    }
+                                ),
+                                flex: 5
+                            ),
+                            Visibility(
+                              child: Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            left: BorderSide(
+                                                width: 1,
+                                                color: Colors.black12
+                                            )
+                                        )
                                     ),
-                                    padding: EdgeInsets.fromLTRB(0, 5, 0, 5)
-                                  ),
-                                  Expanded(
-                                    child: AdvertisedAny(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo,
-                                        type: 1
-                                    ),
-                                    flex: 4,
-                                  ),
-                                  Visibility(
-                                    visible:
-                                    userInfo['profileCompleted'] != 100,
-                                    child: Expanded(
-                                        child: SingleChildScrollView(
-                                          child: Container(
-                                            padding: EdgeInsets.all(20),
-                                            color: Colors.white70,
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  height: 70.0,
-                                                  width: 70.0,
-                                                  decoration: new BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: new DecorationImage(
-                                                        fit: BoxFit.cover,
-                                                        image: profileImageWidget
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                            child: Text(
+                                              "Advertisement",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15
+                                              ),
+                                            ),
+                                            padding: EdgeInsets.fromLTRB(0, 5, 0, 5)
+                                        ),
+                                        Expanded(
+                                          child: AdvertisedAny(
+                                              eventHub: eventHub,
+                                              userInfo: userInfo,
+                                              type: 1
+                                          ),
+                                          flex: 4,
+                                        ),
+                                        Visibility(
+                                            visible:
+                                            userInfo['profileCompleted'] != 100,
+                                            child: Expanded(
+                                                child: SingleChildScrollView(
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(20),
+                                                    color: Colors.white70,
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          height: 70.0,
+                                                          width: 70.0,
+                                                          decoration: new BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            image: new DecorationImage(
+                                                                fit: BoxFit.cover,
+                                                                image: profileImageWidget
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 20),
+                                                        Text(userInfo['email']),
+                                                        SizedBox(height: 20),
+                                                        LinearProgressIndicator(
+                                                          backgroundColor: Colors.grey,
+                                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                                              Colors.amber),
+                                                          value: userInfo['profileCompleted'] / 100,
+                                                        ),
+                                                        SizedBox(height: 20),
+                                                        Text(
+                                                          "Profile Completed ${userInfo['profileCompleted']}%",
+                                                          style:
+                                                          TextStyle(fontWeight: FontWeight.bold),
+                                                        ),
+                                                        SizedBox(height: 20),
+                                                        FlatButton(
+                                                          onPressed: () {
+                                                            userNavigatorKey.currentState.pushNamed('/user/profile');
+                                                          },
+                                                          color: Colors.green,
+                                                          padding:
+                                                          EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                                          child: Text(" Complete Now",
+                                                              style:
+                                                              TextStyle(color: Colors.white)),
+                                                        )
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-                                                SizedBox(height: 20),
-                                                Text(userInfo['email']),
-                                                SizedBox(height: 20),
-                                                LinearProgressIndicator(
-                                                  backgroundColor: Colors.grey,
-                                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                                      Colors.amber),
-                                                  value: userInfo['profileCompleted'] / 100,
-                                                ),
-                                                SizedBox(height: 20),
-                                                Text(
-                                                  "Profile Completed ${userInfo['profileCompleted']}%",
-                                                  style:
-                                                  TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                                SizedBox(height: 20),
-                                                FlatButton(
-                                                  onPressed: () {
-                                                    userNavigatorKey.currentState.pushNamed('/user/profile');
-                                                  },
-                                                  color: Colors.green,
-                                                  padding:
-                                                  EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                                  child: Text(" Complete Now",
-                                                      style:
-                                                      TextStyle(color: Colors.white)),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        flex: 3
-                                    )
-                                  )
-                                ],
+                                                flex: 3
+                                            )
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  flex: 2
                               ),
-                            ),
-                            flex: 2
-                          )
-                        ],
+                              visible: width > 950,
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    flex: 13,
-                  )
-                ],
+                      flex: 13
+                    )
+                  ]
+                )
               ),
+              flex: 4,
             ),
-            flex: 4,
           )
-        ],
-      ),
+        ]
+      )
     );
   }
 

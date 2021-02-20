@@ -1,4 +1,3 @@
-import 'package:client/constants.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,70 +42,108 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
     this.userNavigatorKey,
   });
 
-  bool isSideNavOpen;
-
   @override
   void initState() {
     super.initState();
-    isSideNavOpen = true;
-    eventHub.on("openAndCloseSideNav", (dynamic data) {
-      setState(() {
-        isSideNavOpen = !isSideNavOpen;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Visibility(
-      visible: isSideNavOpen,
-      child: Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              right: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 1, 0),
-            child: Column(
-              children: [
-                Center(
-                  child: Container(
-                    height: 100.0,
-                    width: 100.0,
-                    child: Image.asset(
-                      "assets/images/logo.png",
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: TreeView(
-                    controller: treeViewController,
-                    allowParentSelect: true,
-                    supportParentDoubleTap: false,
-                    onNodeTap: (path) {
-                      setState(() {
-                        treeViewController = treeViewController
-                            .copyWith(selectedKey: path);
-                        userNavigatorKey.currentState
-                            .pushNamedAndRemoveUntil(
-                            path, (route) => false
-                        );
-                      });
-                    },
-                  )
-                )
-              ],
-            ),
+    double width = MediaQuery.of(context).size.width;
+    if(type == 1){
+      return getContent({
+        "width" : width
+      });
+    }else {
+      return Expanded(
+        child: getContent({
+          "width" : width
+        }),
+        flex: 1,
+      );
+    }
+  }
+
+  Widget getContent(var data){
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          right: BorderSide(
+            color: Colors.grey,
+            width: 0.5,
           ),
         ),
-        flex: 1,
-      )
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(0, 0, 1, 0),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                height: 100.0,
+                width: 100.0,
+                child: Image.asset(
+                  "assets/images/logo.png",
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Expanded(
+                child: TreeView(
+                  controller: treeViewController,
+                  allowParentSelect: true,
+                  supportParentDoubleTap: false,
+                  onNodeTap: (path) {
+                    if(data['width'] < 960){
+                      eventHub.fire("openAndCloseSideNav",{
+                        "screenWidth" : data['width']
+                      });
+                    }
+                    setState(() {
+                      treeViewController = treeViewController
+                          .copyWith(selectedKey: path);
+                      userNavigatorKey.currentState
+                          .pushNamedAndRemoveUntil(
+                          path, (route) => false
+                      );
+                    });
+                  },
+                )
+            ),
+            Center(
+              child: InkWell(
+                child: Container(
+                  color: Colors.transparent,
+                  padding: EdgeInsets.all(13),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.arrow_back_ios_sharp,
+                        color: Colors.blueGrey,
+                      ),
+                      Text(
+                        "Close",
+                        style: TextStyle(
+                            color: Colors.blueGrey
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                onTap: (){
+                  eventHub.fire("openAndCloseSideNav",{
+                    "screenWidth" : data['width']
+                  });
+                },
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
+
 }

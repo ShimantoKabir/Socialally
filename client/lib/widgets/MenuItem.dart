@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 
 class MenuItem extends StatelessWidget {
-  final String title;
-  final Function press;
+  final data;
+  final Function onClick;
   const MenuItem({
     Key key,
-    this.title,
-    this.press,
+    this.data,
+    this.onClick,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: press,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+    return Container(
+      child: InkWell(
+        onTap: onClick,
         child: Text(
-          title.toUpperCase(),
+          data['title'].toUpperCase(),
           style: TextStyle(
-            color: Colors.grey,
-            fontWeight: FontWeight.bold,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontSize: data['fontSize']
           ),
         ),
+      ),
+      padding: EdgeInsets.symmetric(
+         horizontal: data['padding']
+      ),
+      margin: EdgeInsets.symmetric(
+          vertical: data['margin']
       ),
     );
   }
