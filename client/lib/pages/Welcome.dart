@@ -11,18 +11,17 @@ class Welcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             WelcomeNavBar(),
             WelcomeBanner(),
-            JobSeeker(),
-            JobGiver(),
-            UserFeedback(),
-            AboutUsComponent(),
-            Footer()
+            // JobSeeker(),
+            // JobGiver(),
+            // UserFeedback(),
+            // AboutUsComponent(),
+            // Footer()
           ],
         ),
       ),

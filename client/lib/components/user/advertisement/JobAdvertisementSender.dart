@@ -39,6 +39,7 @@ class JobAdvertisementSenderState extends State<JobAdvertisementSender> {
   @override
   void initState() {
     super.initState();
+    eventHub.fire("viewTitle","Job Advertisement");
     alertText = "No operation running.";
     alertIcon = Container();
 

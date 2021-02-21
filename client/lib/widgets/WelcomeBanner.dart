@@ -28,19 +28,19 @@ class WelcomeBannerState extends State<WelcomeBanner>{
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(50,20,20,20),
+      padding: EdgeInsets.all(50),
       child: ScreenTypeLayout(
         desktop: getDesktopBanner({
-          "lgFontSize" : 65,
-          "smFontSize" : 15,
+          "lgFontSize" : 65.0,
+          "smFontSize" : 15.0
         }),
         tablet: getDesktopBanner({
-          "lgFontSize" : 35,
-          "smFontSize" : 12,
+          "lgFontSize" : 35.0,
+          "smFontSize" : 12.0
         }),
         mobile: getMobileBanner({
-          "lgFontSize" : 35,
-          "smFontSize" : 12,
+          "lgFontSize" : 35.0,
+          "smFontSize" : 12.0
         }),
       ),
     );
@@ -105,13 +105,17 @@ class WelcomeBannerState extends State<WelcomeBanner>{
   }
 
   Widget getRightContent(var data){
-    return Column(
-      children: [
-        Image.asset(
-          "assets/images/web.png",
-          fit: BoxFit.contain,
-        )
-      ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/web.png",
+            fit: BoxFit.contain,
+          )
+        ],
+      ),
     );
   }
 

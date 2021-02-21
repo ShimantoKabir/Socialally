@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:client/models/Project.dart';
 import 'package:http/http.dart';
 import 'package:client/constants.dart';
@@ -52,7 +53,7 @@ class PostState extends State<Post> {
   void initState() {
     super.initState();
 
-    alertText = "No operation running.";
+    alertText = "No operation running!";
     alertIcon = Container();
 
     clearListControllers();
@@ -62,6 +63,7 @@ class PostState extends State<Post> {
     projectCategories.asMap().forEach((key, projectCategory) {
       bool isValueExist = false;
       projectCategoriesDropDownList.forEach((element) {
+        print("cn = ${element.value.categoryName}");
         if (element.value.categoryName == projectCategory['categoryName']) {
           isValueExist = true;
         }
@@ -142,64 +144,47 @@ class PostState extends State<Post> {
     }else {
       eventHub.fire("viewTitle", "Update Job");
       estimatedDayCtl.text = project.estimatedDay.toString();
-      // titleCtl.text = project.title;
-      // todoStepsControllers.clear();
-      // requiredProofsControllers.clear();
-      // project.todoSteps.forEach((element) {
-      //   TextEditingController textEditingController = new TextEditingController();
-      //   textEditingController.text = element;
-      //   todoStepsControllers.add(textEditingController);
-      // });
-      //
-      // project.requiredProofs.forEach((element) {
-      //   TextEditingController textEditingController = new TextEditingController();
-      //   textEditingController.text = element;
-      //   requiredProofsControllers.add(textEditingController);
-      // });
-      //
-      // requiredScreenShotsCtl.text = project.requiredScreenShots.toString();
-      //
-      // projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
-      //   value: ProjectCategory(
-      //       id: 0,
-      //       categoryId: project.categoryId,
-      //       categoryName: project.categoryName,
-      //       subCategoryName: "Select"
-      //   ),
-      //   child: Text(project.categoryName),
-      // ));
-      //
-      // defaultProjectCategory = ProjectCategory(
-      //     id: 0,
-      //     categoryId: project.categoryId,
-      //     categoryName: project.categoryName,
-      //     subCategoryName: "Select"
-      // );
-      //
-      // projectSubCategoriesDropDownList.clear();
-      //
-      // projectSubCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
-      //   value: ProjectCategory(
-      //       id: project.subCategoryId,
-      //       categoryId: 0,
-      //       categoryName: "Select",
-      //       subCategoryName: project.subCategoryName
-      //   ),
-      //   child: Text(project.subCategoryName),
-      // ));
-      //
-      // defaultProjectSubCategory = ProjectCategory(
-      //     id: project.subCategoryId,
-      //     categoryId: 0,
-      //     categoryName: "Select",
-      //     subCategoryName: project.subCategoryName
-      // );
-      //
-      // regionName = project.regionName;
-      // countryName = project.countryName;
-      //
-      // workerNeededCtl.text = project.workerNeeded.toString();
-      // eachWorkerEarnCtl.text = (project.estimatedCost/project.workerNeeded).toString();
+      titleCtl.text = project.title;
+      todoStepsControllers.clear();
+      requiredProofsControllers.clear();
+      project.todoSteps.forEach((element) {
+        TextEditingController textEditingController = new TextEditingController();
+        textEditingController.text = element;
+        todoStepsControllers.add(textEditingController);
+      });
+
+      project.requiredProofs.forEach((element) {
+        TextEditingController textEditingController = new TextEditingController();
+        textEditingController.text = element;
+        requiredProofsControllers.add(textEditingController);
+      });
+
+      requiredScreenShotsCtl.text = project.requiredScreenShots.toString();
+
+      fetchSubCategoriesById(null,ProjectCategory(
+        id: null,
+        categoryId: project.categoryId,
+        categoryName: project.categoryName,
+        subCategoryName: null
+      ))
+      .whenComplete((){
+
+        defaultProjectSubCategory = ProjectCategory(
+            id: project.subCategoryId,
+            categoryId: null,
+            categoryName: null,
+            subCategoryName: project.subCategoryName
+        );
+
+      });
+
+      regionName = project.regionName;
+      countryName = project.countryName;
+
+      workerNeededCtl.text = project.workerNeeded.toString();
+      double x = project.workerNeeded * companyCharge;
+      double eachWorkerEarn = project.estimatedCost/ (project.workerNeeded + x);
+      eachWorkerEarnCtl.text = eachWorkerEarn.toString();
 
     }
 
@@ -213,7 +198,7 @@ class PostState extends State<Post> {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(10),
           child: Center(
-            child: project == null ? Column(
+            child: Column(
               children: [
                 entryField("Title", titleCtl),
                 SizedBox(
@@ -577,48 +562,64 @@ class PostState extends State<Post> {
                 SizedBox(
                   height: 20,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlineButton(
-                      onPressed: () {
-                        onFileSelect(context, "img");
-                      },
-                      child: Text("Select Image")
-                    ),
-                    Text(fileInfo["imageName"]),
-                    OutlineButton(
-                      onPressed: () {
-                        setState(() {
-                          clearImage();
-                        });
-                      },
-                      child: Text("Clear")
-                    )
-                  ]
+                Visibility(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                            onPressed: () {
+                              onFileSelect(context, "img");
+                            },
+                            icon: Icon(Icons.image)
+                        ),
+                        Expanded(
+                            child:Text(fileInfo["imageName"],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                clearImage();
+                              });
+                            },
+                            icon: Icon(Icons.close)
+                        )
+                      ]
+                  ),
+                  visible: project == null,
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlineButton(
-                      onPressed: () {
-                        onFileSelect(context, "file");
-                      },
-                      child: Text("Select File")
-                    ),
-                    Text(fileInfo["fileName"]),
-                    OutlineButton(
-                      onPressed: () {
-                        setState(() {
-                          clearFile();
-                        });
-                      },
-                      child: Text("Clear")
-                    )
-                  ]
+                Visibility(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                            onPressed: () {
+                              onFileSelect(context, "file");
+                            },
+                            icon: Icon(Icons.file_copy)
+                        ),
+                        Expanded(
+                            child:Text(fileInfo["fileName"],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                clearFile();
+                              });
+                            },
+                            icon: Icon(Icons.close)
+                        )
+                      ]
+                  ),
+                  visible: project == null,
                 ),
                 SizedBox(
                   height: 20,
@@ -631,60 +632,30 @@ class PostState extends State<Post> {
                         if (userInfo['profileCompleted'] == 100) {
                           bool isInputVerified = verifyInput(context);
                           if(isInputVerified){
-                            onSave(context);
+                            if(project == null){
+                              onSave(context);
+                            }else {
+                              onUpdate(context);
+                            }
                           }
                         } else {
-                          Alert.show(alertDialog, context, Alert.ERROR,
-                              "To post a new job, you need to complete your profile 100%.");
+                          Alert.show(alertDialog, context, Alert.ERROR, "To post a new job, you need to complete your profile 100%.");
                         }
                       },
                       child: Text(project == null ? "Save" : "Update")
                     ),
-                    OutlineButton(
-                      onPressed: () {
-                        onReset();
-                      },
-                      child: Text("Reset")
+                    Visibility(
+                      child: OutlineButton(
+                          onPressed: () {
+                            onReset();
+                          },
+                          child: Text("Reset")
+                      ),
+                      visible: project == null
                     )
                   ]
                 )
               ]
-            ) :
-            Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      showRequiredHeading("Estimated Day"),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextField(
-                          controller: estimatedDayCtl,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9]')
-                            ),
-                          ],
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                OutlineButton(
-                    onPressed: () {
-                      onUpdate(context);
-                    },
-                    child: Text("Update")
-                )
-              ],
             )
           )
         ),
@@ -748,9 +719,9 @@ class PostState extends State<Post> {
             categoryName: null,
           );
           projectSubCategoriesDropDownList.add(
-              DropdownMenuItem<ProjectCategory>(
-                value: pc,
-                child: Text(pc.subCategoryName),
+            DropdownMenuItem<ProjectCategory>(
+              value: pc,
+              child: Text(pc.subCategoryName)
             )
           );
         });
@@ -759,8 +730,12 @@ class PostState extends State<Post> {
       setState(() {
         needToFreezeUi = false;
       });
-      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      if(context != null){
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
     }
+
+    print("pc = ${pc.id}, ${pc.categoryId}, ${pc.categoryName}, ${pc.subCategoryName}");
 
     setState(() {
       defaultProjectCategory = pc;
@@ -771,10 +746,11 @@ class PostState extends State<Post> {
     setState(() {
       projectSubCategoriesDropDownList.clear();
       defaultProjectSubCategory = new ProjectCategory(
-          id: 0,
-          categoryId: 0,
-          categoryName: "Select",
-          subCategoryName: "Select");
+        id: 0,
+        categoryId: 0,
+        categoryName: "Select",
+        subCategoryName: "Select"
+      );
       projectSubCategoriesDropDownList.add(
           new DropdownMenuItem<ProjectCategory>(
             value: defaultProjectSubCategory,
@@ -897,6 +873,7 @@ class PostState extends State<Post> {
   }
 
   Future<void> onFileSelect(BuildContext context, String fileType) async {
+    String base64String;
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: fileType == "img" ? allowedImageType : allowedFileType,
@@ -904,6 +881,13 @@ class PostState extends State<Post> {
 
     if (result != null) {
       PlatformFile objFile = result.files.single;
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        base64String = base64.encode(File(objFile.path).readAsBytesSync());
+      } else {
+        base64String = base64.encode(objFile.bytes);
+      }
+
       if (objFile.size > maxImageSize) {
         Alert.show(
             alertDialog,
@@ -915,11 +899,11 @@ class PostState extends State<Post> {
         setState(() {
           if (fileType == "img") {
             fileInfo["imageName"] = objFile.name;
-            fileInfo["imageString"] = base64.encode(objFile.bytes);
+            fileInfo["imageString"] = base64String;
             fileInfo["imageExt"] = objFile.extension;
           } else {
             fileInfo["fileName"] = objFile.name;
-            fileInfo["fileString"] = base64.encode(objFile.bytes);
+            fileInfo["fileString"] = base64String;
             fileInfo["fileExt"] = objFile.extension;
           }
         });
@@ -1032,6 +1016,7 @@ class PostState extends State<Post> {
   @override
   void dispose() {
     super.dispose();
+    project = null;
     eventHub.fire("clearProject");
   }
 
@@ -1052,7 +1037,7 @@ class PostState extends State<Post> {
 
   void clearImage() {
     fileInfo["imageExt"] = null;
-    fileInfo["imageName"] = "No file selected yet!";
+    fileInfo["imageName"] = "No image selected yet!";
     fileInfo["imageString"] = null;
   }
 

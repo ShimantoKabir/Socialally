@@ -17,7 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:client/components/job/ProofSubmissionComponent.dart';
-import 'dart:html' as html; // ignore: avoid_web_libraries_in_flutter
+import 'package:universal_html/html.dart' as html;
 
 class User extends StatefulWidget {
   User({Key key, this.userInfo}) : super(key: key);
@@ -51,12 +51,10 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     nodes = userDashboardMenus;
-
     html.window.history.pushState(null,"User Dashboard","/#/user/dashboard");
-
     treeViewController = TreeViewController(
       children: nodes,
-      selectedKey: selectedKey,
+      selectedKey: selectedKey
     );
 
     eventHub.on("userInfo", (dynamic data) {
@@ -147,28 +145,43 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    if(width<960){
+      var logoutKey = nodes.where((element) => element.key == "/logout");
+      if(logoutKey.isEmpty){
+        nodes.add(Node(
+            label: 'Logout',
+            key: '/logout',
+            icon: NodeIcon.fromIconData(Icons.logout)
+        ));
+      }
+    }else {
+      var logoutKey = nodes.where((element) => element.key == "/logout");
+      if(logoutKey.isNotEmpty){
+        nodes.removeWhere((element) => element.key == "/logout");
+      }
+    }
     return Scaffold(
       key: scaffoldKey,
       drawer: Visibility(
         child: DashboardLeftNavigation(
-          type: 1,
+          positionType: 1,
           eventHub: eventHub,
           treeViewController: treeViewController,
           userNavigatorKey: userNavigatorKey
         ),
         visible: width < 960,
       ),
-      body: Row(
+      body: SafeArea(child:Row(
         children: [
           // side menu bar
           Visibility(
             child: DashboardLeftNavigation(
-              type: 2,
+              positionType: 2,
               eventHub: eventHub,
               treeViewController: treeViewController,
               userNavigatorKey: userNavigatorKey
             ),
-            visible: width > 960 && isSideNavOpen,
+            visible: width > 960 && isSideNavOpen
           ),
           // body with top menu bar, title and body
           Visibility(
@@ -179,35 +192,34 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                   children: [
                     // top menu bar
                     DashboardTopNavigation(
-                        type: 1,
-                        eventHub: eventHub,
-                        totalUnseenNotification: userInfo["totalUnseenNotification"],
-                        userNavigatorKey: userNavigatorKey,
-                        userInfo: userInfo
+                      type: 1,
+                      eventHub: eventHub,
+                      totalUnseenNotification: userInfo["totalUnseenNotification"],
+                      userNavigatorKey: userNavigatorKey,
+                      userInfo: userInfo
                     ),
                     // component title
                     Container(
-                        height: 50,
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.all(5),
-                        color: Colors.black12,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                icon: Icon(Icons.arrow_back_ios),
-                                onPressed: (){
-                                  if(userNavigatorKey.currentState.canPop()){
-                                    userNavigatorKey.currentState.pop();
-                                  }
-                                }
-                            ),
-                            Text(
-                              viewTitle,
-                              style: TextStyle(fontSize: 20),
-                            )
-                          ],
-                        )
+                      height: 25,
+                      padding: EdgeInsets.all(3),
+                      color: Colors.black12,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            child: Icon(Icons.arrow_back_ios,size: 15),
+                            onTap: (){
+                              if(userNavigatorKey.currentState.canPop()){
+                                userNavigatorKey.currentState.pop();
+                              }
+                            }
+                          ),
+                          Text(
+                            viewTitle.toUpperCase(),
+                            style: TextStyle(fontSize: 12),
+                          )
+                        ],
+                      )
                     ),
                     // component body
                     Expanded(
@@ -215,116 +227,114 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                         child: Row(
                           children: [
                             Expanded(
-                                child: Navigator(
-                                    key: userNavigatorKey,
-                                    onGenerateRoute: (settings){
-                                      if(settings.name == "/user/profile"){
-                                        return MaterialPageRoute(builder: (context) => Profile(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo
-                                        ));
-                                      } else if(settings.name == "/job/post"){
-                                        return MaterialPageRoute(builder: (context) => Post(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            project: project
-                                        ));
-                                      } else if(settings.name == "/job/available"){
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 1)
-                                        );
-                                      }else if(settings.name == "/job/accept"){
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 2)
-                                        );
-                                      } else if(settings.name == "/job/posted"){
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 3)
-                                        );
-                                      }else if(settings.name == "/job/applied"){
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 4)
-                                        );
-                                      } else if(settings.name == "/job/submit"){
-                                        return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            project: project)
-                                        );
-                                      }else if(settings.name == "/wallet/deposit"){
-                                        return MaterialPageRoute(builder: (context) => Deposit(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo)
-                                        );
-                                      }else if(settings.name == "/wallet/withdraw"){
-                                        return MaterialPageRoute(builder: (context) => Withdraw(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo)
-                                        );
-                                      }else if(settings.name == "/wallet/history"){
-                                        return MaterialPageRoute(builder: (context) => History(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo)
-                                        );
-                                      }else if(settings.name == "/advertisement/job"){
-                                        return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo)
-                                        );
-                                      }else if(settings.name == "/advertisement/advertised/job"){
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 5)
-                                        );
-                                      }else if(settings.name == "/advertisement/any"){
-                                        return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo)
-                                        );
-                                      }else if(settings.name == "/advertisement/advertised/any"){
-                                        return MaterialPageRoute(builder: (context) => AdvertisedAny(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 2)
-                                        );
-                                      }else if(settings.name == "/users/notifications"){
-                                        return MaterialPageRoute(builder: (context) => NotificationComponent(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 1
-                                        )
-                                        );
-                                      }  else {
-                                        return MaterialPageRoute(builder: (context) => Available(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 1
-                                        )
-                                        );
-                                      }
-                                    }
-                                ),
-                                flex: 5
+                              child: Navigator(
+                                key: userNavigatorKey,
+                                onGenerateRoute: (settings){
+                                  if(settings.name == "/user/profile/update"){
+                                    return MaterialPageRoute(builder: (context) => Profile(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  } else if(settings.name == "/job/post"){
+                                    return MaterialPageRoute(builder: (context) => Post(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      project: project
+                                    ));
+                                  } else if(settings.name == "/job/available"){
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 1
+                                    ));
+                                  }else if(settings.name == "/job/accept"){
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 2
+                                    ));
+                                  } else if(settings.name == "/job/posted"){
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 3
+                                    ));
+                                  }else if(settings.name == "/job/applied"){
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 4
+                                    ));
+                                  } else if(settings.name == "/job/submit"){
+                                    return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      project: project
+                                    ));
+                                  }else if(settings.name == "/wallet/deposit"){
+                                    return MaterialPageRoute(builder: (context) => Deposit(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }else if(settings.name == "/wallet/withdraw"){
+                                    return MaterialPageRoute(builder: (context) => Withdraw(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }else if(settings.name == "/wallet/history"){
+                                    return MaterialPageRoute(builder: (context) => History(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }else if(settings.name == "/advertisement/job"){
+                                    return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }else if(settings.name == "/advertisement/advertised/job"){
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 5
+                                    ));
+                                  }else if(settings.name == "/advertisement/any"){
+                                    return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }else if(settings.name == "/advertisement/advertised/any"){
+                                    return MaterialPageRoute(builder: (context) => AdvertisedAny(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 2
+                                    ));
+                                  }else if(settings.name == "/users/notifications"){
+                                    return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 1
+                                    ));
+                                  }  else {
+                                    return MaterialPageRoute(builder: (context) => Available(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 1
+                                    ));
+                                  }
+                                }
+                              ),
+                              flex: 5
                             ),
                             Visibility(
                               child: Expanded(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        border: Border(
-                                            left: BorderSide(
-                                                width: 1,
-                                                color: Colors.black12
-                                            )
+                                      border: Border(
+                                        left: BorderSide(
+                                          width: 1,
+                                          color: Colors.black12
                                         )
+                                      )
                                     ),
                                     child: Column(
                                       children: [
@@ -340,9 +350,9 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                         ),
                                         Expanded(
                                           child: AdvertisedAny(
-                                              eventHub: eventHub,
-                                              userInfo: userInfo,
-                                              type: 1
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 1
                                           ),
                                           flex: 4,
                                         ),
@@ -385,7 +395,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                         SizedBox(height: 20),
                                                         FlatButton(
                                                           onPressed: () {
-                                                            userNavigatorKey.currentState.pushNamed('/user/profile');
+                                                            userNavigatorKey.currentState.pushNamed('/user/profile/update');
                                                           },
                                                           color: Colors.green,
                                                           padding:
@@ -416,11 +426,11 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                   ]
                 )
               ),
-              flex: 4,
+              flex: 4
             ),
           )
         ]
-      )
+      ))
     );
   }
 

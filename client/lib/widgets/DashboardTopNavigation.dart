@@ -54,21 +54,20 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
   });
 
   Future futureBalanceSummary;
-  double balance;
-  double withdrawAmount;
+  String balance;
+  String withdrawAmount;
   bool isSideNavOpen;
 
   @override
   void initState() {
     super.initState();
-    balance = 0.0;
-    withdrawAmount = 0.0;
+    balance = "0.0";
+    withdrawAmount = "0.0";
     isSideNavOpen = true;
     futureBalanceSummary = fetchBalanceSummary();
     eventHub.on("reloadBalance", (dynamic data) {
       fetchBalanceSummary();
     });
-
   }
 
   @override
@@ -145,12 +144,14 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                   child: Row(
                     children: <Widget>[
-                      Text("Withdraw  $withdrawAmount\$ ",
-                          style: TextStyle(color: Colors.white))
+                      Text(
+                        "Withdraw $withdrawAmount\$",
+                        style: TextStyle(color: Colors.white)
+                      )
                     ],
                   ),
                 ),
-                visible: type == 1,
+                visible: type == 1 && data['needToShowDesktopStaff'],
               ),
               SizedBox(width: 10),
               Visibility(
@@ -163,7 +164,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   child: Row(
                     // Replace with a Row for horizontal icon + text
                     children: <Widget>[
-                      Text("Balance  $balance\$ ",
+                      Text("Balance $balance\$",
                           style: TextStyle(color: Colors.white))
                     ],
                   ),
@@ -210,7 +211,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   ),
                   onPressed: () {
                     if(type == 1){
-                      userNavigatorKey.currentState.pushNamed('/user/profile');
+                      userNavigatorKey.currentState.pushNamed('/user/profile/update');
                     }else {
                       userNavigatorKey.currentState.pushNamed('/admin/profile');
                     }
@@ -226,11 +227,11 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                         color: Colors.black
                     ),
                     onPressed: () {
-                      MySharedPreferences.clear("userInfo")
-                          .then((isClear) {
+                      MySharedPreferences.clear("userInfo").then((isClear) {
                         if (isClear) {
                           Navigator.pushNamedAndRemoveUntil(
-                              context, "/", (r) => false);
+                            context, "/", (r) => false
+                          );
                         }
                       });
                     },
@@ -253,8 +254,8 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
       var res = jsonDecode(response.body);
       if (res['code'] == 200) {
         setState(() {
-          balance = res['balance'];
-          withdrawAmount = res['withdrawTransaction']['debitAmount'];
+          balance = res['balance'].toString();
+          withdrawAmount = res['withdrawTransaction']['debitAmount'].toString();
         });
       }
     }

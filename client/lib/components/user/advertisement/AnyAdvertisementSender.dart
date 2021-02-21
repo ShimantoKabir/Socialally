@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:client/models/AdCostPlan.dart';
 import 'package:client/utilities/Alert.dart';
@@ -37,6 +38,7 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
   @override
   void initState() {
     super.initState();
+    eventHub.fire("viewTitle","Any Advertisement");
     alertText = "No operation running.";
     alertIcon = Container();
 
@@ -212,6 +214,8 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
 
   Future<void> onFileSelect(BuildContext context) async {
 
+    String base64String;
+
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: allowedImageType,
@@ -219,6 +223,13 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
 
     if (result != null) {
       PlatformFile objFile = result.files.single;
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        base64String = base64.encode(File(objFile.path).readAsBytesSync());
+      } else {
+        base64String = base64.encode(objFile.bytes);
+      }
+
       if(objFile.size > maxImageSize){
         Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
             "You can only upload ${maxImageSize/oneMegaByte} or less then ${maxImageSize/oneMegaByte} mb image/file.");
@@ -226,7 +237,7 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
         setState(() {
           bannerImageInfo['imageName'] = objFile.name;
           bannerImageInfo['imageExt'] = objFile.extension;
-          bannerImageInfo['imageString'] = base64.encode(objFile.bytes);
+          bannerImageInfo['imageString'] = base64String;
         });
       }
     }else {

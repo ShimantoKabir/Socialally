@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
+
 EventHub eventHub = EventHub();
 
 const kTextColor = Color(0xFF707070);
@@ -93,7 +95,7 @@ List<Node> userDashboardMenus = [
   ),
   Node(
     label: 'Wallet',
-    key: 'lol',
+    key: '/wallet',
     icon: NodeIcon.fromIconData(Icons.monetization_on),
     children: [
       Node(
@@ -141,18 +143,35 @@ List<Node> userDashboardMenus = [
     ]
   ),
   Node(
+      label: 'Profile',
+      key: '/user/profile',
+      icon: NodeIcon.fromIconData(Icons.account_circle_rounded),
+      children: [
+        Node(
+          label: ' Update',
+          key: '/user/profile/update',
+          icon: NodeIcon.fromIconData(Icons.drive_file_rename_outline),
+        ),
+        Node(
+          label: ' Change Password',
+          key: '/user/profile/change-password',
+          icon: NodeIcon.fromIconData(Icons.lock),
+        ),
+      ]
+  ),
+  Node(
     label: 'Plan & Earn',
-    key: '8',
+    key: '/plan-and-earn',
     icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)
   ),
   Node(
     label: 'Support',
-    key: '9',
+    key: '/support',
     icon: NodeIcon.fromIconData(Icons.support)
   ),
   Node(
     label: 'FAQ',
-    key: '10',
+    key: '/faq',
     icon: NodeIcon.fromIconData(Icons.question_answer)
   )
 ];
@@ -184,24 +203,27 @@ List<Node> adminDashboardMenus = [
 
 TreeViewTheme tvt = TreeViewTheme(
   expanderTheme: ExpanderThemeData(
-    type: ExpanderType.chevron,
+    type: ExpanderType.caret,
     modifier: ExpanderModifier.none,
     position: ExpanderPosition.start,
+    color: Colors.red.shade800,
     size: 20,
-    color: Colors.green
   ),
   labelStyle: TextStyle(
     fontSize: 16,
     letterSpacing: 0.3,
   ),
+  parentLabelStyle: TextStyle(
+    fontSize: 16,
+    letterSpacing: 0.1,
+    fontWeight: FontWeight.w800,
+    color: Colors.red.shade600,
+  ),
   iconTheme: IconThemeData(
     size: 18,
     color: Colors.grey.shade800,
   ),
-  colorScheme: ColorScheme.light(
-    onSurface: Colors.green,
-    surface: Colors.green
-  )
+  colorScheme: ColorScheme.light(),
 );
 
 List<DropdownMenuItem<String>> regionDropDownList = [
@@ -220,6 +242,15 @@ List<DropdownMenuItem<String>> regionDropDownList = [
 
 List<DropdownMenuItem<String>> countryDropDownList = [
   'Select',
+].map<DropdownMenuItem<String>>((String value) {
+  return DropdownMenuItem<String>(
+    value: value,
+    child: Text(value),
+  );
+}).toList();
+
+List<DropdownMenuItem<String>> sortDropDownList = [
+  'SortBy',
 ].map<DropdownMenuItem<String>>((String value) {
   return DropdownMenuItem<String>(
     value: value,

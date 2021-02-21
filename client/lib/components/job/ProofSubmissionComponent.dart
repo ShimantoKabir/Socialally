@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/models/Project.dart';
 import 'package:client/models/ProofSubmission.dart';
 import 'package:event_hub/event_hub.dart';
@@ -459,14 +461,23 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
   }
 
   Future<void> onFileSelect(BuildContext context) async {
-
+    String base64String;
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: allowedImageType,
     );
 
     if (result != null) {
+
       PlatformFile objFile = result.files.single;
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        base64String = base64.encode(File(objFile.path).readAsBytesSync());
+      } else {
+        base64String = base64.encode(objFile.bytes);
+      }
+
+
       if(objFile.size > maxImageSize){
         Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "
             "You can only upload ${maxImageSize/oneMegaByte} or less then ${maxImageSize/oneMegaByte} mb image/file.");
@@ -477,7 +488,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
             imageUrl: null,
             imageName: objFile.name,
             imageExt: objFile.extension,
-            imageString: base64.encode(objFile.bytes)
+            imageString: base64String
           ));
         });
       }

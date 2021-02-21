@@ -118,8 +118,8 @@ class TransactionRpo
                             Transactions.status,
                             Transactions.createdAt AS createdAt,
                             ChartOfAccounts.ledgerId,
-                            Transactions.debitAmount,
-                            Transactions.creditAmount,
+                            IFNULL(Transactions.debitAmount,0) AS debitAmount,
+                            IFNULL(Transactions.creditAmount,0) AS creditAmount,
                             IFNULL(Transactions.debitAmount,Transactions.creditAmount) AS amount 
                         FROM
                             Transactions 

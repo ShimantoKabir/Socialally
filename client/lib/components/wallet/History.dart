@@ -202,13 +202,13 @@ class HistoryState extends State<History> {
         transactionList.add(new Transaction(
           createdAt: value["createdAt"],
           transactionId: value["transactionId"].toString(),
-          debitAmount: value["debitAmount"],
-          creditAmount: value["creditAmount"],
+          debitAmount: double.tryParse(value["debitAmount"].toString()),
+          creditAmount: double.tryParse(value["creditAmount"].toString()),
           paymentGatewayName: value['paymentGatewayName'],
           accountNumber: value['accountNumber'].toString(),
           ledgerId: value['ledgerId'],
           ledgerName: value['ledgerName'],
-          amount: value['amount'],
+          amount: double.tryParse(value['amount'].toString()),
           status: value['status']
         ));
       });

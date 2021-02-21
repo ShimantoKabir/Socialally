@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:client/constants.dart';
 import 'package:client/models/Advertisement.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
@@ -9,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:responsive_image/responsive_image.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../../constants.dart';
 
 class AdvertisedAny extends StatefulWidget {
   AdvertisedAny({Key key, this.eventHub, this.userInfo, this.type}) : super(key: key);
@@ -41,7 +40,10 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   @override
   void initState() {
     super.initState();
-    eventHub.fire("viewTitle","Advertised Any");
+    if(type == 2){
+      eventHub.fire("viewTitle","Advertised Any");
+    }
+
     futureAdvertisedAny = fetchAdvertisedAny();
     alertText = "No operation running.";
     alertIcon = Container();
@@ -155,46 +157,46 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
 
               }),
               Visibility(
-                  visible: needToFreezeUi,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                    strokeWidth: 2,
-                  )
+                visible: needToFreezeUi,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  strokeWidth: 2,
+                )
               ),
               Row(
                 children: [
                   IconButton(
-                      icon: Icon(
-                          Icons.arrow_back_ios,
-                          size: 15
-                      ),
-                      onPressed: (){
-                        if(pageIndex < 1){
-                          Alert.show(alertDialog, context, Alert.ERROR, "Your are already in the first page!");
-                        }else {
-                          pageNumber--;
-                          pageIndex = pageIndex - perPage;
-                          needToFreezeUi = true;
-                          setState(() {
-                            futureAdvertisedAny = fetchAdvertisedAny();
-                          });
-                        }
-                      }
-                  ),
-                  Text("${pageNumber+1}"),
-                  IconButton(
-                      icon: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 15
-                      ),
-                      onPressed: (){
-                        pageIndex = pageIndex + perPage;
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      size: 15
+                    ),
+                    onPressed: (){
+                      if(pageIndex < 1){
+                        Alert.show(alertDialog, context, Alert.ERROR, "Your are already in the first page!");
+                      }else {
+                        pageNumber--;
+                        pageIndex = pageIndex - perPage;
                         needToFreezeUi = true;
-                        pageNumber++;
                         setState(() {
                           futureAdvertisedAny = fetchAdvertisedAny();
                         });
                       }
+                    }
+                  ),
+                  Text("${pageNumber+1}"),
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 15
+                    ),
+                    onPressed: (){
+                      pageIndex = pageIndex + perPage;
+                      needToFreezeUi = true;
+                      pageNumber++;
+                      setState(() {
+                        futureAdvertisedAny = fetchAdvertisedAny();
+                      });
+                    }
                   )
                 ],
               )

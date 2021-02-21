@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:client/constants.dart';
 import 'package:client/models/Project.dart';
+import 'package:client/models/ProjectCategory.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,11 +31,13 @@ class AvailableState extends State<Available> {
   Future futureProjects;
   Widget alertIcon;
   String alertText;
+  String regionName;
   bool needToFreezeUi;
   int pageIndex = 0;
   int perPage = 5;
   int pageNumber = 0;
   double companyCharge = 0.1;
+  ProjectCategory defaultProjectCategory;
 
   @override
   void initState() {
@@ -49,11 +53,108 @@ class AvailableState extends State<Available> {
     alertIcon = Container();
     needToFreezeUi = false;
     pageIndex = 0;
+
+    List<dynamic> projectCategories = userInfo['projectCategories'];
+    projectCategories.asMap().forEach((key, projectCategory) {
+      bool isValueExist = false;
+      projectCategoriesDropDownList.forEach((element) {
+        print("cn = ${element.value.categoryName}");
+        if (element.value.categoryName == projectCategory['categoryName']) {
+          isValueExist = true;
+        }
+      });
+
+      if (!isValueExist) {
+        ProjectCategory pc = new ProjectCategory(
+          id: null,
+          subCategoryName: null,
+          categoryId: projectCategory['categoryId'],
+          categoryName: projectCategory['categoryName'],
+        );
+        projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
+          value: pc,
+          child: Text(pc.categoryName),
+        ));
+      }
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        child: Container(
+          padding: EdgeInsets.all(2),
+          color: Colors.black12,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5))
+                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                    child: DropdownButton<ProjectCategory>(
+                        value: defaultProjectCategory,
+                        isExpanded: true,
+                        underline: SizedBox(),
+                        onChanged: (ProjectCategory pc) {
+
+                        },
+                        items: projectCategoriesDropDownList
+                    )
+                ),
+                flex: 1,
+              ),
+              Expanded(
+                child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                    child: DropdownButton<String>(
+                        value: regionName,
+                        isExpanded: true,
+                        underline: SizedBox(),
+                        onChanged: (String rn) {
+
+                        },
+                        items: regionDropDownList
+                    )
+                ),
+                flex: 1,
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                    value: regionName,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: (String rn) {
+
+                    },
+                    items: sortDropDownList
+                  )
+                ),
+                flex: 1,
+              )
+            ],
+          ),
+        ),
+        preferredSize: Size.fromHeight(30.0)
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: FutureBuilder(

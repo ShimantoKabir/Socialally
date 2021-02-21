@@ -150,6 +150,7 @@ class LoginState extends State<Login> {
                   alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
             }
           }).catchError((err) {
+            print("err = $err");
             Navigator.of(buildContext).pop(false);
             Alert.show(alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
           });

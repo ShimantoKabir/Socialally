@@ -1,3 +1,4 @@
+import 'package:client/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,20 +7,20 @@ import 'package:flutter_treeview/tree_view.dart';
 class DashboardLeftNavigation extends StatefulWidget {
   DashboardLeftNavigation({
     Key key,
-    this.type,
+    this.positionType,
     this.eventHub,
     this.treeViewController,
     this.userNavigatorKey
   }) : super(key: key);
 
-  final int type;
+  final int positionType;
   final EventHub eventHub;
   final TreeViewController treeViewController;
   final userNavigatorKey;
 
   @override
   DashboardLeftNavigationState createState() => DashboardLeftNavigationState(
-    type: type,
+    positionType: positionType,
     eventHub: eventHub,
     treeViewController: treeViewController,
     userNavigatorKey: userNavigatorKey
@@ -29,14 +30,14 @@ class DashboardLeftNavigation extends StatefulWidget {
 
 class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
 
-  int type;
+  int positionType;
   EventHub eventHub;
   TreeViewController treeViewController;
   var userNavigatorKey;
 
   DashboardLeftNavigationState({
     Key key,
-    this.type,
+    this.positionType,
     this.eventHub,
     this.treeViewController,
     this.userNavigatorKey,
@@ -50,10 +51,10 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    if(type == 1){
-      return getContent({
+    if(positionType == 1){
+      return SafeArea(child:getContent({
         "width" : width
-      });
+      }));
     }else {
       return Expanded(
         child: getContent({
@@ -90,26 +91,37 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
               ),
             ),
             Expanded(
-                child: TreeView(
-                  controller: treeViewController,
-                  allowParentSelect: true,
-                  supportParentDoubleTap: false,
-                  onNodeTap: (path) {
-                    if(data['width'] < 960){
-                      eventHub.fire("openAndCloseSideNav",{
-                        "screenWidth" : data['width']
+              child: TreeView(
+                controller: treeViewController,
+                allowParentSelect: true,
+                supportParentDoubleTap: false,
+                onNodeTap: (path) {
+                  if(data['width'] < 960){
+                    eventHub.fire("openAndCloseSideNav",{
+                      "screenWidth" : data['width']
+                    });
+                  }
+                  setState(() {
+                    treeViewController = treeViewController.copyWith(
+                      selectedKey: path
+                    );
+
+                    if(treeViewController.selectedKey == "/logout"){
+                      MySharedPreferences.clear("userInfo").then((isClear) {
+                        if (isClear) {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, "/", (r) => false
+                          );
+                        }
                       });
-                    }
-                    setState(() {
-                      treeViewController = treeViewController
-                          .copyWith(selectedKey: path);
-                      userNavigatorKey.currentState
-                          .pushNamedAndRemoveUntil(
+                    }else {
+                      userNavigatorKey.currentState.pushNamedAndRemoveUntil(
                           path, (route) => false
                       );
-                    });
-                  },
-                )
+                    }
+                  });
+                },
+              )
             ),
             Center(
               child: InkWell(

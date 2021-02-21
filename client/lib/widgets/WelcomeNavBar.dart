@@ -31,41 +31,48 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            offset: Offset(0, -2),
-            blurRadius: 30,
-            color: Colors.black.withOpacity(0.16),
-          )
-        ]
-      ),
-      child: ScreenTypeLayout(
-        desktop: getDesktopNavBar(context,{
-          "logoHeight" : 25,
-          "menuPadding" : 15,
-          "menuMargin" : 0,
-          "menuFontSize" : 15,
-          "needLogo" : true
-        }),
-        tablet: getDesktopNavBar(context,{
-          "logoHeight" : 17,
-          "menuPadding" : 12,
-          "menuMargin" : 0,
-          "menuFontSize" : 12,
-          "needLogo" : true
-        }),
-        mobile: getMobileNavBar(context,{
-          "logoHeight" : 17,
-          "menuPadding" : 12,
-          "menuMargin" : 10,
-          "menuFontSize" : 12,
-          "needLogo" : false
-        })
-      ),
+    final width = MediaQuery.of(context).size.width;
+    return SafeArea(
+      child: Container(
+        width: width,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, -2),
+              blurRadius: 30,
+              color: Colors.black.withOpacity(0.16),
+            )
+          ]
+        ),
+        child: ScreenTypeLayout(
+            desktop: getDesktopNavBar(context,{
+              "logoHeight" : 25.0,
+              "menuPadding" : 15.0,
+              "menuMargin" : 0.0,
+              "menuFontSize" : 15.0,
+              "needLogo" : true,
+              "screenWidth" : width
+            }),
+            tablet: getDesktopNavBar(context,{
+              "logoHeight" : 17.0,
+              "menuPadding" : 12.0,
+              "menuMargin" : 0.0,
+              "menuFontSize" : 12.0,
+              "needLogo" : true,
+              "screenWidth" : width
+            }),
+            mobile: getMobileNavBar(context,{
+              "logoHeight" : 17.0,
+              "menuPadding" : 12.0,
+              "menuMargin" : 10.0,
+              "menuFontSize" : 12.0,
+              "needLogo" : false,
+              "screenWidth" : width
+            })
+        ),
+      )
     );
   }
 
@@ -167,10 +174,11 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
         Visibility(
           visible: isMobileNavOpen,
           child: Container(
+            width: data['screenWidth'],
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: Colors.grey
+                  color: Colors.transparent
                 )
               )
             ),

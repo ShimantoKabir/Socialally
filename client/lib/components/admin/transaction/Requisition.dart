@@ -283,6 +283,8 @@ class RequisitionState extends State<Requisition> {
     List<Transaction> transactionList = [];
     String url = baseUrl + "/transactions/query?par-page=$perPage&page-index=$pageIndex";
 
+    print("url $url");
+
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
@@ -293,9 +295,10 @@ class RequisitionState extends State<Requisition> {
         transactionList.add(new Transaction(
           id: value["id"],
           createdAt: value["createdAt"],
-          transactionId: value["transactionId"],
-          amount: value["amount"],
-          creditAmount: value["creditAmount"],
+          transactionId: value["transactionId"].toString(),
+          amount: double.tryParse(value["amount"].toString()),
+          creditAmount: double.tryParse(value["creditAmount"].toString()),
+          debitAmount: double.tryParse(value["debitAmount"].toString()),
           paymentGatewayName: value['paymentGatewayName'],
           accountHolderId: value['accountHolderId'],
           accountNumber: value['accountNumber'].toString(),

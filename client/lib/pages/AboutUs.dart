@@ -12,7 +12,7 @@ class AboutUs extends StatelessWidget {
           children: [
             WelcomeNavBar(),
             Container(
-              padding: EdgeInsets.fromLTRB(125, 50, 125, 50),
+              padding: EdgeInsets.all(40),
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
