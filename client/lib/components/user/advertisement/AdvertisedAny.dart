@@ -153,14 +153,14 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              IconButton(icon: Icon(Icons.filter_alt_outlined), onPressed: (){
-
-              }),
               Visibility(
                 visible: needToFreezeUi,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                  strokeWidth: 2,
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                    strokeWidth: 2,
+                  ),
                 )
               ),
               Row(

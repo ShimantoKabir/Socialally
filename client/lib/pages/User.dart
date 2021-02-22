@@ -1,6 +1,7 @@
 import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
+import 'package:client/components/job/JobFilter.dart';
 import 'package:client/components/job/Post.dart';
 import 'package:client/components/user/advertisement/AdvertisedAny.dart';
 import 'package:client/components/user/advertisement/AnyAdvertisementSender.dart';
@@ -9,6 +10,7 @@ import 'package:client/components/wallet/Deposit.dart';
 import 'package:client/components/wallet/History.dart';
 import 'package:client/components/wallet/Withdraw.dart';
 import 'package:client/constants.dart';
+import 'package:client/models/FilterCriteria.dart';
 import 'package:client/models/Project.dart';
 import 'package:client/widgets/DashboardLeftNavigation.dart';
 import 'package:client/widgets/DashboardTopNavigation.dart';
@@ -44,17 +46,27 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   AlertDialog alertDialog;
   var userNavigatorKey = GlobalKey<NavigatorState>();
   bool isSideNavOpen = true;
-
+  int type;
+  FilterCriteria filterCriteria;
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     nodes = userDashboardMenus;
+    type = 1;
     html.window.history.pushState(null,"User Dashboard","/#/user/dashboard");
     treeViewController = TreeViewController(
       children: nodes,
       selectedKey: selectedKey
+    );
+    filterCriteria = new FilterCriteria(
+      type: 1,
+      searchText: null,
+      sortBy: null,
+      location: null,
+      categoryId: null,
+      categoryName: null
     );
 
     eventHub.on("userInfo", (dynamic data) {
@@ -122,6 +134,31 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
       setState(() {
         project = data;
         userNavigatorKey.currentState.pushNamed("/advertisement/job");
+      });
+    });
+
+    eventHub.on("redirectToJobFilter", (dynamic data) {
+      setState(() {
+        type = data["type"];
+        userNavigatorKey.currentState.pushNamed("/job/filter");
+      });
+    });
+
+    eventHub.on("redirectToAvailableJob", (dynamic data) {
+      setState(() {
+        filterCriteria = data['filterCriteria'];
+        type = filterCriteria.type;
+        if(type == 1){
+          userNavigatorKey.currentState.pushNamed("/job/available");
+        }else if(type == 2){
+          userNavigatorKey.currentState.pushNamed("/job/accept");
+        }else if(type == 3){
+          userNavigatorKey.currentState.pushNamed("/job/posted");
+        }else if(type == 4){
+          userNavigatorKey.currentState.pushNamed("/job/applied");
+        }else if(type == 5){
+          userNavigatorKey.currentState.pushNamed("/advertisement/advertised/job");
+        }
       });
     });
 
@@ -245,24 +282,28 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 1
                                     ));
                                   }else if(settings.name == "/job/accept"){
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 2
                                     ));
                                   } else if(settings.name == "/job/posted"){
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 3
                                     ));
                                   }else if(settings.name == "/job/applied"){
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 4
                                     ));
                                   } else if(settings.name == "/job/submit"){
@@ -295,6 +336,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 5
                                     ));
                                   }else if(settings.name == "/advertisement/any"){
@@ -314,10 +356,17 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                       userInfo: userInfo,
                                       type: 1
                                     ));
+                                  }else if(settings.name == "/job/filter"){
+                                    return MaterialPageRoute(builder: (context) => JobFilter(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: type
+                                    ));
                                   }  else {
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: 1
                                     ));
                                   }

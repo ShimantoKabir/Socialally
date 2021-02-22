@@ -250,7 +250,9 @@ List<DropdownMenuItem<String>> countryDropDownList = [
 }).toList();
 
 List<DropdownMenuItem<String>> sortDropDownList = [
-  'SortBy',
+  'Select',
+  'Most Paid',
+  'Most Recent'
 ].map<DropdownMenuItem<String>>((String value) {
   return DropdownMenuItem<String>(
     value: value,
