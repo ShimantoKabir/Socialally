@@ -29,6 +29,7 @@ dependencies:
   responsive_image: ^0.1.0
   cached_network_image: ^2.5.0
   universal_html: ^1.2.4
+  universal_io: ^1.0.2
 
 dev_dependencies:
   flutter_test:

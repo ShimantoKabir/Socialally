@@ -83,21 +83,21 @@ class AvailableState extends State<Available> {
     filterBy = "Filtered By [";
 
     if(filterCriteria.categoryName == null){
-      filterBy = filterBy + "Category";
+      filterBy = filterBy + "Category: None";
     }else {
-      filterBy = filterBy +filterCriteria.categoryName;
+      filterBy = filterBy+ "Category: "+filterCriteria.categoryName;
     }
 
     if(filterCriteria.location == null){
-      filterBy = filterBy + "/Location";
+      filterBy = filterBy + "/Location: None";
     }else {
-      filterBy = filterBy + "/" + filterCriteria.location;
+      filterBy = filterBy + "/Location: " + filterCriteria.location;
     }
 
     if(filterCriteria.sortBy == null){
-      filterBy = filterBy + "/Sort";
+      filterBy = filterBy + "/SortBy: None";
     }else {
-      filterBy = filterBy + "/" + filterCriteria.sortBy;
+      filterBy = filterBy + "/SortBy: " + filterCriteria.sortBy;
     }
 
     filterBy = filterBy + "]";
@@ -489,9 +489,31 @@ class AvailableState extends State<Available> {
 
   Future<List<Project>> fetchAvailableJob() async {
 
+
+
     List<Project> projectList = [];
 
-    String url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
+    String location = filterCriteria.location == null ? "none" :
+      filterCriteria.location.replaceAll(" ", "").toLowerCase();
+
+    String sortBy = filterCriteria.sortBy == null ? "none" :
+    filterCriteria.sortBy.replaceAll(" ", "").toLowerCase();
+
+    String searchText = filterCriteria.searchText == null ||
+        filterCriteria.searchText.isEmpty ? "none"
+        : filterCriteria.searchText.replaceAll(" ", "").toLowerCase();
+
+    String url = baseUrl +
+        "/projects/query?type=$type&user-info-id=${userInfo['id']}"
+            "&par-page=$perPage"
+            "&page-index=$pageIndex"
+            "&category-id=${filterCriteria.categoryId}"
+            "&region-name=$location"
+            "&sort-by=$sortBy"
+            "&search-text=$searchText";
+
+    print("url = $url");
+
     // if(type == 1){ // job accept published by me
     //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
     // }else if(type == 2){ // job approve request

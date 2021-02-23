@@ -46,7 +46,6 @@ class JobFilterState extends State<JobFilter>{
     projectCategories.asMap().forEach((key, projectCategory) {
       bool isValueExist = false;
       projectCategoriesDropDownList.forEach((element) {
-        print("cn = ${element.value.categoryName}");
         if (element.value.categoryName == projectCategory['categoryName']) {
           isValueExist = true;
         }
@@ -87,6 +86,8 @@ class JobFilterState extends State<JobFilter>{
               ),
               child: Text(
                 "FILTER",
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
                 style: TextStyle(
                   fontSize: 20
                 ),
@@ -114,7 +115,6 @@ class JobFilterState extends State<JobFilter>{
                 isExpanded: true,
                 underline: SizedBox(),
                 onChanged: (ProjectCategory pc) {
-                  print("pc ${pc.id}, ${pc.categoryId}, ${pc.categoryName}, , ${pc.subCategoryName}");
                   setState(() {
                     defaultProjectCategory = new ProjectCategory(
                       id: pc.id,
@@ -196,10 +196,12 @@ class JobFilterState extends State<JobFilter>{
                   onPressed: () {
                     eventHub.fire("redirectToAvailableJob",{
                       "filterCriteria" : FilterCriteria(
-                        categoryName: defaultProjectCategory.categoryName == "Select" ? "None" : defaultProjectCategory.categoryName,
+                        categoryName: defaultProjectCategory.categoryName ==
+                          "Select" ?
+                          null : defaultProjectCategory.categoryName,
                         categoryId: defaultProjectCategory.categoryId,
-                        location: regionName == "Select" ? "None" : regionName,
-                        sortBy: sortBy == "Select" ? "None" : sortBy,
+                        location: regionName == "Select" ? null : regionName,
+                        sortBy: sortBy == "Select" ? null : sortBy,
                         searchText: searchTextCtl.text,
                         type: type
                       )
@@ -224,10 +226,10 @@ class JobFilterState extends State<JobFilter>{
   void resetFilters() {
     setState(() {
       defaultProjectCategory = ProjectCategory(
-          id: 0,
-          categoryId: 0,
-          categoryName: "Select",
-          subCategoryName: "Select"
+        id: 0,
+        categoryId: 0,
+        categoryName: "Select",
+        subCategoryName: "Select"
       );
       regionName = "Select";
       sortBy = "Select";

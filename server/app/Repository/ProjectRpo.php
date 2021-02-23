@@ -102,6 +102,7 @@ class ProjectRpo
         $type = 0;
         $parPage = 10;
         $pageIndex = 10;
+        $finishSoonLimit = 80;
 
         if (!$request->has('type')) {
             $res['code'] = 404;
@@ -121,6 +122,10 @@ class ProjectRpo
             $userInfoId = $request->query('user-info-id');
             $parPage = $request->query('par-page');
             $pageIndex = $request->query('page-index');
+            $categoryId = $request->has('category-id') ? $request->query('category-id') : null;
+            $regionName = $request->has('region-name') ? $request->query('region-name') : "none";
+            $sortBy = $request->has('sort-by') ? $request->query('sort-by') : "none";
+            $searchText = $request->has('search-text') ? $request->query('search-text') : "none";
 
             $sqlBefore = "SELECT
                 pf.id AS proofSubmissionId,
@@ -153,6 +158,7 @@ class ProjectRpo
                     Projects.countryName,
                     Projects.workerNeeded,
                     Projects.estimatedDay,
+                    Projects.eachWorkerEarn,
                     Projects.estimatedCost,
                     Projects.publishedBy,
                     IFNULL(UserInfos.firstName, UserInfos.email) AS publisherName,
@@ -162,7 +168,11 @@ class ProjectRpo
                     FROM
                         ProofSubmissions 
                     WHERE
-                        ProofSubmissions.projectId = Projects.id 
+                        (
+                            status = 'Pending' 
+                            OR status = 'Approved'
+                        )
+                        AND ProofSubmissions.projectId = Projects.id 
                     )
                     AS totalApplied,
                     (
@@ -198,7 +208,7 @@ class ProjectRpo
 
                 if ($type == 1) { // job accept published by me
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE (status = 'Pending' OR status = 'Approved') AND ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
                 } else if ($type == 2) { // job approve request
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
                     $sql = $sql . " ORDER BY p.id DESC ";
@@ -214,8 +224,34 @@ class ProjectRpo
 
                 $sql = $sql . " LIMIT " . $pageIndex . ", " . $parPage;
 
-                $res['projects'] = DB::select(DB::raw($sql));
-                $res['sql'] = $sql;
+                $filterSql = "SELECT * FROM (" . $sql . ") f WHERE f.id IS NOT NULL ";
+
+                if ($categoryId != null) {
+                    $filterSql = $filterSql . " AND f.categoryId = " . $categoryId;
+                }
+
+                if ($regionName != "none") {
+                    $filterSql = $filterSql . " AND LOWER(REPLACE(f.regionName,' ','')) = " . $regionName;
+                }
+
+                if ($searchText != "none") {
+                    $filterSql = $filterSql . " AND f.title LIKE '%" . $searchText . "%'";
+                }
+
+                // ROUND((f.totalApplied/f.workerNeeded * 100))
+
+                if ($sortBy != "none") {
+                    if ($sortBy == "finishsoon") {
+                        $filterSql = $filterSql . " ORDER BY f.totalApplied DESC ";
+                    } else if ($sortBy == "lesspaid") {
+                        $filterSql = $filterSql . " ORDER BY f.eachWorkerEarn ASC ";
+                    } else if ($sortBy == "mostpaid") {
+                        $filterSql = $filterSql . " ORDER BY f.eachWorkerEarn DESC ";
+                    }
+                }
+
+                $res['projects'] = DB::select(DB::raw($filterSql));
+                $res['sql'] = $filterSql;
                 $res['code'] = 200;
                 $res['msg'] = "Project fetched successfully!";
             } catch (Exception $e) {

@@ -25,6 +25,7 @@ class Project extends Model
         'requiredScreenShots',
         'estimatedDay',
         'estimatedCost',
+        'eachWorkerEarn',
         'publishedBy',
         'isFinished',
         'fileUrl',

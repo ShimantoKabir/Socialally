@@ -12,8 +12,8 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-//const baseUrl = "http://127.0.0.1:8000/api";
-const baseUrl = "http://workersengine.com/server/public/api";
+const baseUrl = "http://127.0.0.1:8000/api";
+// const baseUrl = "http://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -251,8 +251,9 @@ List<DropdownMenuItem<String>> countryDropDownList = [
 
 List<DropdownMenuItem<String>> sortDropDownList = [
   'Select',
+  'Less Paid',
   'Most Paid',
-  'Most Recent'
+  'Finish Soon'
 ].map<DropdownMenuItem<String>>((String value) {
   return DropdownMenuItem<String>(
     value: value,
@@ -304,30 +305,30 @@ List<DropdownMenuItem<AdCostPlan>> adCostPlanDropDownList = [
 
 Widget showRequiredHeading(String title){
   return RichText(
-      text: TextSpan(
-        style: TextStyle(
-            letterSpacing: 0.5,
-            height: 1.5,
+    text: TextSpan(
+      style: TextStyle(
+          letterSpacing: 0.5,
+          height: 1.5,
+          color: Colors.black
+      ),
+      children: <TextSpan>[
+        TextSpan(
+          text: title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
             color: Colors.black
-        ),
-        children: <TextSpan>[
-          TextSpan(
-              text: title,
-              style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black
-              )
-          ),
-          TextSpan(
-              text: " *",
-              style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red
-              )
           )
-        ],
-      )
+        ),
+        TextSpan(
+          text: " *",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: Colors.red
+          )
+        )
+      ],
+    )
   );
 }

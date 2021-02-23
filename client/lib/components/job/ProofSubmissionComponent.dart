@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:client/models/Project.dart';
 import 'package:client/models/ProofSubmission.dart';
 import 'package:event_hub/event_hub.dart';
@@ -11,6 +9,7 @@ import 'package:client/constants.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:universal_io/io.dart';
 
 class ProofSubmissionComponent extends StatefulWidget {
   ProofSubmissionComponent(
