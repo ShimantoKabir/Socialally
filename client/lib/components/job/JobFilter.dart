@@ -6,9 +6,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class JobFilter extends StatefulWidget {
-  JobFilter({Key key, this.type, this.eventHub, this.userInfo}) : super(key: key);
+
+  JobFilter({
+    Key key,
+    this.type,
+    this.eventHub,
+    this.filterCriteria,
+    this.userInfo
+  }) : super(key: key);
+
   final type;
   final userInfo;
+  final FilterCriteria filterCriteria;
   final EventHub eventHub;
 
   @override
@@ -16,6 +25,7 @@ class JobFilter extends StatefulWidget {
     key: key,
     type: type,
     userInfo: userInfo,
+    filterCriteria: filterCriteria,
     eventHub: eventHub
   );
 }
@@ -25,11 +35,13 @@ class JobFilterState extends State<JobFilter>{
   int type;
   var userInfo;
   EventHub eventHub;
+  FilterCriteria filterCriteria;
 
   JobFilterState({
     Key key,
     this.type,
     this.userInfo,
+    this.filterCriteria,
     this.eventHub,
   });
 
@@ -42,6 +54,7 @@ class JobFilterState extends State<JobFilter>{
   void initState() {
     super.initState();
     resetFilters();
+
     List<dynamic> projectCategories = userInfo['projectCategories'];
     projectCategories.asMap().forEach((key, projectCategory) {
       bool isValueExist = false;
@@ -65,6 +78,34 @@ class JobFilterState extends State<JobFilter>{
         ));
       }
     });
+
+    if(filterCriteria.categoryId != null){
+      setState(() {
+        defaultProjectCategory.categoryId = filterCriteria.categoryId;
+        defaultProjectCategory.subCategoryName = null;
+        defaultProjectCategory.id = null;
+        defaultProjectCategory.categoryName = filterCriteria.categoryName;
+      });
+    }
+
+    if(filterCriteria.location != null){
+      setState(() {
+        regionName = filterCriteria.location;
+      });
+    }
+
+    if(filterCriteria.sortBy != null){
+      setState(() {
+        sortBy = filterCriteria.sortBy;
+      });
+    }
+
+    if(filterCriteria.searchText != null){
+      setState(() {
+        searchTextCtl.text = filterCriteria.searchText;
+      });
+    }
+
   }
 
   @override
@@ -199,7 +240,9 @@ class JobFilterState extends State<JobFilter>{
                         categoryName: defaultProjectCategory.categoryName ==
                           "Select" ?
                           null : defaultProjectCategory.categoryName,
-                        categoryId: defaultProjectCategory.categoryId,
+                        categoryId:  defaultProjectCategory.categoryName ==
+                            "Select" ?
+                        null : defaultProjectCategory.categoryId,
                         location: regionName == "Select" ? null : regionName,
                         sortBy: sortBy == "Select" ? null : sortBy,
                         searchText: searchTextCtl.text,
@@ -212,6 +255,10 @@ class JobFilterState extends State<JobFilter>{
                 OutlineButton(
                   onPressed: () {
                     resetFilters();
+                    clearFilterCriteria();
+                    eventHub.fire("redirectToAvailableJob",{
+                      "filterCriteria" : filterCriteria
+                    });
                   },
                   child: Text("Reset")
                 )
@@ -235,6 +282,16 @@ class JobFilterState extends State<JobFilter>{
       sortBy = "Select";
       searchTextCtl.clear();
     });
+
+  }
+
+  clearFilterCriteria(){
+    filterCriteria.type = type;
+    filterCriteria.searchText = null;
+    filterCriteria.sortBy = null;
+    filterCriteria.location = null;
+    filterCriteria.categoryId = null;
+    filterCriteria.categoryName = null;
   }
 
   Widget entryField(String title, TextEditingController controller) {

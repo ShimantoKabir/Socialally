@@ -57,6 +57,7 @@ class ProjectRpo
                 $project->requiredScreenShots = $rProject['requiredScreenShots'];
                 $project->estimatedDay = $rProject['estimatedDay'];
                 $project->estimatedCost = $rProject['estimatedCost'];
+                $project->eachWorkerEarn = $rProject['eachWorkerEarn'];
                 $project->publishedBy = $rUserInfo['id'];
                 $project->save();
 
@@ -226,23 +227,21 @@ class ProjectRpo
 
                 $filterSql = "SELECT * FROM (" . $sql . ") f WHERE f.id IS NOT NULL ";
 
-                if ($categoryId != null) {
+                if ($categoryId != "null") {
                     $filterSql = $filterSql . " AND f.categoryId = " . $categoryId;
                 }
 
                 if ($regionName != "none") {
-                    $filterSql = $filterSql . " AND LOWER(REPLACE(f.regionName,' ','')) = " . $regionName;
+                    $filterSql = $filterSql . " AND LOWER(REPLACE(f.regionName,' ','')) = '" . $regionName . "'";
                 }
 
                 if ($searchText != "none") {
                     $filterSql = $filterSql . " AND f.title LIKE '%" . $searchText . "%'";
                 }
 
-                // ROUND((f.totalApplied/f.workerNeeded * 100))
-
                 if ($sortBy != "none") {
                     if ($sortBy == "finishsoon") {
-                        $filterSql = $filterSql . " ORDER BY f.totalApplied DESC ";
+                        $filterSql = $filterSql . " ORDER BY ROUND((f.totalApplied/f.workerNeeded * 100)) DESC ";
                     } else if ($sortBy == "lesspaid") {
                         $filterSql = $filterSql . " ORDER BY f.eachWorkerEarn ASC ";
                     } else if ($sortBy == "mostpaid") {

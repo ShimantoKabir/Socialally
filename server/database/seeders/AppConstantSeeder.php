@@ -24,6 +24,13 @@ class AppConstantSeeder extends Seeder
                 "appConstantDoubleValue" => null
             ],
             [
+                "appConstantName" => "takePerPound",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => 119,
+                "appConstantDoubleValue" => null
+            ],
+            [
                 "appConstantName" => "proofSubmissionStatus",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => json_encode(["Pending", "Accepted", "Denied"]),
@@ -60,6 +67,20 @@ class AppConstantSeeder extends Seeder
                 ]),
                 "appConstantIntegerValue" => null,
                 "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "quantityOfEarnByRefer",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => 5,
+                "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "referCommission",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 1.5
             ]
         ];
 

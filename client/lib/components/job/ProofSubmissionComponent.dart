@@ -40,7 +40,6 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
   Widget alertIcon;
   String alertText;
   bool needToFreezeUi;
-  double eachWorkerEarn;
   double companyCharge = 0.1;
 
   @override
@@ -51,9 +50,6 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
     needToFreezeUi = false;
     eventHub.fire("viewTitle", project.type == 1 ? "Proof Submission" : "Proof Investigation");
     clearGivenProofs();
-
-    double x = project.workerNeeded * companyCharge;
-    eachWorkerEarn = project.estimatedCost/ (project.workerNeeded + x);
 
     if(project.type == 2){
 
@@ -135,7 +131,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("$eachWorkerEarn\$"),
+                        Text("${project.eachWorkerEarn}£"),
                         SizedBox(width: 5),
                         Icon(Icons.monetization_on, color: Colors.green, size: 25)
                       ],

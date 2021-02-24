@@ -13,7 +13,6 @@ import 'package:client/utilities/MySharedPreferences.dart';
 
 class RouterGenerator {
   Route<dynamic> generate(RouteSettings routeSettings) {
-
     var uri = Uri.parse(routeSettings.name);
     if (routeSettings.name == '/') {
       return redirect(Welcome(), routeSettings, false);
@@ -39,8 +38,14 @@ class RouterGenerator {
       return redirect(Login(type: 1), routeSettings, false);
     }else if (routeSettings.name == '/admin/login') {
       return redirect(Login(type: 2), routeSettings, false);
-    } else if (routeSettings.name == '/user/registration') {
-      return redirect(Registration(type: 1), routeSettings, false);
+    } else if (routeSettings.name.contains("/user/registration")) {
+      if(uri.pathSegments.length == 3){
+        return redirect(Registration(type: 1, referrerId: uri.pathSegments[2]), routeSettings, false);
+      }else if(uri.pathSegments.length == 2){
+        return redirect(Registration(type: 1, referrerId: "empty"), routeSettings, false);
+      }else {
+        return redirect(Unknown(), routeSettings, false);
+      }
     }else if (routeSettings.name == '/admin/registration') {
       return redirect(Registration(type: 2), routeSettings, false);
     } else if (routeSettings.name == '/user/dashboard') {

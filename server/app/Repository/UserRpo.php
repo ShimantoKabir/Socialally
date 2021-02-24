@@ -83,6 +83,11 @@ class UserRpo
             try {
 
                 $token = TokenGenerator::generate();
+                $referId = TokenGenerator::generate();
+                $quantityOfEarnByRefer = AppConstant::where(
+                    "appConstantName",
+                    "quantityOfEarnByRefer"
+                )->first()['appConstantIntegerValue'];
 
                 $userInfo = new UserInfo();
                 $userInfo->email = $rUserInfo['email'];
@@ -91,6 +96,11 @@ class UserRpo
                 $userInfo->token = $token;
                 $userInfo->isEmailVerified = true;
                 $userInfo->type = $rUserInfo['type'];
+                $userInfo->referId = $referId;
+                if ($rUserInfo['referredBy'] != "empty") {
+                    $userInfo->referredBy = $rUserInfo['referredBy'];
+                }
+                $userInfo->quantityOfEarnByRefer = $quantityOfEarnByRefer;
                 $userInfo->save();
 
                 // $mailData = array(
@@ -224,6 +234,7 @@ class UserRpo
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                         'paymentGateways' => PaymentGateway::all(),
                         'takePerDollar' => AppConstant::where("appConstantName", "takePerDollar")->first(),
+                        'takePerPound' => AppConstant::where("appConstantName", "takePerPound")->first(),
                         'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first(),
                         'adCostPlanList' => AppConstant::where("appConstantName", "adCostPlanList")
                             ->first()['appConstantJsonValue'],

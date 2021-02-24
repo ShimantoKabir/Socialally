@@ -5,23 +5,42 @@ import 'package:client/utilities/HttpHandler.dart';
 import 'package:client/utilities/Alert.dart';
 
 class Registration extends StatefulWidget {
-  Registration({Key key, this.type}) : super(key: key);
+  Registration({
+    Key key,
+    this.type,
+    this.referrerId,
+  }) : super(key: key);
 
   final int type;
+  final String referrerId;
 
   @override
-  RegistrationState createState() => RegistrationState(type: type);
+  RegistrationState createState() => RegistrationState(
+    type: type,
+    referrerId: referrerId
+  );
 }
 
 class RegistrationState extends State<Registration> {
 
   int type;
-  RegistrationState({Key key,this.type});
+  String referrerId;
+  RegistrationState({
+    Key key,
+    this.type,
+    this.referrerId
+  });
 
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
   TextEditingController confirmPasswordCtl = new TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    print("re id = $referrerId");
+  }
 
   @override
   Widget build(BuildContext context) {

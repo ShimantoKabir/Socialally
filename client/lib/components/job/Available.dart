@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:client/components/job/JobFilter.dart';
 import 'package:client/constants.dart';
 import 'package:client/models/FilterCriteria.dart';
 import 'package:client/models/Project.dart';
@@ -148,9 +147,6 @@ class AvailableState extends State<Available> {
                   shrinkWrap: true,
                   itemCount: projects.length,
                   itemBuilder: (context, index) {
-                    double x = projects[index].workerNeeded * companyCharge;
-                    double eachWorkerEarn = projects[index].estimatedCost/
-                        (projects[index].workerNeeded + x);
                     return Card(
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -215,7 +211,7 @@ class AvailableState extends State<Available> {
                                 ),
                                 Container(
                                   child: Text(
-                                    "$eachWorkerEarn\$",
+                                    "${projects[index].eachWorkerEarn}£",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.lightGreen
@@ -489,40 +485,28 @@ class AvailableState extends State<Available> {
 
   Future<List<Project>> fetchAvailableJob() async {
 
-
-
     List<Project> projectList = [];
 
     String location = filterCriteria.location == null ? "none" :
       filterCriteria.location.replaceAll(" ", "").toLowerCase();
 
     String sortBy = filterCriteria.sortBy == null ? "none" :
-    filterCriteria.sortBy.replaceAll(" ", "").toLowerCase();
+      filterCriteria.sortBy.replaceAll(" ", "").toLowerCase();
 
     String searchText = filterCriteria.searchText == null ||
-        filterCriteria.searchText.isEmpty ? "none"
-        : filterCriteria.searchText.replaceAll(" ", "").toLowerCase();
+      filterCriteria.searchText.isEmpty ? "none" :
+      filterCriteria.searchText.replaceAll(" ", "").toLowerCase();
 
     String url = baseUrl +
-        "/projects/query?type=$type&user-info-id=${userInfo['id']}"
-            "&par-page=$perPage"
-            "&page-index=$pageIndex"
-            "&category-id=${filterCriteria.categoryId}"
-            "&region-name=$location"
-            "&sort-by=$sortBy"
-            "&search-text=$searchText";
+      "/projects/query?type=$type&user-info-id=${userInfo['id']}"
+      "&par-page=$perPage"
+      "&page-index=$pageIndex"
+      "&category-id=${filterCriteria.categoryId}"
+      "&region-name=$location"
+      "&sort-by=$sortBy"
+      "&search-text=$searchText";
 
-    print("url = $url");
-
-    // if(type == 1){ // job accept published by me
-    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    // }else if(type == 2){ // job approve request
-    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    // }else if(type == 3){ // job only published by me
-    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    // }else { // job applied by me
-    //   url = baseUrl + "/projects/query?type=$type&user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    // }
+    // print("url = $url");
 
     var response = await get(url);
     if (response.statusCode == 200) {
@@ -580,6 +564,7 @@ class AvailableState extends State<Available> {
               givenProofs: gProofs,
               givenScreenshotUrls: gScreenshotUrls,
               estimatedCost: project['estimatedCost'],
+              eachWorkerEarn: project['eachWorkerEarn'],
               type: type,
               proofSubmissionId: project['proofSubmissionId'],
               totalApplied: project['totalApplied'],
@@ -609,4 +594,14 @@ class AvailableState extends State<Available> {
     );
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    filterCriteria.type = type;
+    filterCriteria.searchText = null;
+    filterCriteria.sortBy = null;
+    filterCriteria.location = null;
+    filterCriteria.categoryId = null;
+    filterCriteria.categoryName = null;
+  }
 }

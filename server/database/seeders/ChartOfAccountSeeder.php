@@ -35,6 +35,10 @@ class ChartOfAccountSeeder extends Seeder
             [
                 "ledgerId" => 105,
                 "ledgerName" => "Advertisement Cost"
+            ],
+            [
+                "ledgerId" => 106,
+                "ledgerName" => "Referring Commission"
             ]
         ];
 

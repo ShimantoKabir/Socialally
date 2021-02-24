@@ -4,11 +4,14 @@ namespace App\Repository;
 
 use Exception;
 use App\Models\Project;
+use App\Models\UserInfo;
 use Faker\Provider\Uuid;
+use App\Models\AppConstant;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\ProofSubmission;
 use Illuminate\Support\Facades\DB;
+use App\Utilities\CommissionManager;
 use Illuminate\Support\Facades\Storage;
 
 class ProofSubmissionRpo
@@ -77,7 +80,6 @@ class ProofSubmissionRpo
         ];
 
         $rProofSubmission = $request->proofSubmission;
-        $companyCharge = 0.1;
 
         DB::beginTransaction();
         try {
@@ -90,11 +92,8 @@ class ProofSubmissionRpo
 
             if ($rProofSubmission['status'] == "Approved") {
 
-                $x = $project['workerNeeded'] * $companyCharge;
-                $eachWorkerEarn = $project['estimatedCost'] / ($project['workerNeeded'] + $x);
-
                 $rTransaction = [
-                    "creditAmount" => $eachWorkerEarn,
+                    "creditAmount" => $project['eachWorkerEarn'],
                     "debitAmount" => null,
                     "accountHolderId" => $rProofSubmission["submittedBy"],
                     "ledgerId" => 103,
@@ -105,6 +104,7 @@ class ProofSubmissionRpo
                 ];
 
                 TransactionRpo::saveTransaction($rTransaction);
+                CommissionManager::giveCommission($rProofSubmission["submittedBy"], "Earning");
             }
 
             Notification::create([

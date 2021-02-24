@@ -71,6 +71,30 @@ class UserInfoSeeder extends Seeder
                 "firstName" => "Tamim",
                 "isEmailVerified" => true,
                 "type" => 1
+            ],
+            [
+                "id" => 8,
+                "email" => "rubel420@mail.com",
+                "password" => sha1("Rubel420@"),
+                "firstName" => "Rubel",
+                "isEmailVerified" => true,
+                "type" => 1
+            ],
+            [
+                "id" => 9,
+                "email" => "sabbir420@mail.com",
+                "password" => sha1("Sabbir420@"),
+                "firstName" => "Sabbir",
+                "isEmailVerified" => true,
+                "type" => 1
+            ],
+            [
+                "id" => 10,
+                "email" => "mehedi420@mail.com",
+                "password" => sha1("Mehedi420@"),
+                "firstName" => "Mehedi420",
+                "isEmailVerified" => true,
+                "type" => 1
             ]
         ];
 

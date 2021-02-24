@@ -29,6 +29,9 @@ class UserInfos extends Migration
             $table->boolean('wantNewsLetterNotification')->default(false);
             $table->integer("postedBy")->nullable();
             $table->tinyInteger("type")->comment("1 = user, 2 = admin");
+            $table->string('referId');
+            $table->string('referredBy')->nullable();
+            $table->integer('quantityOfEarnByRefer')->comment("-1 = lifetime, other value should decrease until 0");
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

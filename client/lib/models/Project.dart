@@ -15,6 +15,7 @@ class Project {
   int requiredScreenShots;
   int estimatedDay;
   double estimatedCost;
+  double eachWorkerEarn;
   String imageUrl;
   String fileUrl;
   int type;
@@ -43,6 +44,7 @@ class Project {
     this.requiredScreenShots,
     this.estimatedDay,
     this.estimatedCost,
+    this.eachWorkerEarn,
     this.imageUrl,
     this.fileUrl,
     this.type,

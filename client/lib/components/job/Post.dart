@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:client/models/Project.dart';
 import 'package:http/http.dart';
 import 'package:client/constants.dart';
@@ -10,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_io/io.dart';
 
 class Post extends StatefulWidget {
   Post({Key key, this.eventHub, this.userInfo, this.project}) : super(key: key);
@@ -43,7 +43,7 @@ class PostState extends State<Post> {
   String regionName;
   String countryName;
   int estimatedCost = 0;
-  double companyCharge = 0.1;
+  double jobPostingCharge = 0.0;
   var fileInfo;
   bool needToFreezeUi;
   Widget alertIcon;
@@ -143,6 +143,7 @@ class PostState extends State<Post> {
       eventHub.fire("viewTitle", "Post Job");
     }else {
       eventHub.fire("viewTitle", "Update Job");
+
       estimatedDayCtl.text = project.estimatedDay.toString();
       titleCtl.text = project.title;
       todoStepsControllers.clear();
@@ -178,15 +179,18 @@ class PostState extends State<Post> {
 
       });
 
-      regionName = project.regionName;
-      countryName = project.countryName;
+      fetchCountriesByRegion(null,project.regionName).whenComplete((){
+        countryName = project.countryName;
+      });
 
       workerNeededCtl.text = project.workerNeeded.toString();
-      double x = project.workerNeeded * companyCharge;
-      double eachWorkerEarn = project.estimatedCost/ (project.workerNeeded + x);
-      eachWorkerEarnCtl.text = eachWorkerEarn.toString();
+      eachWorkerEarnCtl.text = project.eachWorkerEarn.toString();
+      estimatedCostCtl.text = project.estimatedCost.toString();
 
     }
+
+    jobPostingCharge = userInfo['jobPostingCharge'];
+    print("jpc = ${userInfo['jobPostingCharge']}");
 
   }
 
@@ -786,7 +790,9 @@ class PostState extends State<Post> {
       setState(() {
         needToFreezeUi = false;
       });
-      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      if(context != null){
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
     }
 
     setState(() {
@@ -829,6 +835,7 @@ class PostState extends State<Post> {
         "workerNeeded": int.parse(workerNeededCtl.text),
         "estimatedDay": int.parse(estimatedDayCtl.text),
         "estimatedCost": double.parse(estimatedCostCtl.text),
+        "eachWorkerEarn": double.parse(eachWorkerEarnCtl.text),
         "requiredScreenShots": int.parse(requiredScreenShotsCtl.text),
         "fileString": fileInfo["fileString"],
         "fileExt": fileInfo["fileExt"],
@@ -979,7 +986,7 @@ class PostState extends State<Post> {
       double ewe = double.tryParse(eachWorkerEarnCtl.text);
       int wn = int.tryParse(workerNeededCtl.text);
       double withoutCharge = ewe * wn;
-      double totalCharge = companyCharge * ewe * wn;
+      double totalCharge = jobPostingCharge * ewe * wn;
       double res = totalCharge + withoutCharge;
       estimatedCostCtl.text = res.toString();
     }

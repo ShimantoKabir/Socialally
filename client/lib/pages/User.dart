@@ -55,11 +55,13 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
     super.initState();
     nodes = userDashboardMenus;
     type = 1;
+
     html.window.history.pushState(null,"User Dashboard","/#/user/dashboard");
     treeViewController = TreeViewController(
       children: nodes,
       selectedKey: selectedKey
     );
+
     filterCriteria = new FilterCriteria(
       type: 1,
       searchText: null,
@@ -360,6 +362,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     return MaterialPageRoute(builder: (context) => JobFilter(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
+                                      filterCriteria: filterCriteria,
                                       type: type
                                     ));
                                   }  else {

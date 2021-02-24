@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
 
+// ignore: must_be_immutable
 class ProjectCategory extends Equatable{
-  final int id;
-  final int categoryId;
-  final String categoryName;
-  final String subCategoryName;
+  int id;
+  int categoryId;
+  String categoryName;
+  String subCategoryName;
 
   ProjectCategory(
       {this.id, this.categoryId, this.categoryName, this.subCategoryName});
