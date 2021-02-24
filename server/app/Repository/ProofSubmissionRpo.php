@@ -104,7 +104,7 @@ class ProofSubmissionRpo
                 ];
 
                 TransactionRpo::saveTransaction($rTransaction);
-                CommissionManager::giveCommission($rProofSubmission["submittedBy"], "Earning");
+                $res['commissionInfo'] = CommissionManager::giveCommission($rProofSubmission["submittedBy"], "Earning");
             }
 
             Notification::create([

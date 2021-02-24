@@ -19,30 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="28121880-3806-44a2-988a-ec051c90b145" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../client/lib/components/AboutUsComponent.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client/lib/pages/AboutUs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/components/AboutUs.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/components/Profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/Profile.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/components/job/Available.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/job/Available.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/components/job/Post.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/components/job/Post.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/models/Project.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/models/Project.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/pages/ContactUs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/ContactUs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/pages/User.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/User.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/pages/Welcome.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/pages/Welcome.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/utilities/RouterGenerator.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/utilities/RouterGenerator.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/widgets/AboutTextWithSign.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/widgets/AboutTextWithSign.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/lib/widgets/WelcomeNavBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../client/lib/widgets/WelcomeNavBar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b1ba87ec-eb7c-4f29-af0d-1c3d27f0db4b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b1ba87ec-eb7c-4f29-af0d-1c3d27f0db4b.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Project.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Project.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Repository/ProjectRpo.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Repository/ProjectRpo.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Repository/UserRpo.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Repository/UserRpo.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_01_26_052911_projects.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_01_26_052911_projects.php" afterDir="false" />
-    </list>
+    <list default="true" id="28121880-3806-44a2-988a-ec051c90b145" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,6 +193,7 @@
       <workItem from="1612210978851" duration="157000" />
       <workItem from="1612245506998" duration="61000" />
       <workItem from="1612248301311" duration="206000" />
+      <workItem from="1614158725839" duration="7000" />
     </task>
     <servers />
   </component>

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\TokenGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -22,6 +23,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Workersengineai247@"),
                 "isEmailVerified" => true,
                 "firstName" => "WorkersEngineAi",
+                "quantityOfEarnByRefer" => -1,
+                "referId" => TokenGenerator::generate(),
                 "type" => 2
             ],
             [
@@ -30,6 +33,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Admin420@"),
                 "isEmailVerified" => true,
                 "firstName" => "Admin",
+                "quantityOfEarnByRefer" => -1,
+                "referId" => TokenGenerator::generate(),
                 "type" => 2
             ],
             [
@@ -38,6 +43,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Developer420@"),
                 "firstName" => "Developer",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => -1,
+                "referId" => TokenGenerator::generate(),
                 "type" => 2
             ],
             [
@@ -45,6 +52,8 @@ class UserInfoSeeder extends Seeder
                 "email" => "sakib420@mail.com",
                 "password" => sha1("Sakib420@"),
                 "firstName" => "Sakib",
+                "quantityOfEarnByRefer" => -1,
+                "referId" => TokenGenerator::generate(),
                 "isEmailVerified" => true,
                 "type" => 1
             ],
@@ -54,6 +63,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Musfiq420@"),
                 "firstName" => "Musfiq",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => 10,
+                "referId" => TokenGenerator::generate(),
                 "type" => 1
             ],
             [
@@ -62,6 +73,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Liton420@"),
                 "firstName" => "Liton",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => 9,
+                "referId" => TokenGenerator::generate(),
                 "type" => 1
             ],
             [
@@ -70,6 +83,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Tamim420@"),
                 "firstName" => "Tamim",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => 8,
+                "referId" => TokenGenerator::generate(),
                 "type" => 1
             ],
             [
@@ -78,6 +93,8 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Rubel420@"),
                 "firstName" => "Rubel",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => 7,
+                "referId" => TokenGenerator::generate(),
                 "type" => 1
             ],
             [
@@ -86,13 +103,17 @@ class UserInfoSeeder extends Seeder
                 "password" => sha1("Sabbir420@"),
                 "firstName" => "Sabbir",
                 "isEmailVerified" => true,
+                "quantityOfEarnByRefer" => 5,
+                "referId" => TokenGenerator::generate(),
                 "type" => 1
             ],
             [
                 "id" => 10,
                 "email" => "mehedi420@mail.com",
                 "password" => sha1("Mehedi420@"),
-                "firstName" => "Mehedi420",
+                "firstName" => "Mehedi",
+                "quantityOfEarnByRefer" => 6,
+                "referId" => TokenGenerator::generate(),
                 "isEmailVerified" => true,
                 "type" => 1
             ]
@@ -108,6 +129,8 @@ class UserInfoSeeder extends Seeder
                 "password" => $val['password'],
                 "isEmailVerified" => $val['isEmailVerified'],
                 "firstName" => $val['firstName'],
+                "referId" => $val['referId'],
+                "quantityOfEarnByRefer" => $val['quantityOfEarnByRefer'],
                 "type" => $val['type']
             ]);
         }

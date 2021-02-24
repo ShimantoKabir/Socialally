@@ -28,7 +28,7 @@ class TransactionRpo
             // deposit = creditAmount,101 , withdraw = debitAmount,102
             if ($rTransaction['ledgerId'] == 101) {
                 self::saveTransaction($rTransaction);
-                CommissionManager::giveCommission($rTransaction["accountHolderId"], "Deposit");
+                $res["commissionInfo"] = CommissionManager::giveCommission($rTransaction["accountHolderId"], "Deposit");
                 $res['code'] = 200;
                 $res['msg'] = "Deposit successfully!";
             } else {

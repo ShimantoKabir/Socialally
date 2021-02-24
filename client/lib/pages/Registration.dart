@@ -39,7 +39,6 @@ class RegistrationState extends State<Registration> {
   @override
   void initState() {
     super.initState();
-    print("re id = $referrerId");
   }
 
   @override
@@ -123,6 +122,7 @@ class RegistrationState extends State<Registration> {
             "userInfo": {
               "email": emailCtl.text,
               "password": passwordCtl.text,
+              "referredBy": referrerId,
               "type" : type
             },
             "clientUrl": Uri.base.origin

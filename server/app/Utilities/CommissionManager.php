@@ -17,26 +17,28 @@ class CommissionManager
 
         if ($userInfo['referredBy'] != null) {
 
-            $commissionGainer = UserInfo::where("id", $userInfo['referredBy'])->first();
+            $commissionGainer = UserInfo::where("referId", $userInfo['referredBy'])->first();
 
             if ($userInfo['quantityOfEarnByRefer'] == -1) {
 
-                self::giveCommission($commissionGainer, $userInfo, $type);
+                return self::executeTransaction($commissionGainer, $userInfo, $type);
             } else {
 
                 if ($userInfo['quantityOfEarnByRefer'] != 0) {
 
-                    self::giveCommission($commissionGainer, $userInfo, $type);
-
                     UserInfo::where('id', $userInfoId)->update(array(
                         'quantityOfEarnByRefer' => $userInfo['quantityOfEarnByRefer'] - 1,
                     ));
+
+                    return self::executeTransaction($commissionGainer, $userInfo, $type);
                 }
             }
+        } else {
+            return null;
         }
     }
 
-    public function executeTransaction($commissionGainer, $userInfo, $type)
+    public static function executeTransaction($commissionGainer, $userInfo, $type)
     {
 
         $referCommission = AppConstant::where(
@@ -59,12 +61,22 @@ class CommissionManager
 
         TransactionRpo::saveTransaction($rTransaction);
 
-        Notification::create([
+        $notification = [
             "message" => "Your " . $referCommission . "GBP commission is pending for admin approval by " . $userName . " " . $type . ".",
             "receiverId" => $commissionGainer["id"],
             "senderId" => $userInfo["id"],
             "isSeen" => 0,
             "type" => 1
-        ]);
+        ];
+
+        Notification::create($notification);
+
+        $res = [
+            'referCommission' => $referCommission,
+            'rTransaction' => $rTransaction,
+            'notification' => $notification,
+        ];
+
+        return $res;
     }
 }
