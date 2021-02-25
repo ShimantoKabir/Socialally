@@ -213,11 +213,15 @@ class UserRpo
                         'agreedTermsAndCondition',
                         'wantNewsLetterNotification',
                         'imageUrl',
+                        'accountNumber',
+                        'referId',
                         'type'
                     )
                     ->first();
 
                 if (!is_null($userInfo)) {
+
+                    $referrerLink = env('APP_URL') . "#/user/registration/" . $userInfo['referId'];
 
                     $res['userInfo'] = [
                         'id' => $userInfo['id'],
@@ -227,6 +231,9 @@ class UserRpo
                         'regionName' => $userInfo['regionName'],
                         'countryName' => $userInfo['countryName'],
                         'contactNumber' => $userInfo['contactNumber'],
+                        'referId' => $userInfo['referId'],
+                        'accountNumber' => $userInfo['accountNumber'],
+                        'referrerLink' => $referrerLink,
                         'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
                         'imageUrl' => $userInfo['imageUrl'],
@@ -241,7 +248,10 @@ class UserRpo
                         "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
                             ->where("isSeen", false)->count(),
                         "jobPostingCharge" =>  AppConstant::where("appConstantName", "jobPostingCharge")
-                            ->first()['appConstantDoubleValue']
+                            ->first()['appConstantDoubleValue'],
+                        "quantityOfJoinByYourRefer" => UserInfo::select("id")
+                            ->where("referredBy", $userInfo['referId'])
+                            ->count()
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(
@@ -285,28 +295,16 @@ class UserRpo
 
         try {
 
-            if (is_null($rUserInfo['password'])) {
-                UserInfo::where('id', $rUserInfo['id'])->update(array(
-                    'firstName' => $rUserInfo['firstName'],
-                    'lastName' => $rUserInfo['lastName'],
-                    'regionName' => $rUserInfo['regionName'],
-                    'countryName' => $rUserInfo['countryName'],
-                    'contactNumber' => $rUserInfo['contactNumber'],
-                    'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
-                    'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
-                ));
-            } else {
-                UserInfo::where('id', $rUserInfo['id'])->update(array(
-                    'password' => sha1($rUserInfo['password']),
-                    'firstName' => $rUserInfo['firstName'],
-                    'lastName' => $rUserInfo['lastName'],
-                    'regionName' => $rUserInfo['regionName'],
-                    'countryName' => $rUserInfo['countryName'],
-                    'contactNumber' => $rUserInfo['contactNumber'],
-                    'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
-                    'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
-                ));
-            }
+            UserInfo::where('id', $rUserInfo['id'])->update(array(
+                'firstName' => $rUserInfo['firstName'],
+                'lastName' => $rUserInfo['lastName'],
+                'regionName' => $rUserInfo['regionName'],
+                'countryName' => $rUserInfo['countryName'],
+                'contactNumber' => $rUserInfo['contactNumber'],
+                'accountNumber' => $rUserInfo['accountNumber'],
+                'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
+                'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
+            ));
 
             $rUserInfo['profileCompleted'] = self::calculateProfileCompletionPercentage($rUserInfo);
 

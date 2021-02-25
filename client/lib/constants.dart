@@ -160,19 +160,14 @@ List<Node> userDashboardMenus = [
       ]
   ),
   Node(
-    label: 'Plan & Earn',
-    key: '/plan-and-earn',
+    label: 'Refer & Earn',
+    key: '/refer-and-earn',
     icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)
   ),
   Node(
     label: 'Support',
     key: '/support',
     icon: NodeIcon.fromIconData(Icons.support)
-  ),
-  Node(
-    label: 'FAQ',
-    key: '/faq',
-    icon: NodeIcon.fromIconData(Icons.question_answer)
   )
 ];
 

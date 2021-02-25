@@ -55,13 +55,13 @@ class CommissionManager
             "ledgerId" => 106,
             "status" => "Pending",
             "transactionId" => null,
-            "accountNumber" => null,
+            "accountNumber" => $commissionGainer["accountNumber"],
             "paymentGatewayName" => null,
         ];
 
         TransactionRpo::saveTransaction($rTransaction);
 
-        $notification = [
+        $clientNotification = [
             "message" => "Your " . $referCommission . "GBP commission is pending for admin approval by " . $userName . " " . $type . ".",
             "receiverId" => $commissionGainer["id"],
             "senderId" => $userInfo["id"],
@@ -69,12 +69,23 @@ class CommissionManager
             "type" => 1
         ];
 
-        Notification::create($notification);
+        Notification::create($clientNotification);
+
+        $adminNotification = [
+            "message" =>  $referCommission . "GBP commission request is pending for approval by " . $userName . " " . $type . ".",
+            "receiverId" => 2,
+            "senderId" => $commissionGainer["id"],
+            "isSeen" => 0,
+            "type" => 2
+        ];
+
+        Notification::create($adminNotification);
 
         $res = [
             'referCommission' => $referCommission,
             'rTransaction' => $rTransaction,
-            'notification' => $notification,
+            'clientNotification' => $clientNotification,
+            'adminNotification' => $adminNotification
         ];
 
         return $res;

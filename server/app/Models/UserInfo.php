@@ -24,6 +24,7 @@ class UserInfo extends Model
         'isEmailVerified',
         'agreedTermsAndCondition',
         'wantNewsLetterNotification',
+        'accountNumber',
         'type',
         'referId',
         'referredBy',

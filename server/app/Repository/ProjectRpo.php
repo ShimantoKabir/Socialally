@@ -250,7 +250,7 @@ class ProjectRpo
                 }
 
                 $res['projects'] = DB::select(DB::raw($filterSql));
-                $res['sql'] = $filterSql;
+                // $res['sql'] = $filterSql;
                 $res['code'] = 200;
                 $res['msg'] = "Project fetched successfully!";
             } catch (Exception $e) {

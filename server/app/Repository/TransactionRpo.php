@@ -169,8 +169,17 @@ class TransactionRpo
                 );
                 $msg = "Your withdraw request "
                     . $rTransaction['debitAmount']
-                    . "$ By "
+                    . "GBP By "
                     . $rTransaction["paymentGatewayName"] . " is "
+                    . $rTransaction["status"];
+            } else if ($rTransaction["ledgerId"] == 106) {
+                $updateQuery = array(
+                    "status" => $rTransaction["status"],
+                    "transactionId" => $rTransaction["transactionId"]
+                );
+                $msg = "Your referring commission "
+                    . $rTransaction['creditAmount']
+                    . "GPB is "
                     . $rTransaction["status"];
             } else {
                 $updateQuery = array(

@@ -102,7 +102,6 @@ class RequisitionState extends State<Requisition> {
                             rows: List<DataRow>.generate(
                                 transactions.length, (index) => DataRow(
                                 onSelectChanged: (value){
-                                  print("tans = ${transactions[index].accountHolderId}");
                                   if(!needToFreezeUi){
                                     setState(() {
                                       transaction = transactions[index];
@@ -159,7 +158,8 @@ class RequisitionState extends State<Requisition> {
                                 SizedBox(height: 10),
                                 Text("Status: ${transaction.createdAt}"),
                                 SizedBox(height: 10),
-                                transaction.ledgerId == 102 ?
+                                transaction.ledgerId == 102 ||
+                                    transaction.ledgerId == 106 ?
                                 entryField("Transaction Id",transactionIdCtl) :
                                 Text("TransactionId: ${
                                     transaction.transactionId}"),
@@ -283,8 +283,6 @@ class RequisitionState extends State<Requisition> {
     List<Transaction> transactionList = [];
     String url = baseUrl + "/transactions/query?par-page=$perPage&page-index=$pageIndex";
 
-    print("url $url");
-
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
@@ -308,7 +306,6 @@ class RequisitionState extends State<Requisition> {
         ));
       });
     }
-
     setState(() {
       needToFreezeUi = false;
     });

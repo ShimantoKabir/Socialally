@@ -27,7 +27,7 @@ class UserInfos extends Migration
             $table->boolean('isEmailVerified')->default(false);
             $table->boolean('agreedTermsAndCondition')->default(false);
             $table->boolean('wantNewsLetterNotification')->default(false);
-            $table->integer("postedBy")->nullable();
+            $table->string("accountNumber")->nullable();
             $table->tinyInteger("type")->comment("1 = user, 2 = admin");
             $table->string('referId');
             $table->string('referredBy')->nullable();

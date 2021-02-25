@@ -33,7 +33,7 @@ class ProfileState extends State<Profile> {
   TextEditingController firstNameCtl = new TextEditingController();
   TextEditingController lastNameCtl = new TextEditingController();
   TextEditingController contactNumberCtl = new TextEditingController();
-  TextEditingController passwordCtl = new TextEditingController();
+  TextEditingController accountNumberCtl = new TextEditingController();
   String regionName;
   String countryName;
   SharedPreferences preferences;
@@ -57,6 +57,10 @@ class ProfileState extends State<Profile> {
     alertText = "No operation running.";
     alertIcon = Container();
     needToFreezeUi = false;
+
+    if (userInfo['accountNumber'] != null) {
+      accountNumberCtl.text = userInfo['accountNumber'].toString();
+    }
 
     if (userInfo['regionName'] == null) {
       regionName = "Select";
@@ -196,7 +200,7 @@ class ProfileState extends State<Profile> {
                     ],
                   ),
                 ),
-                entryField("Password", passwordCtl),
+                entryField("Account Number(Bkash/Rocket)", accountNumberCtl),
                 SizedBox(
                   height: 5,
                 ),
@@ -365,17 +369,10 @@ class ProfileState extends State<Profile> {
       userInfo['contactNumber'] = contactNumberCtl.text;
     }
 
-    if (passwordCtl.text.isEmpty) {
-      userInfo['password'] = null;
+    if (accountNumberCtl.text.isEmpty) {
+      userInfo['accountNumber'] = null;
     } else {
-      if (!passwordRegExp.hasMatch(passwordCtl.text)) {
-        errMsg =
-            "Password should contain at least 8 character, one capital letter, one number and one special character!";
-        isInputVerified = false;
-        userInfo['password'] = null;
-      } else {
-        userInfo['password'] = passwordCtl.text;
-      }
+      userInfo['accountNumber'] = accountNumberCtl.text;
     }
 
     if (regionName == "Select") {
@@ -445,7 +442,6 @@ class ProfileState extends State<Profile> {
     } else {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     }
-
     setState(() {
       regionName = region;
     });
@@ -455,7 +451,7 @@ class ProfileState extends State<Profile> {
     firstNameCtl.clear();
     lastNameCtl.clear();
     contactNumberCtl.clear();
-    passwordCtl.clear();
+    accountNumberCtl.clear();
 
     setState(() {
       regionName = "Select";

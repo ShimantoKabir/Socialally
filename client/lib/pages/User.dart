@@ -1,4 +1,5 @@
 import 'package:client/components/NotificationComponent.dart';
+import 'package:client/components/ReferAndEarn.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/JobFilter.dart';
@@ -364,6 +365,11 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                       userInfo: userInfo,
                                       filterCriteria: filterCriteria,
                                       type: type
+                                    ));
+                                  }else if(settings.name == "/refer-and-earn"){
+                                    return MaterialPageRoute(builder: (context) => ReferAndEarn(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
                                     ));
                                   }  else {
                                     return MaterialPageRoute(builder: (context) => Available(
