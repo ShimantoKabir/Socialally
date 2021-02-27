@@ -1,9 +1,12 @@
 import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/ReferAndEarn.dart';
+import 'package:client/components/SupportInfo.dart';
+import 'package:client/components/job/Applicants.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
 import 'package:client/components/job/JobFilter.dart';
 import 'package:client/components/job/Post.dart';
+import 'package:client/components/profile/ChangePassword.dart';
 import 'package:client/components/user/advertisement/AdvertisedAny.dart';
 import 'package:client/components/user/advertisement/AnyAdvertisementSender.dart';
 import 'package:client/components/user/advertisement/JobAdvertisementSender.dart';
@@ -20,6 +23,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:client/components/job/ProofSubmissionComponent.dart';
+import 'package:marquee/marquee.dart';
 import 'package:universal_html/html.dart' as html;
 
 class User extends StatefulWidget {
@@ -179,6 +183,13 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
       }
     });
 
+    eventHub.on("redirectToJobApplicants", (dynamic data) {
+      setState(() {
+        project = data;
+        userNavigatorKey.currentState.pushNamed("/job/applicants");
+      });
+    });
+
     showProfilePic(userInfo);
   }
 
@@ -238,6 +249,19 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                       userNavigatorKey: userNavigatorKey,
                       userInfo: userInfo
                     ),
+                    Container(
+                      height: 25,
+                      child: ListView(
+                        children: [
+                          Marquee(
+                            text: 'Some sample text that takes some space. ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            scrollAxis: Axis.horizontal,
+                            crossAxisAlignment: CrossAxisAlignment.center
+                          )
+                        ].map(wrapWithStuff).toList(),
+                      ),
+                    ),
                     // component title
                     Container(
                       height: 25,
@@ -257,7 +281,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                           Text(
                             viewTitle.toUpperCase(),
                             style: TextStyle(fontSize: 12),
-                          )
+                          ),
                         ],
                       )
                     ),
@@ -274,6 +298,11 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     return MaterialPageRoute(builder: (context) => Profile(
                                       eventHub: eventHub,
                                       userInfo: userInfo
+                                    ));
+                                  } else if(settings.name == "/user/profile/change-password"){
+                                    return MaterialPageRoute(builder: (context) => ChangePassword(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
                                     ));
                                   } else if(settings.name == "/job/post"){
                                     return MaterialPageRoute(builder: (context) => Post(
@@ -371,7 +400,18 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                         eventHub: eventHub,
                                         userInfo: userInfo
                                     ));
-                                  }  else {
+                                  }else if(settings.name == "/support"){
+                                    return MaterialPageRoute(builder: (context) => SupportInfo(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                    ));
+                                  } else if(settings.name == "/job/applicants"){
+                                    return MaterialPageRoute(builder: (context) => Applicants(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      project: project
+                                    ));
+                                  } else {
                                     return MaterialPageRoute(builder: (context) => Available(
                                       eventHub: eventHub,
                                       userInfo: userInfo,
@@ -498,6 +538,13 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
     } else {
       profileImageWidget = NetworkImage(userInfo['imageUrl']);
     }
+  }
+
+  Widget wrapWithStuff(Widget child) {
+    return Padding(
+      padding: EdgeInsets.all(0.0),
+      child: Container(height: 25.0, color: Colors.white, child: child),
+    );
   }
 
   @override

@@ -233,21 +233,21 @@ class PostState extends State<Post> {
                   child: Row(
                     children: [
                       IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              todoStepsControllers.add(TextEditingController());
-                            });
-                          }),
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            todoStepsControllers.add(TextEditingController());
+                          });
+                        }),
                       IconButton(
-                          icon: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (todoStepsControllers.length > 1) {
-                                todoStepsControllers.removeLast();
-                              }
-                            });
-                          }
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            if (todoStepsControllers.length > 1) {
+                              todoStepsControllers.removeLast();
+                            }
+                          });
+                        }
                       )
                     ],
                   ),
@@ -286,14 +286,14 @@ class PostState extends State<Post> {
                             });
                           }),
                       IconButton(
-                          icon: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (requiredProofsControllers.length > 1) {
-                                requiredProofsControllers.removeLast();
-                              }
-                            });
-                          }
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            if (requiredProofsControllers.length > 1) {
+                              requiredProofsControllers.removeLast();
+                            }
+                          });
+                        }
                       )
                     ],
                   ),
@@ -842,7 +842,10 @@ class PostState extends State<Post> {
         "imageString": fileInfo["imageString"],
         "imageExt": fileInfo["imageExt"]
       },
-      "userInfo": {"id": userInfo['id']}
+      "userInfo": {
+        "id": userInfo['id'],
+        "firstName": userInfo['firstName']
+      }
     };
 
     String url = baseUrl + '/projects';
@@ -1002,7 +1005,6 @@ class PostState extends State<Post> {
   }
 
   void onReset() {
-
     setState(() {
       titleCtl.clear();
       clearListControllers();
@@ -1017,7 +1019,6 @@ class PostState extends State<Post> {
       clearFile();
       clearImage();
     });
-
   }
 
   @override
@@ -1096,8 +1097,5 @@ class PostState extends State<Post> {
       });
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
-
   }
-
-
 }

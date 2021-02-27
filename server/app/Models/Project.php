@@ -33,9 +33,10 @@ class Project extends Model
         'adCost',
         'adDuration',
         'adPublishDate',
+        'status',
         'ip',
         'modifiedBy',
-        'createdAt',
+        'createdAt'
     ];
 
     protected $casts = [

@@ -140,9 +140,9 @@ class JobAdvertisementSenderState extends State<JobAdvertisementSender> {
                 onChanged: (AdCostPlan acp) {
                   setState(() {
                     adCostPlan = new AdCostPlan(
-                        day: acp.day,
-                        cost: acp.cost,
-                        txt: acp.txt
+                      day: acp.day,
+                      cost: acp.cost,
+                      txt: acp.txt
                     );
                   });
                 },

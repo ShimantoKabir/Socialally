@@ -36,6 +36,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   int pageIndex = 0;
   int perPage = 5;
   int pageNumber = 0;
+  ScrollController scrollController = ScrollController(initialScrollOffset: 0.0);
 
   @override
   void initState() {
@@ -43,7 +44,6 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     if(type == 2){
       eventHub.fire("viewTitle","Advertised Any");
     }
-
     futureAdvertisedAny = fetchAdvertisedAny();
     alertText = "No operation running.";
     alertIcon = Container();
@@ -65,11 +65,21 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                 return Center(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("No advertisement found!"),
+                    child: Text("No advertisement found!")
                   ),
                 );
               }else {
+                // WidgetsBinding.instance.addPostFrameCallback((_){
+                //   if(scrollController.hasClients){
+                //     scrollController.animateTo(
+                //         scrollController.position.maxScrollExtent,
+                //         duration: Duration(milliseconds: 1),
+                //         curve: Curves.easeOut
+                //     );
+                //   }
+                // });
                 return ListView.builder(
+                  controller: scrollController,
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: advertisements.length,

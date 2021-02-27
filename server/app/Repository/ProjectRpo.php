@@ -3,11 +3,13 @@
 
 namespace App\Repository;
 
+use Exception;
 use App\Models\Project;
 use Faker\Provider\Uuid;
+use App\Models\AppConstant;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Exception;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectRpo
@@ -27,6 +29,20 @@ class ProjectRpo
 
         DB::beginTransaction();
         try {
+
+            // 1 = automatic, 0 = manual
+            $jobApprovalType = AppConstant::where("appConstantName", "jobApprovalType")->first()["appConstantIntegerValue"];
+
+            if ($jobApprovalType == 0) {
+
+                Notification::create([
+                    "message" => "A new job has been posted by " . $rUserInfo["firstName"] . " waiting for approval.",
+                    "receiverId" => 2,
+                    "senderId" => $rUserInfo['id'],
+                    "isSeen" => 0,
+                    "type" => 2
+                ]);
+            }
 
             $rTransaction = [
                 "accountHolderId" => $rUserInfo['id'],
@@ -59,6 +75,9 @@ class ProjectRpo
                 $project->estimatedCost = $rProject['estimatedCost'];
                 $project->eachWorkerEarn = $rProject['eachWorkerEarn'];
                 $project->publishedBy = $rUserInfo['id'];
+                if ($jobApprovalType == 1) {
+                    $project->status = "Approved";
+                }
                 $project->save();
 
                 if (!is_null($rProject['imageString']) && !is_null($rProject['imageExt'])) {
@@ -103,7 +122,6 @@ class ProjectRpo
         $type = 0;
         $parPage = 10;
         $pageIndex = 10;
-        $finishSoonLimit = 80;
 
         if (!$request->has('type')) {
             $res['code'] = 404;
@@ -127,6 +145,7 @@ class ProjectRpo
             $regionName = $request->has('region-name') ? $request->query('region-name') : "none";
             $sortBy = $request->has('sort-by') ? $request->query('sort-by') : "none";
             $searchText = $request->has('search-text') ? $request->query('search-text') : "none";
+            $projectId = $request->has('project-id') ? $request->query('project-id') : 0;
 
             $sqlBefore = "SELECT
                 pf.id AS proofSubmissionId,
@@ -205,7 +224,7 @@ class ProjectRpo
                     UserInfos 
                     ON UserInfos.id = Projects.publishedBy 
                 WHERE
-                    Projects.publishedBy";
+                    Projects.status = 'Approved' AND Projects.publishedBy";
 
                 if ($type == 1) { // job accept published by me
                     $sql = $sql . " != " . $userInfoId;
@@ -218,9 +237,12 @@ class ProjectRpo
                 } else if ($type == 4) {
                     $sql = $sql . " != " . $userInfoId;
                     $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
-                } else {
+                } else if ($type == 5) {
                     $sql = $sql . " != " . $userInfoId;
                     $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY) ORDER BY Projects.id DESC ";
+                } else { // applicants
+                    $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
+                    $sql = $sql . " WHERE p.id = " . $projectId . " ORDER BY p.id DESC ";
                 }
 
                 $sql = $sql . " LIMIT " . $pageIndex . ", " . $parPage;
@@ -250,7 +272,7 @@ class ProjectRpo
                 }
 
                 $res['projects'] = DB::select(DB::raw($filterSql));
-                // $res['sql'] = $filterSql;
+                $res['sql'] = $sql;
                 $res['code'] = 200;
                 $res['msg'] = "Project fetched successfully!";
             } catch (Exception $e) {

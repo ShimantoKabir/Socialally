@@ -33,6 +33,7 @@ class Projects extends Migration
             $table->integer('adCost')->nullable();
             $table->integer('adDuration')->nullable();
             $table->dateTime("adPublishDate")->nullable();
+            $table->string("status")->default("Pending")->comment("Pending, Approved, Declined");
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);
             $table->integer('modifiedBy')->nullable();

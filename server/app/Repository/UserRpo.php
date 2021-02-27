@@ -9,13 +9,10 @@ use App\Jobs\MailSender;
 use App\Models\AppConstant;
 use App\Models\Notification;
 use App\Models\PaymentGateway;
-use App\Models\Transaction;
 use Exception;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
 class UserRpo
@@ -213,7 +210,6 @@ class UserRpo
                         'agreedTermsAndCondition',
                         'wantNewsLetterNotification',
                         'imageUrl',
-                        'accountNumber',
                         'referId',
                         'type'
                     )
@@ -232,7 +228,6 @@ class UserRpo
                         'countryName' => $userInfo['countryName'],
                         'contactNumber' => $userInfo['contactNumber'],
                         'referId' => $userInfo['referId'],
-                        'accountNumber' => $userInfo['accountNumber'],
                         'referrerLink' => $referrerLink,
                         'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
@@ -249,6 +244,8 @@ class UserRpo
                             ->where("isSeen", false)->count(),
                         "jobPostingCharge" =>  AppConstant::where("appConstantName", "jobPostingCharge")
                             ->first()['appConstantDoubleValue'],
+                        "supportInfo" =>  AppConstant::where("appConstantName", "supportInfo")
+                            ->first()['appConstantJsonValue'],
                         "quantityOfJoinByYourRefer" => UserInfo::select("id")
                             ->where("referredBy", $userInfo['referId'])
                             ->count()
@@ -301,7 +298,6 @@ class UserRpo
                 'regionName' => $rUserInfo['regionName'],
                 'countryName' => $rUserInfo['countryName'],
                 'contactNumber' => $rUserInfo['contactNumber'],
-                'accountNumber' => $rUserInfo['accountNumber'],
                 'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
                 'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
             ));
@@ -390,5 +386,46 @@ class UserRpo
             'imageUrl' => $imageUrl
         ));
         return $imageUrl;
+    }
+
+
+    public function changePassword(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $rUserInfo = $request->userInfo;
+
+        DB::beginTransaction();
+
+        try {
+
+
+            $isExists = UserInfo::where("id", $rUserInfo['id'])
+                ->where("password", sha1($rUserInfo['oldPassword']))->exists();
+
+            if ($isExists) {
+                UserInfo::where('id', $rUserInfo['id'])->update(array(
+                    'password' => sha1($rUserInfo['newPassword'])
+                ));
+                $res['msg'] = "Password updated successfully!";
+                $res['code'] = 200;
+            } else {
+                $res['msg'] = "Old password did not match with current password!";
+                $res['code'] = 404;
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 }

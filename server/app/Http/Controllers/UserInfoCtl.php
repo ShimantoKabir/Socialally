@@ -18,34 +18,40 @@ class UserInfoCtl extends Controller
         $this->userRpo = new UserRpo();
     }
 
-    public function register(Request $request){
+    public function register(Request $request)
+    {
 
         return $this->userRpo->register($request);
-
     }
 
-    public function verifyEmail(Request $request){
+    public function verifyEmail(Request $request)
+    {
 
         return $this->userRpo->verifyEmail($request);
-
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
 
         return $this->userRpo->login($request);
-
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
 
         return $this->userRpo->update($request);
-
     }
 
-    public function uploadImage(Request $request){
+    public function uploadImage(Request $request)
+    {
 
         return $this->userRpo->uploadImage($request);
-
     }
 
+
+    public function changePassword(Request $request)
+    {
+
+        return $this->userRpo->changePassword($request);
+    }
 }

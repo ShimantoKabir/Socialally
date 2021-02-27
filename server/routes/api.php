@@ -30,6 +30,7 @@ Route::post('/users/verification/email', [UserInfoCtl::class, 'verifyEmail']);
 Route::post('/users/login', [UserInfoCtl::class, 'login']);
 Route::put('/users', [UserInfoCtl::class, 'update']);
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
+Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
 
 // project category
 Route::get('/categories', [ProjectCategoryCtl::class, 'read']);

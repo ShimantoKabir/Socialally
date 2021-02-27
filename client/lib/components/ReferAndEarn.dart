@@ -30,9 +30,7 @@ class ReferAndEarnState extends State<ReferAndEarn> {
   void initState() {
     super.initState();
     eventHub.fire("viewTitle", "Refer & Earn");
-    referrerLink = userInfo["accountNumber"] == null ?
-      "Please give an account number and update you profile" :
-      userInfo["referrerLink"];
+    referrerLink = userInfo["referrerLink"];
   }
 
   @override

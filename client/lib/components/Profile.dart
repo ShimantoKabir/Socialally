@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:client/constants.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:client/utilities/HttpHandler.dart';
@@ -10,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class Profile extends StatefulWidget {
   Profile({Key key, this.eventHub, this.userInfo}) : super(key: key);
@@ -33,7 +32,6 @@ class ProfileState extends State<Profile> {
   TextEditingController firstNameCtl = new TextEditingController();
   TextEditingController lastNameCtl = new TextEditingController();
   TextEditingController contactNumberCtl = new TextEditingController();
-  TextEditingController accountNumberCtl = new TextEditingController();
   String regionName;
   String countryName;
   SharedPreferences preferences;
@@ -57,10 +55,6 @@ class ProfileState extends State<Profile> {
     alertText = "No operation running.";
     alertIcon = Container();
     needToFreezeUi = false;
-
-    if (userInfo['accountNumber'] != null) {
-      accountNumberCtl.text = userInfo['accountNumber'].toString();
-    }
 
     if (userInfo['regionName'] == null) {
       regionName = "Select";
@@ -200,7 +194,6 @@ class ProfileState extends State<Profile> {
                     ],
                   ),
                 ),
-                entryField("Account Number(Bkash/Rocket)", accountNumberCtl),
                 SizedBox(
                   height: 5,
                 ),
@@ -369,12 +362,6 @@ class ProfileState extends State<Profile> {
       userInfo['contactNumber'] = contactNumberCtl.text;
     }
 
-    if (accountNumberCtl.text.isEmpty) {
-      userInfo['accountNumber'] = null;
-    } else {
-      userInfo['accountNumber'] = accountNumberCtl.text;
-    }
-
     if (regionName == "Select") {
       errMsg = "Please select a region!";
       isInputVerified = false;
@@ -451,7 +438,6 @@ class ProfileState extends State<Profile> {
     firstNameCtl.clear();
     lastNameCtl.clear();
     contactNumberCtl.clear();
-    accountNumberCtl.clear();
 
     setState(() {
       regionName = "Select";

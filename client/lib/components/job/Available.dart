@@ -60,7 +60,6 @@ class AvailableState extends State<Available> {
   int pageIndex = 0;
   int perPage = 5;
   int pageNumber = 0;
-  double companyCharge = 0.1;
   ProjectCategory defaultProjectCategory;
   String filterBy;
 
@@ -196,15 +195,15 @@ class AvailableState extends State<Available> {
                                         ],
                                       ),
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(color: Colors.grey)
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(color: Colors.grey)
                                       ),
                                     ),
                                     SizedBox(width: 5),
                                     Text(
                                       "${projects[index].totalApplied}/${projects[index].workerNeeded} Applied",
                                       style: TextStyle(
-                                          fontSize: 12
+                                        fontSize: 12
                                       ),
                                     )
                                   ],
@@ -337,27 +336,38 @@ class AvailableState extends State<Available> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                    visible: projects[index].fileUrl != null && type == 1 || type == 5,
-                                    child: FlatButton(
-                                      onPressed: () => {
-                                        openFile(projects[index].fileUrl,context)
-                                      },
-                                      color: Colors.green,
-                                      child: Row(
-                                        // Replace with a Row for horizontal icon + text
-                                        children: <Widget>[
-                                          Icon(Icons.file_download,
-                                              size: 10,
-                                              color: Colors.white),
-                                          Text(" Instruction File",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10
-                                              )
+                                  visible: projects[index].fileUrl != null &&
+                                    type == 1 ||
+                                    type == 5 ||
+                                    type == 3,
+                                  child: FlatButton(
+                                    onPressed: (){
+                                      if(type == 3){
+                                        eventHub.fire("redirectToJobApplicants",projects[index]);
+                                      }else {
+                                        openFile(projects[index].fileUrl,context);
+                                      }
+                                    },
+                                    color: Colors.green,
+                                    child: Row(
+                                      // Replace with a Row for horizontal icon + text
+                                      children: <Widget>[
+                                        Icon(
+                                            type == 3 ? Icons.people_outline :
+                                            Icons.file_download,
+                                          size: 10,
+                                          color: Colors.white
+                                        ),
+                                        Text(type == 3 ? " Applicants" :
+                                            " Instruction File",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10
                                           )
-                                        ],
-                                      ),
-                                    )
+                                        )
+                                      ],
+                                    ),
+                                  )
                                 ),
                                 Visibility(
                                   visible: type != 4,
@@ -381,9 +391,11 @@ class AvailableState extends State<Available> {
                                             fontSize: 10
                                           )
                                         ),
-                                        Icon(Icons.arrow_forward_ios,
-                                            size: 10,
-                                            color: Colors.white)
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 10,
+                                          color: Colors.white
+                                        )
                                       ],
                                     ),
                                   )
@@ -505,8 +517,6 @@ class AvailableState extends State<Available> {
       "&region-name=$location"
       "&sort-by=$sortBy"
       "&search-text=$searchText";
-
-    // print("url = $url");
 
     var response = await get(url);
     if (response.statusCode == 200) {
