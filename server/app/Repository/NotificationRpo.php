@@ -39,21 +39,30 @@ class NotificationRpo
                 $perPage = $request->query('per-page');
                 $pageIndex = $request->query('page-index');
 
-                $sql = "SELECT 
-                            Notifications.*, 
+                $sqlMiddle = "SELECT 
+                            n.*, 
                             IFNULL(
-                                UserInfos.firstName, UserInfos.email
+                                u.firstName, u.email
                             ) AS senderName 
                         FROM 
-                            Notifications 
-                            JOIN UserInfos ON UserInfos.id = Notifications.senderId 
+                            Notifications AS n
+                            JOIN UserInfos AS u ON u.id = n.senderId 
                         WHERE 
-                            Notifications.receiverId = " . $userInfoId . "
-                            AND Notifications.type = " . $type . "
-                        ORDER BY Notifications.id DESC " . "
+                            n.receiverId = " . $userInfoId . "
+                            AND n.type = " . $type;
+
+                $sqlAll = " UNION SELECT a.*, 'Admin' AS senderName FROM Notifications AS a WHERE a.isForAll = 1 ";
+
+                $sqlEnd = " ORDER BY n.id DESC " . "
                         LIMIT " . $pageIndex . ", " . $perPage;
 
-                // $res['sql'] = $sql;
+                if ($type == 2) { // for admin
+                    $sql = $sqlMiddle . $sqlEnd;
+                } else { // for client 
+                    $sql = "SELECT * FROM (" . $sqlMiddle . $sqlAll . " ) n " . $sqlEnd;
+                };
+
+                $res['sql'] = $sql;
                 $res["notifications"] = DB::select(DB::raw($sql));
                 $res['code'] = 200;
                 $res['msg'] = "Notification fetched successfully!";
@@ -84,6 +93,51 @@ class NotificationRpo
                 ));
 
             $res['msg'] = "Notification seen successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 200;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function create(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rNotification = $request->notification;
+        DB::beginTransaction();
+        try {
+
+            $notification = new Notification();
+
+            if ($rNotification["isForAll"] == 1) {
+                $notification->message = $rNotification["message"];
+                $notification->receiverId = 0;
+                $notification->senderId = 0;
+                $notification->isSeen = 1;
+                $notification->isForAll = 1;
+                $notification->type = 0;
+            } else {
+                $notification->message = $rNotification["message"];
+                $notification->receiverId = $rNotification['receiverId'];
+                $notification->senderId = 2;
+                $notification->isSeen = 0;
+                $notification->isForAll = 0;
+                $notification->type = 1;
+            }
+
+            $notification->save();
+
+            $res['msg'] = "Notification sent successfully!";
             $res['code'] = 200;
 
             DB::commit();

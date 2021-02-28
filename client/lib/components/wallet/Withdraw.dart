@@ -29,7 +29,7 @@ class WithdrawState extends State<Withdraw> {
   AlertDialog alertDialog;
   String paymentGatewayName;
   List<dynamic> paymentGateways = [];
-  int takaPerDollar;
+  int takePerPound;
 
   TextEditingController receiverAccountNumberCtl = new TextEditingController();
   TextEditingController amountDollarCtl = new TextEditingController();
@@ -59,11 +59,11 @@ class WithdrawState extends State<Withdraw> {
           )
       );
     });
-    takaPerDollar = userInfo['takePerDollar']['appConstantIntegerValue'];
+    takePerPound = userInfo['takePerPound']['appConstantIntegerValue'];
     amountDollarCtl.addListener(() {
       setState(() {
         if (amountDollarCtl.text.isNotEmpty) {
-          int res = int.tryParse(amountDollarCtl.text) * takaPerDollar;
+          int res = int.tryParse(amountDollarCtl.text) * takePerPound;
           amountTakeCtl.text = res.toString();
         }
       });
@@ -108,7 +108,7 @@ class WithdrawState extends State<Withdraw> {
               Container(
                 padding: EdgeInsets.fromLTRB(2,10,10,10),
                 child: Text(
-                    "1 Dollar = $takaPerDollar Taka",
+                    "1 GPB = $takePerPound Taka",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,

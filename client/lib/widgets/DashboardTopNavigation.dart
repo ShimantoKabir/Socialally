@@ -145,7 +145,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   child: Row(
                     children: <Widget>[
                       Text(
-                        "Withdraw $withdrawAmount\$",
+                        "Withdraw $withdrawAmount£",
                         style: TextStyle(color: Colors.white)
                       )
                     ],
@@ -164,7 +164,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   child: Row(
                     // Replace with a Row for horizontal icon + text
                     children: <Widget>[
-                      Text("Balance $balance\$",
+                      Text("Balance $balance£",
                           style: TextStyle(color: Colors.white))
                     ],
                   ),

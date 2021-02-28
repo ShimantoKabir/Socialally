@@ -1,5 +1,6 @@
 import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/admin/AdminDashboard.dart';
+import 'package:client/components/admin/notification/NotificationSender.dart';
 import 'package:client/components/admin/transaction/Requisition.dart';
 import 'package:client/constants.dart';
 import 'package:client/widgets/DashboardLeftNavigation.dart';
@@ -151,23 +152,25 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                   onGenerateRoute: (settings){
                                     if(settings.name == "/transactions/requisition"){
                                       return MaterialPageRoute(builder: (context) => Requisition(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      )
-                                      );
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                      ));
                                     }else if(settings.name == "/admins/notifications"){
                                       return MaterialPageRoute(builder: (context) => NotificationComponent(
                                         eventHub: eventHub,
                                         userInfo: userInfo,
                                         type: 2,
-                                      )
-                                      );
+                                      ));
+                                    }else if(settings.name == "/notifications/send"){
+                                      return MaterialPageRoute(builder: (context) => NotificationSender(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                      ));
                                     } else {
                                       return MaterialPageRoute(builder: (context) => AdminDashboard(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      )
-                                      );
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                      ));
                                     }
                                   },
                                 )

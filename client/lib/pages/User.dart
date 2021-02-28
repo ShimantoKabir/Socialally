@@ -235,35 +235,33 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
             visible: width > 960 && isSideNavOpen
           ),
           // body with top menu bar, title and body
-          Visibility(
-            visible: true,
-            child: Expanded(
-              child: Container(
-                child: Column(
-                  children: [
-                    // top menu bar
-                    DashboardTopNavigation(
+          Expanded(
+            child: Container(
+              child: Column(
+                children: [
+                  // top menu bar
+                  DashboardTopNavigation(
                       type: 1,
                       eventHub: eventHub,
                       totalUnseenNotification: userInfo["totalUnseenNotification"],
                       userNavigatorKey: userNavigatorKey,
                       userInfo: userInfo
-                    ),
-                    Container(
-                      height: 25,
-                      child: ListView(
-                        children: [
-                          Marquee(
-                            text: 'Some sample text that takes some space. ',
+                  ),
+                  Container(
+                    height: 25,
+                    child: ListView(
+                      children: [
+                        Marquee(
+                            text: userInfo['clientDashboardHeading'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                             scrollAxis: Axis.horizontal,
                             crossAxisAlignment: CrossAxisAlignment.center
-                          )
-                        ].map(wrapWithStuff).toList(),
-                      ),
+                        )
+                      ].map(wrapWithStuff).toList(),
                     ),
-                    // component title
-                    Container(
+                  ),
+                  // component title
+                  Container(
                       height: 25,
                       padding: EdgeInsets.all(3),
                       color: Colors.black12,
@@ -271,12 +269,12 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           InkWell(
-                            child: Icon(Icons.arrow_back_ios,size: 15),
-                            onTap: (){
-                              if(userNavigatorKey.currentState.canPop()){
-                                userNavigatorKey.currentState.pop();
+                              child: Icon(Icons.arrow_back_ios,size: 15),
+                              onTap: (){
+                                if(userNavigatorKey.currentState.canPop()){
+                                  userNavigatorKey.currentState.pop();
+                                }
                               }
-                            }
                           ),
                           Text(
                             viewTitle.toUpperCase(),
@@ -284,155 +282,155 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                           ),
                         ],
                       )
-                    ),
-                    // component body
-                    Expanded(
+                  ),
+                  // component body
+                  Expanded(
                       child: Container(
                         child: Row(
                           children: [
                             Expanded(
-                              child: Navigator(
-                                key: userNavigatorKey,
-                                onGenerateRoute: (settings){
-                                  if(settings.name == "/user/profile/update"){
-                                    return MaterialPageRoute(builder: (context) => Profile(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  } else if(settings.name == "/user/profile/change-password"){
-                                    return MaterialPageRoute(builder: (context) => ChangePassword(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo
-                                    ));
-                                  } else if(settings.name == "/job/post"){
-                                    return MaterialPageRoute(builder: (context) => Post(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      project: project
-                                    ));
-                                  } else if(settings.name == "/job/available"){
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 1
-                                    ));
-                                  }else if(settings.name == "/job/accept"){
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 2
-                                    ));
-                                  } else if(settings.name == "/job/posted"){
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 3
-                                    ));
-                                  }else if(settings.name == "/job/applied"){
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 4
-                                    ));
-                                  } else if(settings.name == "/job/submit"){
-                                    return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      project: project
-                                    ));
-                                  }else if(settings.name == "/wallet/deposit"){
-                                    return MaterialPageRoute(builder: (context) => Deposit(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/wallet/withdraw"){
-                                    return MaterialPageRoute(builder: (context) => Withdraw(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/wallet/history"){
-                                    return MaterialPageRoute(builder: (context) => History(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/advertisement/job"){
-                                    return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/advertisement/advertised/job"){
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 5
-                                    ));
-                                  }else if(settings.name == "/advertisement/any"){
-                                    return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/advertisement/advertised/any"){
-                                    return MaterialPageRoute(builder: (context) => AdvertisedAny(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 2
-                                    ));
-                                  }else if(settings.name == "/users/notifications"){
-                                    return MaterialPageRoute(builder: (context) => NotificationComponent(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      type: 1
-                                    ));
-                                  }else if(settings.name == "/job/filter"){
-                                    return MaterialPageRoute(builder: (context) => JobFilter(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: type
-                                    ));
-                                  }else if(settings.name == "/refer-and-earn"){
-                                    return MaterialPageRoute(builder: (context) => ReferAndEarn(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo
-                                    ));
-                                  }else if(settings.name == "/support"){
-                                    return MaterialPageRoute(builder: (context) => SupportInfo(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo
-                                    ));
-                                  } else if(settings.name == "/job/applicants"){
-                                    return MaterialPageRoute(builder: (context) => Applicants(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      project: project
-                                    ));
-                                  } else {
-                                    return MaterialPageRoute(builder: (context) => Available(
-                                      eventHub: eventHub,
-                                      userInfo: userInfo,
-                                      filterCriteria: filterCriteria,
-                                      type: 1
-                                    ));
-                                  }
-                                }
-                              ),
-                              flex: 5
+                                child: Navigator(
+                                    key: userNavigatorKey,
+                                    onGenerateRoute: (settings){
+                                      if(settings.name == "/user/profile/update"){
+                                        return MaterialPageRoute(builder: (context) => Profile(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      } else if(settings.name == "/user/profile/change-password"){
+                                        return MaterialPageRoute(builder: (context) => ChangePassword(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      } else if(settings.name == "/job/post"){
+                                        return MaterialPageRoute(builder: (context) => Post(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            project: project
+                                        ));
+                                      } else if(settings.name == "/job/available"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 1
+                                        ));
+                                      }else if(settings.name == "/job/accept"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 2
+                                        ));
+                                      } else if(settings.name == "/job/posted"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 3
+                                        ));
+                                      }else if(settings.name == "/job/applied"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 4
+                                        ));
+                                      } else if(settings.name == "/job/submit"){
+                                        return MaterialPageRoute(builder: (context) => ProofSubmissionComponent(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            project: project
+                                        ));
+                                      }else if(settings.name == "/wallet/deposit"){
+                                        return MaterialPageRoute(builder: (context) => Deposit(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/wallet/withdraw"){
+                                        return MaterialPageRoute(builder: (context) => Withdraw(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/wallet/history"){
+                                        return MaterialPageRoute(builder: (context) => History(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/advertisement/job"){
+                                        return MaterialPageRoute(builder: (context) => JobAdvertisementSender(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/advertisement/advertised/job"){
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 5
+                                        ));
+                                      }else if(settings.name == "/advertisement/any"){
+                                        return MaterialPageRoute(builder: (context) => AnyAdvertisementSender(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/advertisement/advertised/any"){
+                                        return MaterialPageRoute(builder: (context) => AdvertisedAny(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 2
+                                        ));
+                                      }else if(settings.name == "/users/notifications"){
+                                        return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            type: 1
+                                        ));
+                                      }else if(settings.name == "/job/filter"){
+                                        return MaterialPageRoute(builder: (context) => JobFilter(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: type
+                                        ));
+                                      }else if(settings.name == "/refer-and-earn"){
+                                        return MaterialPageRoute(builder: (context) => ReferAndEarn(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      }else if(settings.name == "/support"){
+                                        return MaterialPageRoute(builder: (context) => SupportInfo(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo
+                                        ));
+                                      } else if(settings.name == "/job/applicants"){
+                                        return MaterialPageRoute(builder: (context) => Applicants(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            project: project
+                                        ));
+                                      } else {
+                                        return MaterialPageRoute(builder: (context) => Available(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo,
+                                            filterCriteria: filterCriteria,
+                                            type: 1
+                                        ));
+                                      }
+                                    }
+                                ),
+                                flex: 5
                             ),
                             Visibility(
                               child: Expanded(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          width: 1,
-                                          color: Colors.black12
+                                        border: Border(
+                                            left: BorderSide(
+                                                width: 1,
+                                                color: Colors.black12
+                                            )
                                         )
-                                      )
                                     ),
                                     child: Column(
                                       children: [
@@ -448,9 +446,9 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                         ),
                                         Expanded(
                                           child: AdvertisedAny(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo,
-                                            type: 1
+                                              eventHub: eventHub,
+                                              userInfo: userInfo,
+                                              type: 1
                                           ),
                                           flex: 4,
                                         ),
@@ -520,12 +518,11 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       flex: 13
-                    )
-                  ]
-                )
-              ),
-              flex: 4
+                  )
+                ]
+              )
             ),
+            flex: 4
           )
         ]
       ))

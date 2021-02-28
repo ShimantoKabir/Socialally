@@ -59,7 +59,7 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
         AdCostPlan acp = new AdCostPlan(
             day: plan["day"],
             cost: plan["cost"],
-            txt: "Day = ${plan['day']}, Cost = ${plan['cost']}\$"
+            txt: "Day = ${plan['day']}, Cost = ${plan['cost']}£"
         );
         adCostPlanDropDownList.add(DropdownMenuItem(
             value: acp,

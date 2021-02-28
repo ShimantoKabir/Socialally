@@ -16,6 +16,7 @@ class Notification extends Model
         'receiverId',
         'senderId',
         'isSeen',
+        'isForAll',
         'type',
         'ip',
         'modifiedBy',

@@ -19,6 +19,7 @@ class Notifications extends Migration
             $table->integer('receiverId');
             $table->integer('senderId');
             $table->boolean('isSeen');
+            $table->boolean('isForAll')->default(false);
             $table->tinyInteger('type');
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();

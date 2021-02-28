@@ -4,9 +4,7 @@ namespace App\Repository;
 
 use Exception;
 use App\Models\Project;
-use App\Models\UserInfo;
 use Faker\Provider\Uuid;
-use App\Models\AppConstant;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\ProofSubmission;

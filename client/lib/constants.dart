@@ -72,19 +72,14 @@ List<Node> userDashboardMenus = [
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
-        label: 'Post',
+        label: 'Post A New Job',
         key: '/job/post',
         icon: NodeIcon.fromIconData(Icons.post_add)
       ),
       Node(
-        label: 'Posted',
+        label: 'My Job',
         key: '/job/posted',
         icon: NodeIcon.fromIconData(Icons.event_available)
-      ),
-      Node(
-        label: 'Accept',
-        key: '/job/accept',
-        icon: NodeIcon.fromIconData(Icons.done_all_outlined)
       ),
       Node(
         label: 'Applied',
@@ -186,13 +181,13 @@ List<Node> adminDashboardMenus = [
         label: 'Requisition',
         key: '/transactions/requisition',
         icon: NodeIcon.fromIconData(Icons.request_page)
-      ),
-      Node(
-        label: 'History',
-        key: '/job/posted',
-        icon: NodeIcon.fromIconData(Icons.history)
       )
     ],
+  ),
+  Node(
+      label: 'Send Notification',
+      key: '/notifications/send',
+      icon: NodeIcon.fromIconData(Icons.history)
   )
 ];
 
@@ -295,6 +290,17 @@ List<DropdownMenuItem<AdCostPlan>> adCostPlanDropDownList = [
   return DropdownMenuItem<AdCostPlan>(
     value: plan,
     child: Text(plan.txt)
+  );
+}).toList();
+
+List<DropdownMenuItem<String>> notificationForDropDownList = [
+  'Select',
+  'All',
+  'Individual',
+].map<DropdownMenuItem<String>>((String value) {
+  return DropdownMenuItem<String>(
+    value: value,
+    child: Text(value),
   );
 }).toList();
 

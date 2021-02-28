@@ -246,6 +246,8 @@ class UserRpo
                             ->first()['appConstantDoubleValue'],
                         "supportInfo" =>  AppConstant::where("appConstantName", "supportInfo")
                             ->first()['appConstantJsonValue'],
+                        "clientDashboardHeading" =>  AppConstant::where("appConstantName", "clientDashboardHeading")
+                            ->first()['appConstantStringValue'],
                         "quantityOfJoinByYourRefer" => UserInfo::select("id")
                             ->where("referredBy", $userInfo['referId'])
                             ->count()
@@ -388,7 +390,6 @@ class UserRpo
         return $imageUrl;
     }
 
-
     public function changePassword(Request $request)
     {
 
@@ -427,5 +428,36 @@ class UserRpo
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function readByQuery(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            if ($request->has('first-name')) {
+
+                $firstName = $request->has('first-name') ?  $request->query('first-name') : "none";
+                $res['userInfos'] = UserInfo::select("id", DB::raw("IFNULL(firstName,email) AS firstName"))
+                    ->where(DB::raw("IFNULL(firstName,email)"), 'like', '%' . $firstName . '%')
+                    ->get();
+
+                $res['msg'] = "User info fetched successfully!";
+                $res['code'] = 200;
+            } else {
+                $res['msg'] = "First name required!";
+                $res['code'] = 404;
+            }
+        } catch (Exception $e) {
+            $res['code'] = 404;
+            $res['msg'] = $e->getMessage();
+        }
+
+        return $res;
     }
 }

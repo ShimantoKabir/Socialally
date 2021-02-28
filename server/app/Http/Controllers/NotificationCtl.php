@@ -30,4 +30,11 @@ class NotificationCtl extends Controller
 
         return $this->notificationRpo->update($request);
     }
+
+
+    public function create(Request $request)
+    {
+
+        return $this->notificationRpo->create($request);
+    }
 }

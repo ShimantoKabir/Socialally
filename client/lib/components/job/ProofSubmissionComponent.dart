@@ -126,14 +126,12 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    padding: EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text("${project.eachWorkerEarn}£"),
-                        SizedBox(width: 5),
-                        Icon(Icons.monetization_on, color: Colors.green, size: 25)
                       ],
                     ),
                     decoration: BoxDecoration(
@@ -402,7 +400,8 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                   )
               ),
               Visibility(
-                visible: project.type == 2 ? project.status != null && project.status == "Pending" ? true : false : false,
+                visible: project.type == 2 ? project.status != null &&
+                    project.status == "Pending" ? true : false : false,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -410,7 +409,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                         onPressed: () {
                           onProofSubmissionStatusChange(context,"Approved");
                         },
-                        child: Text("Accept")),
+                        child: Text("Approve")),
                     OutlineButton(
                         onPressed: () {
                           onProofSubmissionStatusChange(context,"Declined");
@@ -583,7 +582,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
-          eventHub.fire("redirectToAcceptJob");
+          eventHub.fire("redirectToJobApplicants",project);
         }else {
           Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
         }

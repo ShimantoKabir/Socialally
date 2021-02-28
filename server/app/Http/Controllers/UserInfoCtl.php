@@ -48,10 +48,14 @@ class UserInfoCtl extends Controller
         return $this->userRpo->uploadImage($request);
     }
 
-
     public function changePassword(Request $request)
     {
 
         return $this->userRpo->changePassword($request);
+    }
+
+    public function readByQuery(Request $request)
+    {
+        return $this->userRpo->readByQuery($request);
     }
 }

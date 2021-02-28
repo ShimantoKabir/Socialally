@@ -32,7 +32,7 @@ class DepositState extends State<Deposit> {
   String personalNumber;
   String agentNumber;
   List<dynamic> paymentGateways = [];
-  int takaPerDollar;
+  int takePerPound;
   AlertDialog alertDialog;
 
   TextEditingController transactionIdCtl = new TextEditingController();
@@ -64,11 +64,11 @@ class DepositState extends State<Deposit> {
         )
       );
     });
-    takaPerDollar = userInfo['takePerDollar']['appConstantIntegerValue'];
+    takePerPound = userInfo['takePerPound']['appConstantIntegerValue'];
     amountDollarCtl.addListener(() {
       setState(() {
         if (amountDollarCtl.text.isNotEmpty) {
-          double res = double.tryParse(amountDollarCtl.text) * takaPerDollar;
+          double res = double.tryParse(amountDollarCtl.text) * takePerPound;
           amountTakeCtl.text = res.toString();
         }
         if(amountDollarCtl.text.isEmpty){
@@ -140,7 +140,7 @@ class DepositState extends State<Deposit> {
               Container(
                 padding: EdgeInsets.fromLTRB(2,10,10,10),
                 child: Text(
-                    "1 Dollar = $takaPerDollar Taka",
+                    "1 GBP = $takePerPound Taka",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,

@@ -63,7 +63,6 @@ class PostState extends State<Post> {
     projectCategories.asMap().forEach((key, projectCategory) {
       bool isValueExist = false;
       projectCategoriesDropDownList.forEach((element) {
-        print("cn = ${element.value.categoryName}");
         if (element.value.categoryName == projectCategory['categoryName']) {
           isValueExist = true;
         }
@@ -190,7 +189,6 @@ class PostState extends State<Post> {
     }
 
     jobPostingCharge = userInfo['jobPostingCharge'];
-    print("jpc = ${userInfo['jobPostingCharge']}");
 
   }
 
@@ -707,7 +705,6 @@ class PostState extends State<Post> {
     clearSubCategoryDropdown();
 
     var response = await get("$baseUrl/categories/sub/${pc.categoryId}");
-    print("response = $response");
     if (response.statusCode == 200) {
       setState(() {
         needToFreezeUi = false;
@@ -738,8 +735,6 @@ class PostState extends State<Post> {
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       }
     }
-
-    print("pc = ${pc.id}, ${pc.categoryId}, ${pc.categoryName}, ${pc.subCategoryName}");
 
     setState(() {
       defaultProjectCategory = pc;

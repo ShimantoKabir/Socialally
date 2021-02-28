@@ -295,12 +295,14 @@ class ProfileState extends State<Profile> {
                             onSave(context);
                           }
                         },
-                        child: Text("Save")),
+                        child: Text("Save")
+                    ),
                     OutlineButton(
                         onPressed: () {
                           onReset(context);
                         },
-                        child: Text("Reset"))
+                        child: Text("Reset")
+                    )
                   ],
                 )
               ]

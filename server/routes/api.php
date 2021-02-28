@@ -29,6 +29,8 @@ Route::post('/users/registration', [UserInfoCtl::class, 'register']);
 Route::post('/users/verification/email', [UserInfoCtl::class, 'verifyEmail']);
 Route::post('/users/login', [UserInfoCtl::class, 'login']);
 Route::put('/users', [UserInfoCtl::class, 'update']);
+Route::get('/users/query', [UserInfoCtl::class, 'readByQuery']);
+// -- ?first-name=kabir
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
 
@@ -59,6 +61,7 @@ Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBa
 // notifications
 Route::get('/notifications/query', [NotificationCtl::class, 'readByQuery']);
 Route::put('/notifications', [NotificationCtl::class, 'update']);
+Route::post('/notifications', [NotificationCtl::class, 'create']);
 
 // advertisements
 Route::get('/advertisements/query', [AdvertisementCtl::class, 'readByQuery']);

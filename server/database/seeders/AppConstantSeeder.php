@@ -108,6 +108,13 @@ class AppConstantSeeder extends Seeder
                 "appConstantJsonValue" => null,
                 "appConstantIntegerValue" => 0, // 1 = automatic, 0 = manual
                 "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "clientDashboardHeading",
+                "appConstantStringValue" => "This is earning application. You can send job, apply new job, withdraw directly to bkash or Rocket.",
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => 0,
+                "appConstantDoubleValue" => null
             ]
         ];
 
