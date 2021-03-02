@@ -49,25 +49,24 @@ class RequisitionState extends State<Requisition> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-            future: futureTransactions,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<Transaction> transactions = snapshot.data;
-
-                if(transactions.length == 0){
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                      child: Text("No transaction found!"),
-                    ),
-                  );
-                }else {
-                  return Row(
-                    children: [
-                      Expanded(
+      body: FutureBuilder(
+          future: futureTransactions,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Transaction> transactions = snapshot.data;
+              if(transactions.length == 0){
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                    child: Text("No transaction found!"),
+                  ),
+                );
+              }else {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
@@ -120,159 +119,151 @@ class RequisitionState extends State<Requisition> {
                                   DataCell(Text("${transactions[index].status}")),
                                   DataCell(Text("${transactions[index].createdAt}"))
                                 ]
-                              )
+                            )
                             ),
                           ),
                         ),
                         flex: 7
-                      ),
-                      Visibility(
+                    ),
+                    Visibility(
                         visible: transaction != null
                             && transaction.status == "Pending",
                         child: Expanded(
-                          child: Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                // top: BorderSide(
-                                //     color: Colors.grey
-                                // ),
-                                // left: BorderSide(
-                                //     color: Colors.grey
-                                // ),
-                                // bottom: BorderSide(
-                                //     color: Colors.grey
-                                // )
-                              )
-                            ),
-                            child: transaction == null ? Container() : Column(
-                              children: [
-                                Text("Type: ${transaction.ledgerName}"),
-                                SizedBox(height: 10),
-                                Text("Amount: ${transaction.creditAmount}"),
-                                SizedBox(height: 10),
-                                Text("Account Number: ${transaction.accountNumber}"),
-                                SizedBox(height: 10),
-                                Text("Applied Date: ${transaction.createdAt}"),
-                                SizedBox(height: 10),
-                                Text("Status: ${transaction.createdAt}"),
-                                SizedBox(height: 10),
-                                transaction.ledgerId == 102 ?
-                                entryField("Transaction Id",transactionIdCtl) :
-                                Text("TransactionId: ${
-                                    transaction.transactionId}"),
-                                SizedBox(height: 10),
-                                Visibility(
-                                  child: OutlineButton(
+                            child: Container(
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                    color: Colors.grey
+                                  )
+                                )
+                              ),
+                              child: transaction == null ? Container() : Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Type: ${transaction.ledgerName}"),
+                                  SizedBox(height: 10),
+                                  Text("Amount: ${transaction.creditAmount}"),
+                                  SizedBox(height: 10),
+                                  Text("Account Number: ${transaction.accountNumber}"),
+                                  SizedBox(height: 10),
+                                  Text("Applied Date: ${transaction.createdAt}"),
+                                  SizedBox(height: 10),
+                                  Text("Status: ${transaction.createdAt}"),
+                                  SizedBox(height: 10),
+                                  transaction.ledgerId == 102 ?
+                                  entryField("Transaction Id",transactionIdCtl) :
+                                  Text("TransactionId: ${
+                                      transaction.transactionId}"),
+                                  SizedBox(height: 10),
+                                  Visibility(
+                                    child: OutlineButton(
                                       onPressed: (){
                                         onUpdate(context,"Approved",transactions);
                                       },
                                       child: Text("Approved"),
                                     ),
-                                  visible: transaction.status == "Pending",
-                                ),
-                                SizedBox(height: 10),
-                                Visibility(
-                                  child: OutlineButton(
-                                    onPressed: (){
-                                      onUpdate(context,"Declined",transactions);
-                                    },
-                                    child: Text("Declined"),
+                                    visible: transaction.status == "Pending",
                                   ),
-                                  visible: transaction.status == "Pending",
-                                ),
-                                SizedBox(height: 10),
-                                OutlineButton(
-                                  onPressed: (){
-                                    setState(() {
-                                      listPosition = null;
-                                      transaction = null;
-                                    });
-                                  },
-                                  child: Text("Close"),
-                                )
-                              ],
+                                  SizedBox(height: 10),
+                                  Visibility(
+                                    child: OutlineButton(
+                                      onPressed: (){
+                                        onUpdate(context,"Declined",transactions);
+                                      },
+                                      child: Text("Declined"),
+                                    ),
+                                    visible: transaction.status == "Pending",
+                                  ),
+                                  SizedBox(height: 10),
+                                  OutlineButton(
+                                    onPressed: (){
+                                      setState(() {
+                                        listPosition = null;
+                                        transaction = null;
+                                      });
+                                    },
+                                    child: Text("Close"),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          flex: 3
+                            flex: 3
                         )
-                      )
-                    ],
-                  );
-                }
-              } else {
-                return Center(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                    ),
-                  ),
+                    )
+                  ],
                 );
               }
-            },
-          ),
-        ),
-        bottomNavigationBar: AbsorbPointer(
-          absorbing: needToFreezeUi,
-          child: Container(
-            color: Colors.black12,
-            height: 50.0,
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                IconButton(icon: Icon(Icons.filter_alt_outlined), onPressed: (){
-
-                }),
-                Visibility(
-                    visible: needToFreezeUi,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                      strokeWidth: 2,
-                    )
+            } else {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                        icon: Icon(
-                            Icons.arrow_back_ios,
-                            size: 15
-                        ),
-                        onPressed: (){
-                          if(pageIndex < 1){
-                            Alert.show(alertDialog, context, Alert.ERROR, "Your are already in the first page!");
-                          }else {
-                            pageNumber--;
-                            pageIndex = pageIndex - perPage;
-                            needToFreezeUi = true;
-                            setState(() {
-                              futureTransactions = fetchTransactions();
-                            });
-                          }
-                        }
-                    ),
-                    Text("${pageNumber+1}"),
-                    IconButton(
-                        icon: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15
-                        ),
-                        onPressed: (){
-                          pageIndex = pageIndex + perPage;
+              );
+            }
+          }
+      ),
+      bottomNavigationBar: AbsorbPointer(
+        absorbing: needToFreezeUi,
+        child: Container(
+          color: Colors.black12,
+          height: 50.0,
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Visibility(
+                  visible: needToFreezeUi,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                    strokeWidth: 2,
+                  )
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                          Icons.arrow_back_ios,
+                          size: 15
+                      ),
+                      onPressed: (){
+                        if(pageIndex < 1){
+                          Alert.show(alertDialog, context, Alert.ERROR, "Your are already in the first page!");
+                        }else {
+                          pageNumber--;
+                          pageIndex = pageIndex - perPage;
                           needToFreezeUi = true;
-                          pageNumber++;
                           setState(() {
                             futureTransactions = fetchTransactions();
                           });
                         }
-                    )
-                  ],
-                )
-              ],
-            ),
+                      }
+                  ),
+                  Text("${pageNumber+1}"),
+                  IconButton(
+                      icon: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 15
+                      ),
+                      onPressed: (){
+                        pageIndex = pageIndex + perPage;
+                        needToFreezeUi = true;
+                        pageNumber++;
+                        setState(() {
+                          futureTransactions = fetchTransactions();
+                        });
+                      }
+                  )
+                ],
+              )
+            ],
           ),
-        )
+        ),
+      )
     );
   }
 

@@ -59,7 +59,7 @@ class WithdrawState extends State<Withdraw> {
           )
       );
     });
-    takePerPound = userInfo['takePerPound']['appConstantIntegerValue'];
+    takePerPound = userInfo['takePerPound'];
     amountDollarCtl.addListener(() {
       setState(() {
         if (amountDollarCtl.text.isNotEmpty) {

@@ -200,6 +200,23 @@ List<Node> adminDashboardMenus = [
     ],
   ),
   Node(
+      label: 'Manage Job Category',
+      key: '/categories/manage',
+      icon: NodeIcon.fromIconData(Icons.category),
+      children: [
+        Node(
+            label: 'Create Category',
+            key: '/categories/create',
+            icon: NodeIcon.fromIconData(Icons.workspaces_filled)
+        ),
+        Node(
+            label: 'Create Sub Category',
+            key: '/categories/create-sub-category',
+            icon: NodeIcon.fromIconData(Icons.workspaces_outline)
+        )
+      ]
+  ),
+  Node(
       label: 'Send Notification',
       key: '/notifications/send',
       icon: NodeIcon.fromIconData(Icons.notifications_active)
@@ -207,7 +224,7 @@ List<Node> adminDashboardMenus = [
   Node(
       label: 'Approve Job',
       key: '/job/approve',
-      icon: NodeIcon.fromIconData(Icons.check)
+      icon: NodeIcon.fromIconData(Icons.done_all)
   )
 ];
 

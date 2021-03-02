@@ -7,8 +7,12 @@ class ProjectCategory extends Equatable{
   String categoryName;
   String subCategoryName;
 
-  ProjectCategory(
-      {this.id, this.categoryId, this.categoryName, this.subCategoryName});
+  ProjectCategory({
+    this.id,
+    this.categoryId,
+    this.categoryName,
+    this.subCategoryName
+  });
 
   @override
   List<Object> get props => [id, categoryId, categoryName, subCategoryName];

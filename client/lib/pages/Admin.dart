@@ -1,6 +1,7 @@
 import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/admin/AdminDashboard.dart';
 import 'package:client/components/admin/job/JobManager.dart';
+import 'package:client/components/admin/job/category/JobCategory.dart';
 import 'package:client/components/admin/notification/NotificationSender.dart';
 import 'package:client/components/admin/setting/General.dart';
 import 'package:client/components/admin/transaction/Requisition.dart';
@@ -175,6 +176,11 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                       ));
                                     }else if(settings.name == "/settings/general"){
                                       return MaterialPageRoute(builder: (context) => General(
+                                          eventHub: eventHub,
+                                          userInfo: userInfo
+                                      ));
+                                    }else if(settings.name == "/categories/create"){
+                                      return MaterialPageRoute(builder: (context) => JobCategory(
                                           eventHub: eventHub,
                                           userInfo: userInfo
                                       ));

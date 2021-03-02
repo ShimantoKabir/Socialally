@@ -20,8 +20,8 @@ class AppConstantSeeder extends Seeder
                 "appConstantName" => "takePerDollar",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
-                "appConstantIntegerValue" => 85.0,
-                "appConstantDoubleValue" => null
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 85.0
             ],
             [
                 "appConstantName" => "takePerPound",

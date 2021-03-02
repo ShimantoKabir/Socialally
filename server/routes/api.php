@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AppConstant;
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\UserInfoCtl;
@@ -37,7 +36,10 @@ Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
 
 // project category
-Route::get('/categories', [ProjectCategoryCtl::class, 'read']);
+Route::get('/categories', [ProjectCategoryCtl::class, 'readCategory']);
+Route::post('/categories', [ProjectCategoryCtl::class, 'createCategory']);
+Route::put('/categories', [ProjectCategoryCtl::class, 'updateCategory']);
+Route::delete('/categories/{categoryId}', [ProjectCategoryCtl::class, 'deleteCategory']);
 Route::get('/categories/sub/{categoryId}', [ProjectCategoryCtl::class, 'getSubCategoriesById']);
 
 // project

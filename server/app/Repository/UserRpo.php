@@ -244,17 +244,10 @@ class UserRpo
                         "jobPostingCharge" =>  $appConstants['jobPostingCharge'],
                         "supportInfo" =>  $appConstants['supportInfo'],
                         "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
-                        "quantityOfJoinByYourRefer" => UserInfo::select("id")
-                            ->where("referredBy", $userInfo['referId'])
-                            ->count(),
-                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
-                            ->where("isSeen", false)->count()
+                        "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
+                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),
+                        "projectCategories" => ProjectCategory::select('categoryId', 'categoryName')->distinct('categoryId')->get()
                     ];
-
-                    $res['userInfo']['projectCategories'] = ProjectCategory::select(
-                        'categoryId',
-                        'categoryName',
-                    )->distinct('categoryId')->get();
 
                     $res['msg'] = "Login successful!";
                     $res['code'] = 200;

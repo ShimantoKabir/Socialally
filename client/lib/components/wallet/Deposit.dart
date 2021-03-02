@@ -64,7 +64,7 @@ class DepositState extends State<Deposit> {
         )
       );
     });
-    takePerPound = userInfo['takePerPound']['appConstantIntegerValue'];
+    takePerPound = userInfo['takePerPound'];
     amountDollarCtl.addListener(() {
       setState(() {
         if (amountDollarCtl.text.isNotEmpty) {

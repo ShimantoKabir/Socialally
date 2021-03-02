@@ -17,7 +17,7 @@ class ProjectCategories extends Migration
             $table->id();
             $table->integer('categoryId');
             $table->string('categoryName');
-            $table->string('subCategoryName');
+            $table->string('subCategoryName')->nullable();
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

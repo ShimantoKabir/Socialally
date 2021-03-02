@@ -19,10 +19,28 @@ class ProjectCategoryCtl extends Controller
         $this->projectCategoryRpo = new ProjectCategoryRpo();
     }
 
-    public function read(Request $request)
+    public function readCategory(Request $request)
     {
 
-        return $this->projectCategoryRpo->read($request);
+        return $this->projectCategoryRpo->readCategory($request);
+    }
+
+    public function deleteCategory(Request $request, $categoryId)
+    {
+
+        return $this->projectCategoryRpo->deleteCategory($request, $categoryId);
+    }
+
+    public function createCategory(Request $request)
+    {
+
+        return $this->projectCategoryRpo->createCategory($request);
+    }
+
+    public function updateCategory(Request $request)
+    {
+
+        return $this->projectCategoryRpo->updateCategory($request);
     }
 
     public function getSubCategoriesById(Request $request, $categoryId)

@@ -48,165 +48,157 @@ class JobManagerState extends State<JobManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: FutureBuilder(
-            future: futureProjects,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<Project> projects = snapshot.data;
-
-                if(projects.length == 0){
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                      child: Text("No project found!"),
-                    ),
-                  );
-                }else {
-                  return Row(
-                    children: [
-                      Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              sortAscending: true,
-                              columns: <DataColumn>[
-                                DataColumn(
-                                  label: Text('SL'),
-                                ),
-                                DataColumn(
-                                  label: Text("Title"),
-                                ),
-                                DataColumn(
-                                  label: Text("Region"),
-                                ),
-                                DataColumn(
-                                  label: Text("Country"),
-                                ),
-                                DataColumn(
-                                  label: Text("Worker Needed"),
-                                ),
-                                DataColumn(
-                                  label: Text("Estimated Cost"),
-                                ),
-                                DataColumn(
-                                  label: Text("Each Worker Earn"),
-                                ),
-                                DataColumn(
-                                  label: Text("Status"),
-                                ),
-                                DataColumn(
-                                  label: Text("Date"),
-                                )
-                              ],
-                              rows: List<DataRow>.generate(
-                                  projects.length, (index) => DataRow(
-                                  onSelectChanged: (value){
-                                    if(!needToFreezeUi){
-                                      setState(() {
-                                        project = projects[index];
-                                        listPosition = index;
-                                      });
-                                    }
-                                  },
-                                  cells: [
-                                    DataCell(Text("${index+1}")),
-                                    DataCell(Text("${projects[index].title}")),
-                                    DataCell(Text("${projects[index].regionName}")),
-                                    DataCell(Text("${projects[index].countryName}")),
-                                    DataCell(Text("${projects[index].workerNeeded}")),
-                                    DataCell(Text("${projects[index].eachWorkerEarn}")),
-                                    DataCell(Text("${projects[index].estimatedCost}")),
-                                    DataCell(Text("${projects[index].status}")),
-                                    DataCell(Text("${projects[index].createdAt}"))
-                                  ]
-                              )
-                              ),
-                            ),
-                          ),
-                          flex: 7
-                      ),
-                      Visibility(
-                          visible: project != null && project.status == "Pending",
-                          child: Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(15),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                      // top: BorderSide(
-                                      //     color: Colors.grey
-                                      // ),
-                                      // left: BorderSide(
-                                      //     color: Colors.grey
-                                      // ),
-                                      // bottom: BorderSide(
-                                      //     color: Colors.grey
-                                      // )
-                                    )
-                                ),
-                                child: project == null ? Container() : Column(
-                                  children: [
-                                    Text("Title: ${project.title}"),
-                                    SizedBox(height: 10),
-                                    Text("Region: ${project.regionName}"),
-                                    SizedBox(height: 10),
-                                    Text("Country: ${project.countryName}"),
-                                    SizedBox(height: 10),
-                                    Text("Worker Needed: ${project.workerNeeded}"),
-                                    SizedBox(height: 10),
-                                    Text("Each Worker Earn: ${project.eachWorkerEarn}"),
-                                    SizedBox(height: 10),
-                                    SizedBox(height: 10),
-                                    Visibility(
-                                      child: OutlineButton(
-                                        onPressed: (){
-                                          onUpdate(context,"Approved",projects);
-                                        },
-                                        child: Text("Approved"),
-                                      ),
-                                      visible: project.status == "Pending",
-                                    ),
-                                    SizedBox(height: 10),
-                                    Visibility(
-                                      child: OutlineButton(
-                                        onPressed: (){
-                                          onUpdate(context,"Declined",projects);
-                                        },
-                                        child: Text("Declined"),
-                                      ),
-                                      visible: project.status == "Pending",
-                                    ),
-                                    SizedBox(height: 10),
-                                    OutlineButton(
-                                      onPressed: (){
-                                        setState(() {
-                                          project = null;
-                                        });
-                                      },
-                                      child: Text("Close"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              flex: 3
-                          )
-                      )
-                    ],
-                  );
-                }
-              } else {
+        body: FutureBuilder(
+          future: futureProjects,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Project> projects = snapshot.data;
+              if(projects.length == 0){
                 return Center(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                    ),
+                    child: Text("No project found!"),
                   ),
                 );
+              }else {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          sortAscending: true,
+                          columns: <DataColumn>[
+                            DataColumn(
+                              label: Text('SL'),
+                            ),
+                            DataColumn(
+                              label: Text("Title"),
+                            ),
+                            DataColumn(
+                              label: Text("Region"),
+                            ),
+                            DataColumn(
+                              label: Text("Country"),
+                            ),
+                            DataColumn(
+                              label: Text("Worker Needed"),
+                            ),
+                            DataColumn(
+                              label: Text("Estimated Cost"),
+                            ),
+                            DataColumn(
+                              label: Text("Each Worker Earn"),
+                            ),
+                            DataColumn(
+                              label: Text("Status"),
+                            ),
+                            DataColumn(
+                              label: Text("Date"),
+                            )
+                          ],
+                          rows: List<DataRow>.generate(
+                              projects.length, (index) => DataRow(
+                              onSelectChanged: (value){
+                                if(!needToFreezeUi){
+                                  setState(() {
+                                    project = projects[index];
+                                    listPosition = index;
+                                  });
+                                }
+                              },
+                              cells: [
+                                DataCell(Text("${index+1}")),
+                                DataCell(Text("${projects[index].title}")),
+                                DataCell(Text("${projects[index].regionName}")),
+                                DataCell(Text("${projects[index].countryName}")),
+                                DataCell(Text("${projects[index].workerNeeded}")),
+                                DataCell(Text("${projects[index].eachWorkerEarn}")),
+                                DataCell(Text("${projects[index].estimatedCost}")),
+                                DataCell(Text("${projects[index].status}")),
+                                DataCell(Text("${projects[index].createdAt}"))
+                              ]
+                          )
+                          ),
+                        ),
+                      ),
+                      flex: 7
+                    ),
+                    Visibility(
+                        visible: project != null && project.status == "Pending",
+                        child: Expanded(
+                          child: Container(
+                            padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                      color: Colors.grey
+                                  ),
+                                )
+                            ),
+                            child: project == null ? Container() : Column(
+                              children: [
+                                Text("Title: ${project.title}"),
+                                SizedBox(height: 10),
+                                Text("Region: ${project.regionName}"),
+                                SizedBox(height: 10),
+                                Text("Country: ${project.countryName}"),
+                                SizedBox(height: 10),
+                                Text("Worker Needed: ${project.workerNeeded}"),
+                                SizedBox(height: 10),
+                                Text("Each Worker Earn: ${project.eachWorkerEarn}"),
+                                SizedBox(height: 10),
+                                SizedBox(height: 10),
+                                Visibility(
+                                  child: OutlineButton(
+                                    onPressed: (){
+                                      onUpdate(context,"Approved",projects);
+                                    },
+                                    child: Text("Approved"),
+                                  ),
+                                  visible: project.status == "Pending",
+                                ),
+                                SizedBox(height: 10),
+                                Visibility(
+                                  child: OutlineButton(
+                                    onPressed: (){
+                                      onUpdate(context,"Declined",projects);
+                                    },
+                                    child: Text("Declined"),
+                                  ),
+                                  visible: project.status == "Pending",
+                                ),
+                                SizedBox(height: 10),
+                                OutlineButton(
+                                  onPressed: (){
+                                    setState(() {
+                                      project = null;
+                                    });
+                                  },
+                                  child: Text("Close"),
+                                )
+                              ],
+                            ),
+                          ),
+                          flex: 3
+                        )
+                    )
+                  ],
+                );
               }
-            },
-          ),
+            } else {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
+              );
+            }
+          },
         ),
         bottomNavigationBar: AbsorbPointer(
           absorbing: needToFreezeUi,
