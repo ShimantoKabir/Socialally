@@ -290,11 +290,11 @@ class AvailableState extends State<Available> {
                             child: Container(
                               padding: EdgeInsets.fromLTRB(15, 0, 15,0),
                               child: Text(
-                                "Status: ${projects[index].status}",
+                                "Status: ${projects[index].pfStatus}",
                                 style: TextStyle(
-                                  color: projects[index].status == "Pending" ?
+                                  color: projects[index].pfStatus == "Pending" ?
                                   Colors.blue :
-                                  projects[index].status == "Approved" ?
+                                  projects[index].pfStatus == "Approved" ?
                                   Colors.green : Colors.red,
                                   fontWeight: FontWeight.bold
                                 ),
@@ -302,6 +302,23 @@ class AvailableState extends State<Available> {
                               alignment: Alignment.bottomLeft,
                             ),
                             visible: type == 4 || type == 2,
+                          ),
+                          Visibility(
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(15, 0, 15,0),
+                              child: Text(
+                                "Status: ${projects[index].status}",
+                                style: TextStyle(
+                                    color: projects[index].status == "Pending" ?
+                                    Colors.blue :
+                                    projects[index].status == "Approved" ?
+                                    Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                              alignment: Alignment.bottomLeft,
+                            ),
+                            visible: type == 3,
                           ),
                           Visibility(
                             child: Padding(
@@ -319,6 +336,7 @@ class AvailableState extends State<Available> {
                                   Text(
                                     type == 2 ?
                                     "Applied By: ${projects[index].applicantName}" :
+                                    type == 3 ? "Published By: Me" :
                                     "Published By: ${projects[index].publisherName}",
                                     style: TextStyle(
                                       color: Colors.red,
@@ -580,7 +598,8 @@ class AvailableState extends State<Available> {
               totalApplied: project['totalApplied'],
               publisherName: project['publisherName'],
               applicantName: project['applicantName'],
-              status: type == 2 ? project['pfStatus'] : project['status'],
+              pfStatus: project['pfStatus'],
+              status: project['status'],
               publishedBy: project['publishedBy'],
               submittedBy: project['submittedBy']
           ));

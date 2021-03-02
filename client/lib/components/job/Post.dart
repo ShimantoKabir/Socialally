@@ -1016,13 +1016,6 @@ class PostState extends State<Post> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    project = null;
-    eventHub.fire("clearProject");
-  }
-
   void resetCategories() {
     defaultProjectCategory = ProjectCategory(
       id: 0,
@@ -1093,4 +1086,10 @@ class PostState extends State<Post> {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 }

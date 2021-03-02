@@ -15,20 +15,34 @@ class AppConstantSeeder extends Seeder
      */
     public function run()
     {
-        $categories = [
+        $appConstants = [
             [
                 "appConstantName" => "takePerDollar",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
-                "appConstantIntegerValue" => 85,
+                "appConstantIntegerValue" => 85.0,
                 "appConstantDoubleValue" => null
             ],
             [
                 "appConstantName" => "takePerPound",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
-                "appConstantIntegerValue" => 119,
-                "appConstantDoubleValue" => null
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 119.0
+            ],
+            [
+                "appConstantName" => "minimumDeposit",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 5.0
+            ],
+            [
+                "appConstantName" => "minimumWithdraw",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 5.0
             ],
             [
                 "appConstantName" => "proofSubmissionStatus",
@@ -92,7 +106,7 @@ class AppConstantSeeder extends Seeder
                 "appConstantName" => "quantityOfEarnByRefer",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
-                "appConstantIntegerValue" => 5,
+                "appConstantIntegerValue" => 5.0,
                 "appConstantDoubleValue" => null
             ],
             [
@@ -110,7 +124,7 @@ class AppConstantSeeder extends Seeder
                 "appConstantDoubleValue" => null
             ],
             [
-                "appConstantName" => "clientDashboardHeading",
+                "appConstantName" => "clientDashboardHeadline",
                 "appConstantStringValue" => "This is earning application. You can send job, apply new job, withdraw directly to bkash or Rocket.",
                 "appConstantJsonValue" => null,
                 "appConstantIntegerValue" => 0,
@@ -120,7 +134,7 @@ class AppConstantSeeder extends Seeder
 
         DB::table('AppConstants')->truncate();
 
-        foreach ($categories as $key => $val) {
+        foreach ($appConstants as $key => $val) {
 
             DB::table('AppConstants')->insert([
                 "appConstantName" => $val['appConstantName'],

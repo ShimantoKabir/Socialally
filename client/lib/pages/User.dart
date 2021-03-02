@@ -60,8 +60,8 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
     super.initState();
     nodes = userDashboardMenus;
     type = 1;
-
     html.window.history.pushState(null,"User Dashboard","/#/user/dashboard");
+
     treeViewController = TreeViewController(
       children: nodes,
       selectedKey: selectedKey
@@ -90,6 +90,12 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
       });
     });
 
+    eventHub.on("clearStaffBeforeNavigate", (dynamic data) {
+      setState(() {
+        project = null;
+      });
+    });
+
     eventHub.on("redirectToProofSubmission", (dynamic data) {
       setState(() {
         project = data;
@@ -107,12 +113,6 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
       setState(() {
         project = data;
         userNavigatorKey.currentState.pushNamed("/job/post");
-      });
-    });
-
-    eventHub.on("clearProject", (dynamic data) {
-      setState(() {
-        project = null;
       });
     });
 
@@ -252,7 +252,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                     child: ListView(
                       children: [
                         Marquee(
-                            text: userInfo['clientDashboardHeading'],
+                            text: userInfo['clientDashboardHeadline'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                             scrollAxis: Axis.horizontal,
                             crossAxisAlignment: CrossAxisAlignment.center

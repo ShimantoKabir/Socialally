@@ -2,17 +2,18 @@
 
 namespace App\Repository;
 
-use App\Helpers\TokenGenerator;
-use App\Models\ProjectCategory;
-use App\Models\UserInfo;
+use Exception;
 use App\Jobs\MailSender;
+use App\Models\UserInfo;
+use Faker\Provider\Uuid;
 use App\Models\AppConstant;
 use App\Models\Notification;
-use App\Models\PaymentGateway;
-use Exception;
-use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
+use App\Models\PaymentGateway;
+use App\Helpers\TokenGenerator;
+use App\Models\ProjectCategory;
 use Illuminate\Support\Facades\DB;
+use App\Utilities\AppConstantReader;
 use Illuminate\Support\Facades\Storage;
 
 class UserRpo
@@ -219,6 +220,8 @@ class UserRpo
 
                     $referrerLink = env('APP_URL') . "#/user/registration/" . $userInfo['referId'];
 
+                    $appConstants = AppConstantReader::read();
+
                     $res['userInfo'] = [
                         'id' => $userInfo['id'],
                         'email' => $userInfo['email'],
@@ -235,22 +238,17 @@ class UserRpo
                         'type' => $userInfo['type'],
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                         'paymentGateways' => PaymentGateway::all(),
-                        'takePerDollar' => AppConstant::where("appConstantName", "takePerDollar")->first(),
-                        'takePerPound' => AppConstant::where("appConstantName", "takePerPound")->first(),
-                        'proofSubmissionStatus' => AppConstant::where("appConstantName", "proofSubmissionStatus")->first(),
-                        'adCostPlanList' => AppConstant::where("appConstantName", "adCostPlanList")
-                            ->first()['appConstantJsonValue'],
-                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
-                            ->where("isSeen", false)->count(),
-                        "jobPostingCharge" =>  AppConstant::where("appConstantName", "jobPostingCharge")
-                            ->first()['appConstantDoubleValue'],
-                        "supportInfo" =>  AppConstant::where("appConstantName", "supportInfo")
-                            ->first()['appConstantJsonValue'],
-                        "clientDashboardHeading" =>  AppConstant::where("appConstantName", "clientDashboardHeading")
-                            ->first()['appConstantStringValue'],
+                        'takePerPound' => $appConstants["takePerPound"],
+                        'proofSubmissionStatus' => $appConstants["proofSubmissionStatus"],
+                        'adCostPlanList' => $appConstants['adCostPlanList'],
+                        "jobPostingCharge" =>  $appConstants['jobPostingCharge'],
+                        "supportInfo" =>  $appConstants['supportInfo'],
+                        "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
                         "quantityOfJoinByYourRefer" => UserInfo::select("id")
                             ->where("referredBy", $userInfo['referId'])
-                            ->count()
+                            ->count(),
+                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])
+                            ->where("isSeen", false)->count()
                     ];
 
                     $res['userInfo']['projectCategories'] = ProjectCategory::select(
@@ -300,6 +298,8 @@ class UserRpo
                 'regionName' => $rUserInfo['regionName'],
                 'countryName' => $rUserInfo['countryName'],
                 'contactNumber' => $rUserInfo['contactNumber'],
+                'nationalId' => $rUserInfo['nationalId'],
+                'passportId' => $rUserInfo['passportId'],
                 'agreedTermsAndCondition' => $rUserInfo['agreedTermsAndCondition'],
                 'wantNewsLetterNotification' => $rUserInfo['wantNewsLetterNotification'],
             ));

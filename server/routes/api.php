@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\AppConstant;
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\UserInfoCtl;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AppConstantCtl;
 use App\Http\Controllers\TransactionCtl;
 use App\Http\Controllers\NotificationCtl;
 use App\Http\Controllers\AdvertisementCtl;
@@ -47,6 +49,9 @@ Route::get('/projects/title-query', [ProjectCtl::class, 'readByTitle']);
 // -- ?title=tile&user-info-id=2
 Route::put('/projects/advertisements', [ProjectCtl::class, 'addAdToProject']);
 Route::put('/projects', [ProjectCtl::class, 'update']);
+Route::get('/projects/approve-query', [ProjectCtl::class, 'readByStatus']);
+Route::put('/projects/status', [ProjectCtl::class, 'updateStatus']);
+// -- ?status=pending
 
 // proof submission
 Route::post('/proof-submissions', [ProofSubmissionCtl::class, 'create']);
@@ -66,3 +71,7 @@ Route::post('/notifications', [NotificationCtl::class, 'create']);
 // advertisements
 Route::get('/advertisements/query', [AdvertisementCtl::class, 'readByQuery']);
 Route::post('/advertisements', [AdvertisementCtl::class, 'create']);
+
+// app constant
+Route::get('/app-constants/settings/general', [AppConstantCtl::class, 'getGeneralSettingData']);
+Route::put('/app-constants/settings/general', [AppConstantCtl::class, 'updateGeneralSettingData']);

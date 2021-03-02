@@ -32,6 +32,8 @@ class ProfileState extends State<Profile> {
   TextEditingController firstNameCtl = new TextEditingController();
   TextEditingController lastNameCtl = new TextEditingController();
   TextEditingController contactNumberCtl = new TextEditingController();
+  TextEditingController nationalIdCtl = new TextEditingController();
+  TextEditingController passportIdCtl = new TextEditingController();
   String regionName;
   String countryName;
   SharedPreferences preferences;
@@ -51,6 +53,8 @@ class ProfileState extends State<Profile> {
     emailCtl.text = userInfo['email'];
     firstNameCtl.text = userInfo['firstName'];
     lastNameCtl.text = userInfo['lastName'];
+    nationalIdCtl.text = userInfo['nationalId'].toString();
+    passportIdCtl.text = userInfo['passportId'].toString();
     contactNumberCtl.text = userInfo['contactNumber'].toString();
     alertText = "No operation running.";
     alertIcon = Container();
@@ -93,11 +97,20 @@ class ProfileState extends State<Profile> {
       wantNewsLetterNotification = true;
     }
 
-    showProfilePic(userInfo);
-
     if (userInfo['contactNumber'] == null) {
       contactNumberCtl.clear();
     }
+
+    if (userInfo['nationalId'] == null) {
+      nationalIdCtl.clear();
+    }
+
+    if (userInfo['passportId'] == null) {
+      passportIdCtl.clear();
+    }
+
+    showProfilePic(userInfo);
+
   }
 
   @override
@@ -186,11 +199,59 @@ class ProfileState extends State<Profile> {
                         height: 10,
                       ),
                       TextField(
-                          controller: contactNumberCtl,
+                        controller: contactNumberCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "National Id",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                          controller: nationalIdCtl,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                              filled: true
+                          )
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Passport Id",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                        controller: passportIdCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -205,20 +266,22 @@ class ProfileState extends State<Profile> {
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<String>(
-                        value: regionName,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (String newValue) {
-                          fetchCountriesByRegion(context, newValue);
-                        },
-                        items: regionDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                    value: regionName,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: (String newValue) {
+                      fetchCountriesByRegion(context, newValue);
+                    },
+                    items: regionDropDownList
+                  )
+                ),
                 SizedBox(
                   height: 20,
                 ),
@@ -230,22 +293,24 @@ class ProfileState extends State<Profile> {
                   height: 10,
                 ),
                 Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                    child: DropdownButton<String>(
-                        value: countryName,
-                        isExpanded: true,
-                        underline: SizedBox(),
-                        onChanged: (String newValue) {
-                          setState(() {
-                            countryName = newValue;
-                          });
-                        },
-                        items: countryDropDownList)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                    value: countryName,
+                    isExpanded: true,
+                    underline: SizedBox(),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        countryName = newValue;
+                      });
+                    },
+                    items: countryDropDownList
+                  )
+                ),
                 SizedBox(
                   height: 30,
                 ),
@@ -289,19 +354,19 @@ class ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlineButton(
-                        onPressed: () {
-                          bool isInputVerified = verifyInput(context);
-                          if (isInputVerified) {
-                            onSave(context);
-                          }
-                        },
-                        child: Text("Save")
+                      onPressed: () {
+                        bool isInputVerified = verifyInput(context);
+                        if (isInputVerified) {
+                          onSave(context);
+                        }
+                      },
+                      child: Text("Save")
                     ),
                     OutlineButton(
-                        onPressed: () {
-                          onReset(context);
-                        },
-                        child: Text("Reset")
+                      onPressed: () {
+                        onReset(context);
+                      },
+                      child: Text("Reset")
                     )
                   ],
                 )
@@ -309,7 +374,11 @@ class ProfileState extends State<Profile> {
             )
           )
         ),
-        bottomNavigationBar: Alert.addBottomLoader(needToFreezeUi, alertIcon, alertText)
+        bottomNavigationBar: Alert.addBottomLoader(
+          needToFreezeUi,
+          alertIcon,
+          alertText
+        )
       )
     );
   }
@@ -362,6 +431,18 @@ class ProfileState extends State<Profile> {
       errMsg = "Contact number required!";
     } else {
       userInfo['contactNumber'] = contactNumberCtl.text;
+    }
+
+    if (passportIdCtl.text.isEmpty) {
+      userInfo['passportId'] = null;
+    } else {
+      userInfo['passportId'] = passportIdCtl.text;
+    }
+
+    if (nationalIdCtl.text.isEmpty) {
+      userInfo['nationalId'] = null;
+    } else {
+      userInfo['nationalId'] = nationalIdCtl.text;
     }
 
     if (regionName == "Select") {

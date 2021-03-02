@@ -121,21 +121,22 @@ class WithdrawState extends State<Withdraw> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    showRequiredHeading("Amount (Dollar)"),
+                    showRequiredHeading("Amount (GBP)"),
                     SizedBox(
                       height: 10,
                     ),
                     TextField(
-                        controller: amountDollarCtl,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9]')),
-                        ],
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Color(0xfff3f3f4),
-                            filled: true))
+                      controller: amountDollarCtl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                      ],
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        fillColor: Color(0xfff3f3f4),
+                        filled: true
+                      )
+                    )
                   ],
                 ),
               ),

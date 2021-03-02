@@ -96,6 +96,7 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
                 allowParentSelect: true,
                 supportParentDoubleTap: false,
                 onNodeTap: (path) {
+                  eventHub.fire("clearStaffBeforeNavigate");
                   if(data['width'] < 960){
                     eventHub.fire("openAndCloseSideNav",{
                       "screenWidth" : data['width']

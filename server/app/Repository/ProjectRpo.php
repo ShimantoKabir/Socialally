@@ -152,7 +152,7 @@ class ProjectRpo
                 pf.submittedBy,
                 pf.givenProofs,
                 pf.givenScreenshotUrls,
-                pf.status AS pfStatus,
+                pf.status AS pfdStatus,
                 ui.firstName AS applicantName,
                 p.* 
             from
@@ -175,6 +175,7 @@ class ProjectRpo
                     Projects.regionName,
                     Projects.imageUrl,
                     Projects.fileUrl,
+                    Projects.status,
                     Projects.countryName,
                     Projects.workerNeeded,
                     Projects.estimatedDay,
@@ -204,7 +205,7 @@ class ProjectRpo
                         ProofSubmissions.projectId = Projects.id 
                         AND ProofSubmissions.submittedBy = $userInfoId
                     )
-                    AS status
+                    AS pfStatus
                 FROM
                     Projects 
                     JOIN
@@ -224,20 +225,21 @@ class ProjectRpo
                     UserInfos 
                     ON UserInfos.id = Projects.publishedBy 
                 WHERE
-                    Projects.status = 'Approved' AND Projects.publishedBy";
+                    Projects.publishedBy";
 
-                if ($type == 1) { // job accept published by me
+                if ($type == 1) { // available job
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE (status = 'Pending' OR status = 'Approved') AND ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND Projects.status = 'Approved' AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE (status = 'Pending' OR status = 'Approved') AND ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
                 } else if ($type == 2) { // job approve request
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
                     $sql = $sql . " ORDER BY p.id DESC ";
-                } else if ($type == 3) { // job only published by me
+                } else if ($type == 3) { // job published by me
                     $sql = $sql . " = " . $userInfoId;
-                } else if ($type == 4) {
+                    $sql = $sql . " ORDER BY Projects.id DESC ";
+                } else if ($type == 4) { // job applied by me
                     $sql = $sql . " != " . $userInfoId;
                     $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
-                } else if ($type == 5) {
+                } else if ($type == 5) { // advertised job
                     $sql = $sql . " != " . $userInfoId;
                     $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY) ORDER BY Projects.id DESC ";
                 } else { // applicants
@@ -466,6 +468,85 @@ class ProjectRpo
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 200;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function updateStatus(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rProject = $request->project;
+        DB::beginTransaction();
+        try {
+
+            Project::where("id", $rProject['id'])
+                ->update(array(
+                    "status" => $rProject['status']
+                ));
+
+            Notification::create([
+                "message" => "Your posted job has been " . $rProject['status'],
+                "receiverId" => $rProject["publishedBy"],
+                "senderId" => 2,
+                "isSeen" => 0,
+                "type" => 1
+            ]);
+
+            $res['data'] = $rProject;
+            $res['msg'] = "Job status updated successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 200;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function readByStatus(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            if (!$request->has('status')) {
+                $res['code'] = 404;
+                $res['msg'] = "Status required!";
+            } else if (!$request->has('par-page')) {
+                $res['code'] = 404;
+                $res['msg'] = "Par page required!";
+            } else if (!$request->has('page-index')) {
+                $res['code'] = 404;
+                $res['msg'] = "Page index required!";
+            } else {
+
+                $status = $request->query('status');
+                $parPage = $request->query('par-page');
+                $pageIndex = $request->query('page-index');
+
+                $sql = "SELECT * FROM Projects WHERE status = '" . $status . "' ORDER BY id DESC LIMIT " . $pageIndex . ", " . $parPage;
+
+                $res['projects'] = DB::select(DB::raw($sql));
+                $res['msg'] = "Job fetched successfully!";
+                $res['code'] = 200;
+            }
+        } catch (Exception $e) {
+
             $res['msg'] = $e->getMessage();
             $res['code'] = 200;
         }

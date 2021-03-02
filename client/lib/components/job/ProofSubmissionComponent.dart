@@ -400,8 +400,8 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                   )
               ),
               Visibility(
-                visible: project.type == 2 ? project.status != null &&
-                    project.status == "Pending" ? true : false : false,
+                visible: project.type == 2 ? project.pfStatus != null &&
+                    project.pfStatus == "Pending" ? true : false : false,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -470,7 +470,6 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
       } else {
         base64String = base64.encode(objFile.bytes);
       }
-
 
       if(objFile.size > maxImageSize){
         Alert.show(alertDialog, context, Alert.ERROR, "Image size cross the max limit, "

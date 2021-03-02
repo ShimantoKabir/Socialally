@@ -21,6 +21,8 @@ class UserInfo extends Model
         'firstName',
         'countryId',
         'contactNumber',
+        'nationalId',
+        'passportId',
         'isEmailVerified',
         'agreedTermsAndCondition',
         'wantNewsLetterNotification',

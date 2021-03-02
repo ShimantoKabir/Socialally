@@ -43,8 +43,13 @@ class ProjectCtl extends Controller
         return $this->projectRpo->addAdToProject($request);
     }
 
-    public function update(Request $request)
+    public function readByStatus(Request $request)
     {
-        return $this->projectRpo->update($request);
+        return $this->projectRpo->readByStatus($request);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        return $this->projectRpo->updateStatus($request);
     }
 }

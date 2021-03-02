@@ -94,13 +94,13 @@ class ApplicantsState extends State<Applicants> {
                         leading: Icon(Icons.touch_app_outlined),
                         title: Text(projects[index].applicantName),
                         subtitle: Text(
-                          "${projects[index].status}",
+                          "${projects[index].pfStatus}",
                           style: TextStyle(
                             fontStyle: FontStyle.normal,
                             fontWeight: FontWeight.bold,
-                            color: projects[index].status == "Approved" ?
+                            color: projects[index].pfStatus == "Approved" ?
                               Colors.green :
-                              projects[index].status == "Pending" ?
+                              projects[index].pfStatus == "Pending" ?
                               Colors.blue : Colors.red
                           ),
                         ),
@@ -261,7 +261,7 @@ class ApplicantsState extends State<Applicants> {
               totalApplied: project['totalApplied'],
               publisherName: project['publisherName'],
               applicantName: project['applicantName'],
-              status: project['pfStatus'],
+              pfStatus: project['pfdStatus'],
               publishedBy: project['publishedBy'],
               submittedBy: project['submittedBy']
           ));

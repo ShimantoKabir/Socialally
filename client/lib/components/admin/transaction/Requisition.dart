@@ -48,7 +48,6 @@ class RequisitionState extends State<Requisition> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -158,8 +157,7 @@ class RequisitionState extends State<Requisition> {
                                 SizedBox(height: 10),
                                 Text("Status: ${transaction.createdAt}"),
                                 SizedBox(height: 10),
-                                transaction.ledgerId == 102 ||
-                                    transaction.ledgerId == 106 ?
+                                transaction.ledgerId == 102 ?
                                 entryField("Transaction Id",transactionIdCtl) :
                                 Text("TransactionId: ${
                                     transaction.transactionId}"),

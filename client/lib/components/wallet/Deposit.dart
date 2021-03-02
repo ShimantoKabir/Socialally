@@ -153,7 +153,7 @@ class DepositState extends State<Deposit> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    showRequiredHeading("Amount (Dollar)"),
+                    showRequiredHeading("Amount (GBP)"),
                     SizedBox(
                       height: 10,
                     ),

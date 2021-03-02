@@ -5,15 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-
 EventHub eventHub = EventHub();
 
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
 const baseUrl = "http://127.0.0.1:8000/api";
-// const baseUrl = "http://workersengine.com/server/public/api";
+// const baseUrl = "https://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -110,33 +108,33 @@ List<Node> userDashboardMenus = [
       )
     ]
   ),
-  Node(
-    label: 'Advertisement',
-    key: '/advertisement',
-    icon: NodeIcon.fromIconData(Icons.account_tree),
-    children: [
-      Node(
-        label: 'Job',
-        key: '/advertisement/job',
-        icon: NodeIcon.fromIconData(Icons.send_to_mobile),
-      ),
-      Node(
-        label: 'Advertised Job',
-        key: '/advertisement/advertised/job',
-        icon: NodeIcon.fromIconData(Icons.description),
-      ),
-      Node(
-        label: 'Any',
-        key: '/advertisement/any',
-        icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
-      ),
-      Node(
-        label: 'Advertised Any',
-        key: '/advertisement/advertised/any',
-        icon: NodeIcon.fromIconData(Icons.mobile_friendly),
-      )
-    ]
-  ),
+  // Node(
+  //   label: 'Advertisement',
+  //   key: '/advertisement',
+  //   icon: NodeIcon.fromIconData(Icons.account_tree),
+  //   children: [
+  //     Node(
+  //       label: 'Job',
+  //       key: '/advertisement/job',
+  //       icon: NodeIcon.fromIconData(Icons.send_to_mobile),
+  //     ),
+  //     Node(
+  //       label: 'Advertised Job',
+  //       key: '/advertisement/advertised/job',
+  //       icon: NodeIcon.fromIconData(Icons.description),
+  //     ),
+  //     Node(
+  //       label: 'Any',
+  //       key: '/advertisement/any',
+  //       icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
+  //     ),
+  //     Node(
+  //       label: 'Advertised Any',
+  //       key: '/advertisement/advertised/any',
+  //       icon: NodeIcon.fromIconData(Icons.mobile_friendly),
+  //     )
+  //   ]
+  // ),
   Node(
       label: 'Profile',
       key: '/user/profile',
@@ -153,6 +151,11 @@ List<Node> userDashboardMenus = [
           icon: NodeIcon.fromIconData(Icons.lock),
         ),
       ]
+  ),
+  Node(
+      label: 'Advertisement',
+      key: '/advertisement/any',
+      icon: NodeIcon.fromIconData(Icons.account_tree)
   ),
   Node(
     label: 'Refer & Earn',
@@ -173,6 +176,18 @@ List<Node> adminDashboardMenus = [
     icon: NodeIcon.fromIconData(Icons.dashboard)
   ),
   Node(
+    label: 'Setting',
+    key: '/settings',
+    icon: NodeIcon.fromIconData(Icons.settings),
+    children: [
+      Node(
+          label: 'General',
+          key: '/settings/general',
+          icon: NodeIcon.fromIconData(Icons.settings_applications_rounded)
+      )
+    ],
+  ),
+  Node(
     label: 'Transaction',
     key: '/transaction',
     icon: NodeIcon.fromIconData(Icons.monetization_on_sharp),
@@ -187,7 +202,12 @@ List<Node> adminDashboardMenus = [
   Node(
       label: 'Send Notification',
       key: '/notifications/send',
-      icon: NodeIcon.fromIconData(Icons.history)
+      icon: NodeIcon.fromIconData(Icons.notifications_active)
+  ),
+  Node(
+      label: 'Approve Job',
+      key: '/job/approve',
+      icon: NodeIcon.fromIconData(Icons.check)
   )
 ];
 
@@ -297,6 +317,16 @@ List<DropdownMenuItem<String>> notificationForDropDownList = [
   'Select',
   'All',
   'Individual',
+].map<DropdownMenuItem<String>>((String value) {
+  return DropdownMenuItem<String>(
+    value: value,
+    child: Text(value),
+  );
+}).toList();
+
+List<DropdownMenuItem<String>> jobApproveTypeDropDownList = [
+  'Manual',
+  'Automatic',
 ].map<DropdownMenuItem<String>>((String value) {
   return DropdownMenuItem<String>(
     value: value,
