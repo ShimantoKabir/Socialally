@@ -28,4 +28,19 @@ class AppConstantCtl extends Controller
     {
         return $this->appConstantRpo->updateGeneralSettingData($request);
     }
+
+    public function getAddCostPlanList(Request $request)
+    {
+        return $this->appConstantRpo->getAddCostPlanList($request);
+    }
+
+    public function createAddCostPlan(Request $request)
+    {
+        return $this->appConstantRpo->createAddCostPlan($request);
+    }
+
+    public function deleteAddCostPlan(Request $request)
+    {
+        return $this->appConstantRpo->deleteAddCostPlan($request);
+    }
 }

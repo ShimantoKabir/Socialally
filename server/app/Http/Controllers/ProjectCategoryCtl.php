@@ -48,4 +48,28 @@ class ProjectCategoryCtl extends Controller
 
         return $this->projectCategoryRpo->getSubCategoriesById($request, $categoryId);
     }
+
+    public function getSubCategories(Request $request)
+    {
+
+        return $this->projectCategoryRpo->getSubCategories($request);
+    }
+
+    public function deleteSubCategory(Request $request, $id)
+    {
+
+        return $this->projectCategoryRpo->deleteSubCategory($request, $id);
+    }
+
+    public function createSubCategory(Request $request)
+    {
+
+        return $this->projectCategoryRpo->createSubCategory($request);
+    }
+
+    public function updateSubCategory(Request $request)
+    {
+
+        return $this->projectCategoryRpo->updateSubCategory($request);
+    }
 }

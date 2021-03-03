@@ -18,6 +18,11 @@ class CategorySeeder extends Seeder
             [
                 "categoryId" => 101,
                 "categoryName" => "Facebook",
+                "subCategoryName" => null
+            ],
+            [
+                "categoryId" => 101,
+                "categoryName" => "Facebook",
                 "subCategoryName" => "Picture Like"
             ],
             [
@@ -26,9 +31,9 @@ class CategorySeeder extends Seeder
                 "subCategoryName" => "Page Like"
             ],
             [
-                "categoryId" => 101,
-                "categoryName" => "Facebook",
-                "subCategoryName" => "Follow"
+                "categoryId" => 102,
+                "categoryName" => "Instagram",
+                "subCategoryName" => null
             ],
             [
                 "categoryId" => 102,
@@ -39,11 +44,6 @@ class CategorySeeder extends Seeder
                 "categoryId" => 102,
                 "categoryName" => "Instagram",
                 "subCategoryName" => "Like"
-            ],
-            [
-                "categoryId" => 102,
-                "categoryName" => "Instagram",
-                "subCategoryName" => "Comment"
             ]
         ];
 

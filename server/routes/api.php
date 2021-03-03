@@ -31,7 +31,7 @@ Route::post('/users/verification/email', [UserInfoCtl::class, 'verifyEmail']);
 Route::post('/users/login', [UserInfoCtl::class, 'login']);
 Route::put('/users', [UserInfoCtl::class, 'update']);
 Route::get('/users/query', [UserInfoCtl::class, 'readByQuery']);
-// -- ?first-name=kabir
+// -- ?first-name=jon
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
 
@@ -41,6 +41,10 @@ Route::post('/categories', [ProjectCategoryCtl::class, 'createCategory']);
 Route::put('/categories', [ProjectCategoryCtl::class, 'updateCategory']);
 Route::delete('/categories/{categoryId}', [ProjectCategoryCtl::class, 'deleteCategory']);
 Route::get('/categories/sub/{categoryId}', [ProjectCategoryCtl::class, 'getSubCategoriesById']);
+Route::get('/sub-categories', [ProjectCategoryCtl::class, 'getSubCategories']);
+Route::post('/sub-categories', [ProjectCategoryCtl::class, 'createSubCategory']);
+Route::put('/sub-categories', [ProjectCategoryCtl::class, 'updateSubCategory']);
+Route::delete('/sub-categories/{id}', [ProjectCategoryCtl::class, 'deleteSubCategory']);
 
 // project
 Route::post('/projects', [ProjectCtl::class, 'create']);
@@ -77,3 +81,6 @@ Route::post('/advertisements', [AdvertisementCtl::class, 'create']);
 // app constant
 Route::get('/app-constants/settings/general', [AppConstantCtl::class, 'getGeneralSettingData']);
 Route::put('/app-constants/settings/general', [AppConstantCtl::class, 'updateGeneralSettingData']);
+Route::get('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'getAddCostPlanList']);
+Route::post('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'createAddCostPlan']);
+Route::delete('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'deleteAddCostPlan']);

@@ -184,6 +184,11 @@ List<Node> adminDashboardMenus = [
           label: 'General',
           key: '/settings/general',
           icon: NodeIcon.fromIconData(Icons.settings_applications_rounded)
+      ),
+      Node(
+          label: ' Advertisement Cost',
+          key: '/settings/advertisement-cost',
+          icon: NodeIcon.fromIconData(Icons.add_road_outlined)
       )
     ],
   ),
@@ -212,7 +217,7 @@ List<Node> adminDashboardMenus = [
         Node(
             label: 'Create Sub Category',
             key: '/categories/create-sub-category',
-            icon: NodeIcon.fromIconData(Icons.workspaces_outline)
+            icon: NodeIcon.fromIconData(Icons.bar_chart)
         )
       ]
   ),

@@ -93,4 +93,92 @@ class AppConstantRpo
 
         return $res;
     }
+
+    public function getAddCostPlanList(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            $res["adCostPlans"] = AppConstant::where("appConstantName", "adCostPlanList")->first()['appConstantJsonValue'];
+            $res['msg'] = "App constant value fetched successfully!";
+            $res['code'] = 200;
+        } catch (Exception $e) {
+            $res['msg'] = $e->getMessage();
+            $res['code'] = $e->getCode();
+        }
+
+        return $res;
+    }
+
+    public function createAddCostPlan(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rAdCostPlan = $request->adCostPlan;
+
+        DB::beginTransaction();
+        try {
+
+            $adCostPlans = AppConstant::where("appConstantName", "adCostPlanList")->first()['appConstantJsonValue'];
+
+            array_push($adCostPlans, array(
+                "day" => $rAdCostPlan['day'],
+                "cost" => $rAdCostPlan['cost']
+            ));
+
+            AppConstant::where("appConstantName", "adCostPlanList")
+                ->update([
+                    "appConstantJsonValue" => json_encode($adCostPlans)
+                ]);
+
+            $res['msg'] = "Ad cost plan save successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = $e->getCode();
+        }
+
+        return $res;
+    }
+
+    public function deleteAddCostPlan(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            $adCostPlans = AppConstant::where("appConstantName", "adCostPlanList")->first()['appConstantJsonValue'];
+
+            array_pop($adCostPlans);
+
+            AppConstant::where("appConstantName", "adCostPlanList")
+                ->update([
+                    "appConstantJsonValue" => json_encode($adCostPlans)
+                ]);
+
+            $res['msg'] = "Ad cost plan deleted successfully!";
+            $res['code'] = 200;
+        } catch (Exception $e) {
+            $res['msg'] = $e->getMessage();
+            $res['code'] = $e->getCode();
+        }
+
+        return $res;
+    }
 }
