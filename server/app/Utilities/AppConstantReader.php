@@ -24,8 +24,8 @@ class AppConstantReader
             if ($val["appConstantName"] == "referCommission") {
                 $res["referCommission"] = $val["appConstantDoubleValue"];
             }
-            if ($val["appConstantName"] == "referCommission") {
-                $res["referCommission"] = $val["appConstantDoubleValue"];
+            if ($val["appConstantName"] == "quantityOfEarnByRefer") {
+                $res["quantityOfEarnByRefer"] = $val["appConstantIntegerValue"];
             }
             if ($val["appConstantName"] == "jobPostingCharge") {
                 $res["jobPostingCharge"] = $val["appConstantDoubleValue"];
@@ -45,8 +45,8 @@ class AppConstantReader
             if ($val["appConstantName"] == "adCostPlanList") {
                 $res["adCostPlanList"] = $val["appConstantJsonValue"];
             }
-            if ($val["appConstantName"] == "supportInfo") {
-                $res["supportInfo"] = $val["appConstantJsonValue"];
+            if ($val["appConstantName"] == "supportInfoList") {
+                $res["supportInfoList"] = $val["appConstantJsonValue"];
             }
         }
 

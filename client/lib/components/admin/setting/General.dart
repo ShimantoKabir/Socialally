@@ -30,6 +30,7 @@ class GeneralState extends State<General> {
   String alertText;
   bool needToFreezeUi;
   String jobApprovalType;
+  String referCommissionType;
 
   TextEditingController minimumDepositCtl = new TextEditingController();
   TextEditingController minimumWithdrawCtl = new TextEditingController();
@@ -37,6 +38,7 @@ class GeneralState extends State<General> {
   TextEditingController jobPostingChargeCtl = new TextEditingController();
   TextEditingController referCommissionCtl = new TextEditingController();
   TextEditingController clientDashboardHeadlineCtl = new TextEditingController();
+  TextEditingController quantityOfReferCommissionCtl = new TextEditingController();
   Future futureGeneralSettingData;
 
   @override
@@ -46,6 +48,7 @@ class GeneralState extends State<General> {
     alertIcon = Container();
     needToFreezeUi = false;
     jobApprovalType = "Manual";
+    referCommissionType = "Lifetime";
     futureGeneralSettingData = fetchGeneralSettingData();
   }
 
@@ -160,21 +163,69 @@ class GeneralState extends State<General> {
                 maxLines: 3
               ),
               SizedBox(
+                height: 10,
+              ),
+              Text(
+                  "Refer Commission Type",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold
+                  )
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                  child: DropdownButton<String>(
+                      value: referCommissionType,
+                      isExpanded: true,
+                      underline: SizedBox(),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          quantityOfReferCommissionCtl.clear();
+                          referCommissionType = newValue;
+                        });
+                      },
+                      items: referCommissionTypeDropDownList
+                  )
+              ),
+              Visibility(
+                child: entryField(
+                  title: "Refer Commission Will Get",
+                  controller: quantityOfReferCommissionCtl,
+                  textInputType: TextInputType.numberWithOptions(
+                      decimal: true
+                  ),
+                  textInputFormatter: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'[0-9.]')
+                    )
+                  ]
+                ),
+                visible: referCommissionType == "Limited",
+              ),
+              SizedBox(
                 height: 20,
               ),
               Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlineButton(
-                        onPressed: () {
-                          bool isInputVerified = verifyInput(context);
-                          if(isInputVerified){
-                            onUpdate(context);
-                          }
-                        },
-                        child: Text("Update")
-                    )
-                  ]
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlineButton(
+                      onPressed: () {
+                        bool isInputVerified = verifyInput(context);
+                        if(isInputVerified){
+                          onUpdate(context);
+                        }
+                      },
+                      child: Text("Update")
+                  )
+                ]
               )
             ],
           ),
@@ -244,6 +295,10 @@ class GeneralState extends State<General> {
           minimumWithdrawCtl.text = res['minimumWithdraw'].toString();
           minimumDepositCtl.text = res['minimumDeposit'].toString();
           jobApprovalType = res['jobApprovalType'] == 1 ? "Automatic" : "Manual";
+          referCommissionType = res['quantityOfEarnByRefer'] == -1 ? "Lifetime" : "Limited";
+          if(res['quantityOfEarnByRefer'] != -1){
+            quantityOfReferCommissionCtl.text = res['quantityOfEarnByRefer'].toString();
+          }
         });
       }else {
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
@@ -276,6 +331,9 @@ class GeneralState extends State<General> {
     }else if(clientDashboardHeadlineCtl.text.isEmpty){
       errMsg = "Please give user dashboard headline!";
       isInputVerified = false;
+    }else if(referCommissionType == "Limited" && quantityOfReferCommissionCtl.text.isEmpty){
+      errMsg = "Please give how many time refer commission will get!";
+      isInputVerified = false;
     }
 
     if (!isInputVerified) {
@@ -295,7 +353,9 @@ class GeneralState extends State<General> {
         "jobPostingCharge": double.tryParse(jobPostingChargeCtl.text),
         "referCommission": double.tryParse(referCommissionCtl.text),
         "clientDashboardHeadline": clientDashboardHeadlineCtl.text,
-        "jobApprovalType": jobApprovalType == "Manual" ? 0 : 1
+        "jobApprovalType": jobApprovalType == "Manual" ? 0 : 1,
+        "quantityOfEarnByRefer": referCommissionType == "Lifetime" ? -1 :
+            int.tryParse(quantityOfReferCommissionCtl.text)
       }
     };
 

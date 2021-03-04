@@ -6,6 +6,8 @@ import 'package:client/components/admin/job/category/JobSubCategory.dart';
 import 'package:client/components/admin/notification/NotificationSender.dart';
 import 'package:client/components/admin/setting/AdvertisementCost.dart';
 import 'package:client/components/admin/setting/General.dart';
+import 'package:client/components/admin/setting/PaymentGatewayManager.dart';
+import 'package:client/components/admin/setting/SupportInfoManager.dart';
 import 'package:client/components/admin/transaction/Requisition.dart';
 import 'package:client/constants.dart';
 import 'package:client/widgets/DashboardLeftNavigation.dart';
@@ -193,6 +195,16 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                       ));
                                     }else if(settings.name == "/settings/advertisement-cost"){
                                       return MaterialPageRoute(builder: (context) => AdvertisementCost(
+                                          eventHub: eventHub,
+                                          userInfo: userInfo
+                                      ));
+                                    }else if(settings.name == "/settings/support-info"){
+                                      return MaterialPageRoute(builder: (context) => SupportInfoManager(
+                                          eventHub: eventHub,
+                                          userInfo: userInfo
+                                      ));
+                                    }else if(settings.name == "/settings/payment-gateway"){
+                                      return MaterialPageRoute(builder: (context) => PaymentGatewayManager(
                                           eventHub: eventHub,
                                           userInfo: userInfo
                                       ));

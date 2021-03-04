@@ -13,6 +13,7 @@ use App\Models\PaymentGateway;
 use App\Helpers\TokenGenerator;
 use App\Models\ProjectCategory;
 use Illuminate\Support\Facades\DB;
+use PHPMailer\PHPMailer\PHPMailer;
 use App\Utilities\AppConstantReader;
 use Illuminate\Support\Facades\Storage;
 
@@ -101,10 +102,25 @@ class UserRpo
                 $userInfo->quantityOfEarnByRefer = $quantityOfEarnByRefer;
                 $userInfo->save();
 
-                // $mailData = array(
-                //     'email' => $userInfo['email'],
-                //     'verificationLink' => $clientUrl . '/#/email-verification/' . $token
-                // );
+                $mailData = array(
+                    'email' => $userInfo['email'],
+                    'verificationLink' => $clientUrl . '/#/email-verification/' . $token
+                );
+
+                $mail = new PHPMailer;
+                $mail->isSMTP();
+                $mail->SMTPDebug = 2;
+                $mail->Host = 'mail.workersengine.com';
+                $mail->Port = 587;
+                $mail->SMTPAuth = true;
+                $mail->Username = 'noreply@workersengine.com';
+                $mail->Password = 'F3%[SJ2$v1r~';
+                $mail->setFrom('noreply@workersengine.com', 'Your Name');
+                $mail->addReplyTo('noreply@workersengine.com', 'Your Name');
+                $mail->addAddress('echologyxkabir@gmail.com', 'Receiver Name');
+                $mail->Subject = 'Testing PHPMailer';
+                $mail->Body = 'This is a plain text message body';
+                $mail->send();
 
                 // Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
                 //     $message->to($mailData['email'])->subject('Email Verification');
@@ -112,8 +128,8 @@ class UserRpo
 
                 // Queue::push(new MailSender($mailData));
 
-                // $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
-                $res['msg'] = "Registration successful!";
+                $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
+                // $res['msg'] = "Registration successful!";
                 $res['code'] = 200;
 
                 DB::commit();
@@ -242,7 +258,7 @@ class UserRpo
                         'proofSubmissionStatus' => $appConstants["proofSubmissionStatus"],
                         'adCostPlanList' => $appConstants['adCostPlanList'],
                         "jobPostingCharge" =>  $appConstants['jobPostingCharge'],
-                        "supportInfo" =>  $appConstants['supportInfo'],
+                        "supportInfoList" =>  $appConstants['supportInfoList'],
                         "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
                         "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
                         "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),

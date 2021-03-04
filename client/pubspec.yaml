@@ -32,6 +32,7 @@ dependencies:
   universal_io: ^1.0.2
   clipboard: ^0.1.2+8
   marquee: ^1.7.0
+  google_sign_in: ^4.5.9
 
 dev_dependencies:
   flutter_test:

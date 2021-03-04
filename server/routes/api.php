@@ -8,6 +8,7 @@ use App\Http\Controllers\AppConstantCtl;
 use App\Http\Controllers\TransactionCtl;
 use App\Http\Controllers\NotificationCtl;
 use App\Http\Controllers\AdvertisementCtl;
+use App\Http\Controllers\PaymentGatewayCtl;
 use App\Http\Controllers\ProjectCategoryCtl;
 use App\Http\Controllers\ProofSubmissionCtl;
 
@@ -84,3 +85,12 @@ Route::put('/app-constants/settings/general', [AppConstantCtl::class, 'updateGen
 Route::get('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'getAddCostPlanList']);
 Route::post('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'createAddCostPlan']);
 Route::delete('/app-constants/settings/ad-cost-plans', [AppConstantCtl::class, 'deleteAddCostPlan']);
+Route::get('/app-constants/settings/support-infos', [AppConstantCtl::class, 'getSupportInfoList']);
+Route::post('/app-constants/settings/support-infos', [AppConstantCtl::class, 'createSupportInfo']);
+Route::delete('/app-constants/settings/support-infos', [AppConstantCtl::class, 'deleteSupportInfo']);
+
+// payment gateways
+Route::get('/payment-gateways', [PaymentGatewayCtl::class, 'read']);
+Route::post('/payment-gateways', [PaymentGatewayCtl::class, 'create']);
+Route::put('/payment-gateways', [PaymentGatewayCtl::class, 'update']);
+Route::delete('/payment-gateways/{id}', [PaymentGatewayCtl::class, 'delete']);

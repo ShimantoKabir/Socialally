@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:client/constants.dart';
 import 'package:client/models/AdCostPlan.dart';
+import 'package:client/models/SupportInfo.dart';
 import 'package:client/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,33 +9,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
-class AdvertisementCost extends StatefulWidget {
-  AdvertisementCost({Key key, this.userInfo, this.eventHub}) : super(key: key);
+class SupportInfoManager extends StatefulWidget {
+  SupportInfoManager({Key key, this.userInfo, this.eventHub}) : super(key: key);
   final userInfo;
   final EventHub eventHub;
   @override
-  AdvertisementCostState createState() => AdvertisementCostState(
-    userInfo: userInfo,
-    eventHub: eventHub
+  SupportInfoManagerState createState() => SupportInfoManagerState(
+      userInfo: userInfo,
+      eventHub: eventHub
   );
 }
 
-class AdvertisementCostState extends State<AdvertisementCost> {
+class SupportInfoManagerState extends State<SupportInfoManager> {
   var userInfo;
   EventHub eventHub;
 
-  AdvertisementCostState({Key key, this.userInfo, this.eventHub});
+  SupportInfoManagerState({Key key, this.userInfo, this.eventHub});
 
   AlertDialog alertDialog;
   Widget alertIcon;
   String alertText;
   bool needToFreezeUi;
-  Future futureAdCostPlanList;
+  Future futureSupportInfoList;
   bool isSideBoxOpen;
 
-  TextEditingController dayCtl = new TextEditingController();
-  TextEditingController costCtl = new TextEditingController();
-  AdCostPlan adCostPlan;
+  TextEditingController nameCtl = new TextEditingController();
+  TextEditingController addressCtl = new TextEditingController();
+  SupportInfo supportInfo;
 
   @override
   void initState() {
@@ -43,12 +43,11 @@ class AdvertisementCostState extends State<AdvertisementCost> {
     alertText = "No operation running.";
     alertIcon = Container();
     needToFreezeUi = false;
-    futureAdCostPlanList = fetchAdCostPlanList();
+    futureSupportInfoList = fetchSupportInfoList();
     isSideBoxOpen = false;
-    adCostPlan = new AdCostPlan(
-      day: null,
-      cost: null,
-      txt: null
+    supportInfo = new SupportInfo(
+      name: null,
+      address: null
     );
   }
 
@@ -58,11 +57,11 @@ class AdvertisementCostState extends State<AdvertisementCost> {
       absorbing: needToFreezeUi,
       child: Scaffold(
         body: FutureBuilder(
-            future: futureAdCostPlanList,
+            future: futureSupportInfoList,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<AdCostPlan> adCostPlans = snapshot.data;
-                if(adCostPlans.length == 0){
+                List<SupportInfo> supportInfos = snapshot.data;
+                if(supportInfos.length == 0){
                   return Center(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -78,12 +77,13 @@ class AdvertisementCostState extends State<AdvertisementCost> {
                           child: ListView.builder(
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
-                            itemCount: adCostPlans.length,
+                            itemCount: supportInfos.length,
                             itemBuilder: (context, index) {
                               return Container(
                                 color: Colors.black12,
                                 child: ListTile(
-                                    title: Text("Day = ${adCostPlans[index].day}, Cost = ${adCostPlans[index].cost}")
+                                  title: Text("${supportInfos[index].name}"),
+                                  subtitle: Text("${supportInfos[index].address}")
                                 ),
                                 margin: EdgeInsets.all(5),
                               );
@@ -121,15 +121,16 @@ class AdvertisementCostState extends State<AdvertisementCost> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               IconButton(
-                icon: Icon(
-                    Icons.add,
-                    size: 25
-                ),
-                onPressed: (){
-                  setState(() {
-                    isSideBoxOpen = true;
-                  });
-                }
+                  icon: Icon(
+                      Icons.add,
+                      size: 25
+                  ),
+                  onPressed: (){
+                    print("hi");
+                    setState(() {
+                      isSideBoxOpen = true;
+                    });
+                  }
               ),
               Visibility(
                   visible: needToFreezeUi,
@@ -142,13 +143,13 @@ class AdvertisementCostState extends State<AdvertisementCost> {
                   )
               ),
               IconButton(
-                icon: Icon(
-                    Icons.delete,
-                    size: 25
-                ),
-                onPressed: (){
-                  onDelete(context);
-                }
+                  icon: Icon(
+                      Icons.delete,
+                      size: 25
+                  ),
+                  onPressed: (){
+                    onDelete(context);
+                  }
               ),
             ],
           ),
@@ -172,31 +173,31 @@ class AdvertisementCostState extends State<AdvertisementCost> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           entryField(
-              title: "Day",
-              controller: dayCtl
+              title: "Name",
+              controller: nameCtl
           ),
           SizedBox(height: 20),
           entryField(
-              title: "Cost",
-              controller: costCtl
+              title: "Address",
+              controller: addressCtl
           ),
           SizedBox(height: 10),
           OutlineButton(
               onPressed: (){
                 setState(() {
-                  if(dayCtl.text.isEmpty){
+                  if(nameCtl.text.isEmpty){
                     Alert.show(
                         alertDialog,
                         context,
                         Alert.ERROR,
-                        "Please give day!"
+                        "Please give a name!"
                     );
-                  } else if(costCtl.text.isEmpty){
+                  } else if(addressCtl.text.isEmpty){
                     Alert.show(
                         alertDialog,
                         context,
                         Alert.ERROR,
-                        "Please give cost!"
+                        "Please give a address!"
                     );
                   }else {
                     onSave(context);
@@ -246,11 +247,11 @@ class AdvertisementCostState extends State<AdvertisementCost> {
     );
   }
 
-  Future<List<AdCostPlan>> fetchAdCostPlanList() async {
+  Future<List<SupportInfo>> fetchSupportInfoList() async {
 
-    List<AdCostPlan> adCostPlanList = [];
+    List<SupportInfo> supportInfoList = [];
 
-    String url = baseUrl + "/app-constants/settings/ad-cost-plans";
+    String url = baseUrl + "/app-constants/settings/support-infos";
 
     setState(() {
       needToFreezeUi = true;
@@ -264,13 +265,12 @@ class AdvertisementCostState extends State<AdvertisementCost> {
     });
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
-      print("res $res");
       if (res['code'] == 200) {
-        List<dynamic> adCostPlans = res['adCostPlans'];
-        adCostPlans.asMap().forEach((key, value) {
-          adCostPlanList.add(new AdCostPlan(
-            cost: value['cost'],
-            day: value['day']
+        List<dynamic> supportInfos = res['supportInfos'];
+        supportInfos.asMap().forEach((key, value) {
+          supportInfoList.add(new SupportInfo(
+            name : value['name'],
+            address : value['address']
           ));
         });
       }else {
@@ -279,12 +279,12 @@ class AdvertisementCostState extends State<AdvertisementCost> {
     }else {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     }
-    return adCostPlanList;
+    return supportInfoList;
   }
 
   void onDelete(BuildContext context) {
 
-    String url = baseUrl + '/app-constants/settings/ad-cost-plans';
+    String url = baseUrl + '/app-constants/settings/support-infos';
     Map<String, String> headers = {"Content-type": "application/json"};
 
     setState(() {
@@ -299,7 +299,7 @@ class AdvertisementCostState extends State<AdvertisementCost> {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
           setState(() {
-            futureAdCostPlanList = fetchAdCostPlanList();
+            futureSupportInfoList = fetchSupportInfoList();
           });
           onReset(context);
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
@@ -321,13 +321,13 @@ class AdvertisementCostState extends State<AdvertisementCost> {
   void onSave(BuildContext context) {
 
     var request = {
-      "adCostPlan": {
-        "day": int.tryParse(dayCtl.text),
-        "cost": int.tryParse(costCtl.text)
+      "supportInfo": {
+        "name": nameCtl.text,
+        "address": addressCtl.text
       }
     };
 
-    String url = baseUrl + '/app-constants/settings/ad-cost-plans';
+    String url = baseUrl + '/app-constants/settings/support-infos';
     Map<String, String> headers = {"Content-type": "application/json"};
 
     setState(() {
@@ -342,7 +342,7 @@ class AdvertisementCostState extends State<AdvertisementCost> {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
           setState(() {
-            futureAdCostPlanList = fetchAdCostPlanList();
+            futureSupportInfoList = fetchSupportInfoList();
           });
           onReset(context);
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
@@ -364,10 +364,10 @@ class AdvertisementCostState extends State<AdvertisementCost> {
   void onReset(BuildContext context) {
     setState(() {
       isSideBoxOpen = false;
-      adCostPlan.day = null;
-      adCostPlan.cost = null;
-      dayCtl.clear();
-      costCtl.clear();
+      supportInfo.name = null;
+      supportInfo.address = null;
+      nameCtl.clear();
+      addressCtl.clear();
     });
   }
 }

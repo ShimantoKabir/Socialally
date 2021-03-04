@@ -4,21 +4,21 @@ import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SupportInfo extends StatefulWidget{
-  SupportInfo({Key key, this.eventHub, this.userInfo}) : super(key: key);
+class SupportInfoPresenter extends StatefulWidget{
+  SupportInfoPresenter({Key key, this.eventHub, this.userInfo}) : super(key: key);
   final EventHub eventHub;
   final userInfo;
 
   @override
-  SupportInfoState createState() =>
-      SupportInfoState(key: key, eventHub: eventHub, userInfo: userInfo);
+  SupportInfoPresenterState createState() =>
+      SupportInfoPresenterState(key: key, eventHub: eventHub, userInfo: userInfo);
 }
 
-class SupportInfoState extends State<SupportInfo> {
+class SupportInfoPresenterState extends State<SupportInfoPresenter> {
   EventHub eventHub;
   var userInfo;
 
-  SupportInfoState({Key key, this.eventHub, this.userInfo});
+  SupportInfoPresenterState({Key key, this.eventHub, this.userInfo});
 
   List<dynamic> supportInfo;
   AlertDialog alertDialog;
@@ -27,7 +27,7 @@ class SupportInfoState extends State<SupportInfo> {
   void initState() {
     super.initState();
     eventHub.fire("viewTitle", "Support");
-    supportInfo = userInfo['supportInfo'];
+    supportInfo = userInfo['supportInfoList'];
   }
 
   @override
@@ -50,7 +50,7 @@ class SupportInfoState extends State<SupportInfo> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        supportInfo[index]["key"],
+                        supportInfo[index]["name"],
                         style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -62,7 +62,7 @@ class SupportInfoState extends State<SupportInfo> {
                       children: [
                         Flexible(
                             child: Text(
-                              supportInfo[index]["value"],
+                              supportInfo[index]["address"],
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               softWrap: false,
@@ -72,7 +72,7 @@ class SupportInfoState extends State<SupportInfo> {
                             )
                         ),
                         IconButton(icon: Icon(Icons.copy), onPressed: (){
-                          FlutterClipboard.copy(supportInfo[index]["value"]).then((value){
+                          FlutterClipboard.copy(supportInfo[index]["address"]).then((value){
                             Alert.show(alertDialog, context, Alert.SUCCESS,"Copied");
                           });
                         })

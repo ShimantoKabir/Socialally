@@ -43,4 +43,19 @@ class AppConstantCtl extends Controller
     {
         return $this->appConstantRpo->deleteAddCostPlan($request);
     }
+
+    public function getSupportInfoList(Request $request)
+    {
+        return $this->appConstantRpo->getSupportInfoList($request);
+    }
+
+    public function createSupportInfo(Request $request)
+    {
+        return $this->appConstantRpo->createSupportInfo($request);
+    }
+
+    public function deleteSupportInfo(Request $request)
+    {
+        return $this->appConstantRpo->deleteSupportInfo($request);
+    }
 }

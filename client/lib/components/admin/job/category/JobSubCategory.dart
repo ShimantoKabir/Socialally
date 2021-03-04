@@ -98,6 +98,7 @@ class JobSubCategoryState extends State<JobSubCategory> {
                                   setState(() {
                                     subCategoryId = projectCategories[index].id;
                                   });
+                                  print("id $subCategoryId");
                                   onDelete(context);
                                 },
                               ),
@@ -309,7 +310,7 @@ class JobSubCategoryState extends State<JobSubCategory> {
         List<dynamic> projectSubCategories = res['projectSubCategories'];
         projectSubCategories.asMap().forEach((key, value) {
           projectSubCategoryList.add(new ProjectCategory(
-            id: 0,
+            id: value['id'],
             categoryId: value['categoryId'],
             categoryName: value['categoryName'],
             subCategoryName: value['subCategoryName']

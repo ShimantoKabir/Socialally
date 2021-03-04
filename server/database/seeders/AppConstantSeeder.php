@@ -83,20 +83,20 @@ class AppConstantSeeder extends Seeder
                 "appConstantDoubleValue" => null
             ],
             [
-                "appConstantName" => "supportInfo",
+                "appConstantName" => "supportInfoList",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => json_encode([
                     [
-                        "key" => "Mail",
-                        "value" => "admin@mail.com"
+                        "name" => "Mail",
+                        "address" => "admin@mail.com"
                     ],
                     [
-                        "key" => "Messenger",
-                        "value" => "admin.messenger.contact"
+                        "name" => "Messenger",
+                        "address" => "admin.messenger.contact"
                     ],
                     [
-                        "key" => "WhatsApp",
-                        "value" => "admin.whatsapp.contact"
+                        "name" => "WhatsApp",
+                        "address" => "admin.whatsapp.contact"
                     ]
                 ]),
                 "appConstantIntegerValue" => null,
@@ -106,7 +106,7 @@ class AppConstantSeeder extends Seeder
                 "appConstantName" => "quantityOfEarnByRefer",
                 "appConstantStringValue" => null,
                 "appConstantJsonValue" => null,
-                "appConstantIntegerValue" => 5.0,
+                "appConstantIntegerValue" => 5,
                 "appConstantDoubleValue" => null
             ],
             [

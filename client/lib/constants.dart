@@ -189,6 +189,16 @@ List<Node> adminDashboardMenus = [
           label: ' Advertisement Cost',
           key: '/settings/advertisement-cost',
           icon: NodeIcon.fromIconData(Icons.add_road_outlined)
+      ),
+      Node(
+          label: ' Support Info',
+          key: '/settings/support-info',
+          icon: NodeIcon.fromIconData(Icons.support)
+      ),
+      Node(
+          label: ' Payment Gateway',
+          key: '/settings/payment-gateway',
+          icon: NodeIcon.fromIconData(Icons.directions_off_sharp)
       )
     ],
   ),
@@ -349,6 +359,16 @@ List<DropdownMenuItem<String>> notificationForDropDownList = [
 List<DropdownMenuItem<String>> jobApproveTypeDropDownList = [
   'Manual',
   'Automatic',
+].map<DropdownMenuItem<String>>((String value) {
+  return DropdownMenuItem<String>(
+    value: value,
+    child: Text(value),
+  );
+}).toList();
+
+List<DropdownMenuItem<String>> referCommissionTypeDropDownList = [
+  'Lifetime',
+  'Limited',
 ].map<DropdownMenuItem<String>>((String value) {
   return DropdownMenuItem<String>(
     value: value,

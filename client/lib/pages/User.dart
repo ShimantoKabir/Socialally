@@ -1,6 +1,6 @@
 import 'package:client/components/NotificationComponent.dart';
 import 'package:client/components/ReferAndEarn.dart';
-import 'package:client/components/SupportInfo.dart';
+import 'package:client/components/SupportInfoPresenter.dart';
 import 'package:client/components/job/Applicants.dart';
 import 'package:client/components/job/Available.dart';
 import 'package:client/components/Profile.dart';
@@ -399,7 +399,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                             userInfo: userInfo
                                         ));
                                       }else if(settings.name == "/support"){
-                                        return MaterialPageRoute(builder: (context) => SupportInfo(
+                                        return MaterialPageRoute(builder: (context) => SupportInfoPresenter(
                                             eventHub: eventHub,
                                             userInfo: userInfo
                                         ));
