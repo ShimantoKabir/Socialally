@@ -1,5 +1,5 @@
-import 'package:client/constants.dart';
-import 'package:client/models/Service.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/Service.dart';
 import 'package:flutter/material.dart';
 
 class ServiceCard extends StatefulWidget {

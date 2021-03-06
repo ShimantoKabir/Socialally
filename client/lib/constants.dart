@@ -1,5 +1,5 @@
-import 'package:client/models/AdCostPlan.dart';
-import 'package:client/models/ProjectCategory.dart';
+import 'package:wengine/models/AdCostPlan.dart';
+import 'package:wengine/models/ProjectCategory.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/tree_view.dart';

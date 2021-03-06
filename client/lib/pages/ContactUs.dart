@@ -1,8 +1,8 @@
-import 'package:client/constants.dart';
-import 'package:client/widgets/AboutUsBtn.dart';
-import 'package:client/widgets/SectionTitle.dart';
-import 'package:client/widgets/SocialCard.dart';
-import 'package:client/widgets/WelcomeNavBar.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/widgets/AboutUsBtn.dart';
+import 'package:wengine/widgets/SectionTitle.dart';
+import 'package:wengine/widgets/SocialCard.dart';
+import 'package:wengine/widgets/WelcomeNavBar.dart';
 import 'package:flutter/material.dart';
 
 class ContactUs extends StatelessWidget {

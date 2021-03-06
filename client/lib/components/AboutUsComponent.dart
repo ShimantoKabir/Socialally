@@ -1,8 +1,8 @@
-import 'package:client/constants.dart';
-import 'package:client/widgets/AboutSectionText.dart';
-import 'package:client/widgets/AboutUsBtn.dart';
-import 'package:client/widgets/OutlineButton.dart';
-import 'package:client/widgets/SectionTitle.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/widgets/AboutSectionText.dart';
+import 'package:wengine/widgets/AboutUsBtn.dart';
+import 'package:wengine/widgets/OutlineButton.dart';
+import 'package:wengine/widgets/SectionTitle.dart';
 import 'package:flutter/material.dart';
 
 class AboutUsComponent extends StatelessWidget {

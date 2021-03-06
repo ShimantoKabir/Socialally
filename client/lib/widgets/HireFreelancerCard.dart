@@ -1,5 +1,5 @@
-import 'package:client/constants.dart';
-import 'package:client/widgets/AboutUsBtn.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/widgets/AboutUsBtn.dart';
 import 'package:flutter/material.dart';
 
 class HireFreelancerCard extends StatelessWidget {

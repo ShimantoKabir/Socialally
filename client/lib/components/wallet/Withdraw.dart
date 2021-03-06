@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:client/constants.dart';
-import 'package:client/utilities/Alert.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

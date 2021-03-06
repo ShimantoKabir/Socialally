@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:universal_io/io.dart';
-import 'package:client/constants.dart';
-import 'package:client/utilities/Alert.dart';
-import 'package:client/utilities/HttpHandler.dart';
-import 'package:client/utilities/MySharedPreferences.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/utilities/Alert.dart';
+import 'package:wengine/utilities/HttpHandler.dart';
+import 'package:wengine/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';

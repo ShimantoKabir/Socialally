@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:client/constants.dart';
-import 'package:client/pages/Admin.dart';
-import 'package:client/pages/User.dart';
-import 'package:client/utilities/Alert.dart';
-import 'package:client/utilities/HttpHandler.dart';
-import 'package:client/utilities/MySharedPreferences.dart';
-import 'package:client/widgets/WelcomeNavBar.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/pages/Admin.dart';
+import 'package:wengine/pages/User.dart';
+import 'package:wengine/utilities/Alert.dart';
+import 'package:wengine/utilities/HttpHandler.dart';
+import 'package:wengine/utilities/MySharedPreferences.dart';
+import 'package:wengine/widgets/WelcomeNavBar.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -59,7 +59,11 @@ class LoginState extends State<Login> {
                     padding: EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.centerRight,
                     child: Text('Forgot Password ?',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500
+                      )
+                    ),
                   ),
                   divider(),
                   Row(
@@ -215,106 +219,116 @@ class LoginState extends State<Login> {
   }
 
   Widget facebookButton() {
-    return Container(
-      height: 30,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      width: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xff1959a9),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(5),
-                    topLeft: Radius.circular(5)),
+    return InkWell(
+      child: Container(
+        height: 30,
+        margin: EdgeInsets.symmetric(vertical: 10),
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff1959a9),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      topLeft: Radius.circular(5)),
+                ),
+                alignment: Alignment.center,
+                child: Text('f',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400)),
               ),
-              alignment: Alignment.center,
-              child: Text('f',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400)),
             ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xff2872ba),
-                borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(5),
-                    topRight: Radius.circular(5)),
+            Expanded(
+              flex: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff2872ba),
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(5),
+                      topRight: Radius.circular(5)),
+                ),
+                alignment: Alignment.center,
+                child: Text('Facebook',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400)),
               ),
-              alignment: Alignment.center,
-              child: Text('Facebook',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400)),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: (){
+
+      },
     );
   }
 
   Widget googleButton() {
-    return Container(
-      height: 30,
-      width: 120,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(5),
-                    topLeft: Radius.circular(5)
+    return InkWell(
+      onTap: (){
+
+      },
+      child: Container(
+        height: 30,
+        width: 120,
+        margin: EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      topLeft: Radius.circular(5)
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text('G',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400
+                    )
                 ),
               ),
-              alignment: Alignment.center,
-              child: Text('G',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                )
-              ),
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(5),
-                  topRight: Radius.circular(5)
+            Expanded(
+              flex: 4,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(5),
+                      topRight: Radius.circular(5)
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text('Google',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400
+                    )
                 ),
               ),
-              alignment: Alignment.center,
-              child: Text('Google',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400
-                )
-              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 
@@ -405,4 +419,5 @@ class LoginState extends State<Login> {
     }
     return isInputVerified;
   }
+
 }

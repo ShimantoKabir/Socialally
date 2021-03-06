@@ -1,5 +1,5 @@
-import 'package:client/constants.dart';
-import 'package:client/models/SuccessfulWork.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/SuccessfulWork.dart';
 import 'package:flutter/material.dart';
 
 class SuccessfulWorkCard extends StatefulWidget {

@@ -1,14 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:client/constants.dart';
-import 'package:client/models/Advertisement.dart';
-import 'package:client/utilities/Alert.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/Advertisement.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:responsive_image/responsive_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AdvertisedAny extends StatefulWidget {
@@ -34,9 +35,15 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   String alertText;
   bool needToFreezeUi;
   int pageIndex = 0;
-  int perPage = 5;
+  int perPage = 3;
   int pageNumber = 0;
-  ScrollController scrollController = ScrollController(initialScrollOffset: 0.0);
+  ScrollController scrollController = ScrollController();
+  IconButton scrollButton;
+  IconButton nextButton;
+  IconButton previousButton;
+  int nextCounter = 0;
+  int onPressedCounter = 0;
+  bool isTappedToImage = false;
 
   @override
   void initState() {
@@ -49,110 +56,164 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     alertIcon = Container();
     needToFreezeUi = false;
     pageIndex = 0;
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        if( scrollController.position.pixels == 0){
+          nextCounter++;
+        }else {
+          nextCounter++;
+        }
+      }
+      if(nextCounter == 2){
+        nextCounter = 0;
+        nextButton.onPressed();
+      }
+    });
+
+    scrollButton = IconButton(
+      icon: Icon(
+        Icons.keyboard_arrow_down
+      ),
+      onPressed: (){
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 1500),
+          curve: Curves.ease
+        ).whenComplete((){
+          scrollController.animateTo(
+            scrollController.position.minScrollExtent,
+            duration: Duration(milliseconds: 1500),
+            curve: Curves.ease
+          );
+        });
+      }
+    );
+
+    nextButton = IconButton(
+        icon: Icon(
+            Icons.arrow_forward_ios,
+            size: 15
+        ),
+        onPressed: (){
+          pageIndex = pageIndex + perPage;
+          needToFreezeUi = true;
+          pageNumber++;
+          setState(() {
+            futureAdvertisedAny = fetchAdvertisedAny();
+          });
+        }
+    );
+
+    previousButton = IconButton(
+      icon: Icon(
+          Icons.arrow_back_ios,
+          size: 15
+      ),
+      onPressed: (){
+        if(pageIndex < 1){
+          Alert.show(alertDialog, context, Alert.ERROR, "You are already in the first page!");
+        }else {
+          pageNumber--;
+          pageIndex = pageIndex - perPage;
+          needToFreezeUi = true;
+          setState(() {
+            futureAdvertisedAny = fetchAdvertisedAny();
+          });
+        }
+      }
+    );
+
+    Timer.periodic(Duration(seconds: 5), (timer) {
+       if(isTappedToImage){
+         isTappedToImage = false;
+         scrollButton.onPressed();
+       }
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: FutureBuilder(
-          future: futureAdvertisedAny,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Advertisement> advertisements = snapshot.data;
-              if(advertisements.length == 0){
-                return Center(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("No advertisement found!")
-                  ),
-                );
-              }else {
-                // WidgetsBinding.instance.addPostFrameCallback((_){
-                //   if(scrollController.hasClients){
-                //     scrollController.animateTo(
-                //         scrollController.position.maxScrollExtent,
-                //         duration: Duration(milliseconds: 1),
-                //         curve: Curves.easeOut
-                //     );
-                //   }
-                // });
-                return ListView.builder(
-                  controller: scrollController,
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: advertisements.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.fromLTRB(10,5,10,5),
-                            child: Text(
-                              advertisements[index].title,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
-                              ),
-                            ),
-                            decoration: headingDecoration(),
-                          ),
-                          SizedBox(height: 5),
-                          ResponsiveImage(
-                            srcSet: {
-                              1024: advertisements[index].bannerImageUrl,
-                            },
-                            builder: (BuildContext context, String url) {
-                              return CachedNetworkImage(
-                                imageUrl: url,
-                                placeholder: (context, url) => Center(
-                                  child: Padding(
-                                    child: CircularProgressIndicator(),
-                                    padding: EdgeInsets.all(20),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Icon(Icons.error),
-                              );
-                            },
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                            child: InkWell(
-                              child: Text(
-                                advertisements[index].targetedDestinationUrl,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              onTap: (){
-                                openUrl(advertisements[index].targetedDestinationUrl, context);
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }
-            } else {
+      body: FutureBuilder(
+        future: futureAdvertisedAny,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Advertisement> advertisements = snapshot.data;
+            if(advertisements.length == 0){
+              goToFirstPage(context);
               return Center(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                  ),
+                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                    child: Text("No advertisement found!")
                 ),
               );
+            }else {
+              if(perPage > advertisements.length){
+                goToFirstPage(context);
+              }
+              return ListView.builder(
+                controller: scrollController,
+                itemCount: advertisements.length,
+                itemBuilder: (context, index) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if(advertisements.length == (index+1)){
+                      scrollButton.onPressed();
+                    }
+                  });
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(10,5,10,5),
+                          child: Text(
+                            advertisements[index].title,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),
+                          ),
+                          decoration: headingDecoration(),
+                        ),
+                        SizedBox(height: 5),
+                        InkWell(
+                          child: CachedNetworkImage(
+                            width: 300,
+                            height: 190,
+                            imageUrl: advertisements[index].bannerImageUrl,
+                            placeholder: (context, url) => Center(
+                              child: Padding(
+                                child: CircularProgressIndicator(),
+                                padding: EdgeInsets.all(20),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Icon(Icons.error),
+                          ),
+                          onTap: (){
+                            isTappedToImage = true;
+                            openUrl(advertisements[index].targetedDestinationUrl, context);
+                          }
+                        )
+                      ],
+                    ),
+                  );
+                }
+              );
             }
-          },
-        ),
+          } else {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
+              ),
+            );
+          }
+        },
       ),
       bottomNavigationBar: AbsorbPointer(
         absorbing: needToFreezeUi,
@@ -163,6 +224,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              scrollButton,
               Visibility(
                 visible: needToFreezeUi,
                 child: Container(
@@ -175,39 +237,9 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
               ),
               Row(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      size: 15
-                    ),
-                    onPressed: (){
-                      if(pageIndex < 1){
-                        Alert.show(alertDialog, context, Alert.ERROR, "Your are already in the first page!");
-                      }else {
-                        pageNumber--;
-                        pageIndex = pageIndex - perPage;
-                        needToFreezeUi = true;
-                        setState(() {
-                          futureAdvertisedAny = fetchAdvertisedAny();
-                        });
-                      }
-                    }
-                  ),
+                  previousButton,
                   Text("${pageNumber+1}"),
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 15
-                    ),
-                    onPressed: (){
-                      pageIndex = pageIndex + perPage;
-                      needToFreezeUi = true;
-                      pageNumber++;
-                      setState(() {
-                        futureAdvertisedAny = fetchAdvertisedAny();
-                      });
-                    }
-                  )
+                  nextButton
                 ],
               )
             ],
@@ -215,6 +247,14 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
         ),
       ),
     );
+  }
+
+  goToFirstPage(BuildContext context){
+    Future.delayed(Duration(days: 0,hours: 0,seconds: 5), () async {
+      pageIndex = 0;
+      pageNumber = 0;
+      nextButton.onPressed();
+    });
   }
 
   Future<List<Advertisement>> fetchAdvertisedAny() async {
@@ -257,10 +297,10 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   BoxDecoration headingDecoration() {
     return BoxDecoration(
       border: Border(
-          bottom:  BorderSide(
-            color: Colors.green,
-            width: 1.0,
-          )
+        bottom:  BorderSide(
+          color: Colors.green,
+          width: 1.0,
+        )
       ),
     );
   }

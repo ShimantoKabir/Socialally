@@ -14,7 +14,6 @@ class MailSender extends Job
     {
 
         $this->data = $data;
-
     }
 
     public function handle()
@@ -29,5 +28,4 @@ class MailSender extends Job
             $message->to($mailData['email'])->subject('Email Verification');
         });
     }
-
 }

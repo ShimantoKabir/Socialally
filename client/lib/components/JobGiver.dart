@@ -1,8 +1,8 @@
-import 'package:client/constants.dart';
-import 'package:client/models/SuccessfulWork.dart';
-import 'package:client/widgets/HireFreelancerCard.dart';
-import 'package:client/widgets/SectionTitle.dart';
-import 'package:client/widgets/SuccessfulWorkCard.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/SuccessfulWork.dart';
+import 'package:wengine/widgets/HireFreelancerCard.dart';
+import 'package:wengine/widgets/SectionTitle.dart';
+import 'package:wengine/widgets/SuccessfulWorkCard.dart';
 import 'package:flutter/material.dart';
 
 class JobGiver extends StatelessWidget {

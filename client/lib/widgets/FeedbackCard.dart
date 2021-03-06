@@ -1,5 +1,5 @@
-import 'package:client/constants.dart';
-import 'package:client/models/Feedback.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/Feedback.dart';
 import 'package:flutter/material.dart';
 
 class FeedbackCard extends StatefulWidget {

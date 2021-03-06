@@ -1,5 +1,5 @@
-import 'package:client/widgets/DefaultButton.dart';
-import 'package:client/widgets/MenuItem.dart';
+import 'package:wengine/widgets/DefaultButton.dart';
+import 'package:wengine/widgets/MenuItem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';

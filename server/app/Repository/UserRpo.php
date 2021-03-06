@@ -15,6 +15,7 @@ use App\Models\ProjectCategory;
 use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
 use App\Utilities\AppConstantReader;
+use App\Utilities\PHPMailSender;
 use Illuminate\Support\Facades\Storage;
 
 class UserRpo
@@ -104,23 +105,10 @@ class UserRpo
 
                 $mailData = array(
                     'email' => $userInfo['email'],
-                    'verificationLink' => $clientUrl . '/#/email-verification/' . $token
+                    'body' => $clientUrl . '/#/email-verification/' . $token
                 );
 
-                $mail = new PHPMailer;
-                $mail->isSMTP();
-                $mail->SMTPDebug = 2;
-                $mail->Host = 'mail.workersengine.com';
-                $mail->Port = 587;
-                $mail->SMTPAuth = true;
-                $mail->Username = 'noreply@workersengine.com';
-                $mail->Password = 'F3%[SJ2$v1r~';
-                $mail->setFrom('noreply@workersengine.com', 'Your Name');
-                $mail->addReplyTo('noreply@workersengine.com', 'Your Name');
-                $mail->addAddress('echologyxkabir@gmail.com', 'Receiver Name');
-                $mail->Subject = 'Testing PHPMailer';
-                $mail->Body = 'This is a plain text message body';
-                $mail->send();
+                PHPMailSender::send($mailData);
 
                 // Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
                 //     $message->to($mailData['email'])->subject('Email Verification');

@@ -1,13 +1,12 @@
 import 'dart:convert';
-
-import 'package:client/models/AdCostPlan.dart';
-import 'package:client/models/Project.dart';
-import 'package:client/utilities/Alert.dart';
+import 'package:wengine/models/AdCostPlan.dart';
+import 'package:wengine/models/Project.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:client/constants.dart';
+import 'package:wengine/constants.dart';
 import 'package:http/http.dart';
 
 class JobAdvertisementSender extends StatefulWidget {

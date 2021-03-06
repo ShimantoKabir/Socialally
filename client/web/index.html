@@ -21,18 +21,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="client">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" href="logo_without_text.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="logo_without_text.png"/>
 
-  <title>client</title>
+  <title>W-engine</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+      var FACEBOOK_APP_ID = "1112072695975816";
+      window.fbAsyncInit = function () {
+          FB.init({
+              appId: FACEBOOK_APP_ID,
+              cookie: true,
+              status: true,
+              xfbml: true,
+              version: 'v3.2'
+          });
+          FB.AppEvents.logPageView();
+      };
+  </script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+  <script src="flutter_facebook_auth.js" type="application/javascript"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {

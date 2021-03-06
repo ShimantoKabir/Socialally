@@ -1,17 +1,17 @@
-import 'package:client/components/NotificationComponent.dart';
-import 'package:client/components/admin/AdminDashboard.dart';
-import 'package:client/components/admin/job/JobManager.dart';
-import 'package:client/components/admin/job/category/JobCategory.dart';
-import 'package:client/components/admin/job/category/JobSubCategory.dart';
-import 'package:client/components/admin/notification/NotificationSender.dart';
-import 'package:client/components/admin/setting/AdvertisementCost.dart';
-import 'package:client/components/admin/setting/General.dart';
-import 'package:client/components/admin/setting/PaymentGatewayManager.dart';
-import 'package:client/components/admin/setting/SupportInfoManager.dart';
-import 'package:client/components/admin/transaction/Requisition.dart';
-import 'package:client/constants.dart';
-import 'package:client/widgets/DashboardLeftNavigation.dart';
-import 'package:client/widgets/DashboardTopNavigation.dart';
+import 'package:wengine/components/NotificationComponent.dart';
+import 'package:wengine/components/admin/AdminDashboard.dart';
+import 'package:wengine/components/admin/job/JobManager.dart';
+import 'package:wengine/components/admin/job/category/JobCategory.dart';
+import 'package:wengine/components/admin/job/category/JobSubCategory.dart';
+import 'package:wengine/components/admin/notification/NotificationSender.dart';
+import 'package:wengine/components/admin/setting/AdvertisementCost.dart';
+import 'package:wengine/components/admin/setting/General.dart';
+import 'package:wengine/components/admin/setting/PaymentGatewayManager.dart';
+import 'package:wengine/components/admin/setting/SupportInfoManager.dart';
+import 'package:wengine/components/admin/transaction/Requisition.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/widgets/DashboardLeftNavigation.dart';
+import 'package:wengine/widgets/DashboardTopNavigation.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,14 +51,15 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
       children: nodes,
       selectedKey: selectedKey,
     );
-    html.window.history.pushState(null,"Admin Dashboard","/#/admin/dashboard");
+    html.window.history
+        .pushState(null, "Admin Dashboard", "/#/admin/dashboard");
     viewTitle = "Dashboard";
     eventHub.on("openAndCloseSideNav", (dynamic data) {
-      if(data['screenWidth'] > 960){
+      if (data['screenWidth'] > 960) {
         setState(() {
           isSideNavOpen = !isSideNavOpen;
         });
-      }else {
+      } else {
         if (scaffoldKey.currentState.isDrawerOpen) {
           scaffoldKey.currentState.openEndDrawer();
         } else {
@@ -66,24 +67,22 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
         }
       }
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    if(width<960){
+    if (width < 960) {
       var logoutKey = nodes.where((element) => element.key == "/logout");
-      if(logoutKey.isEmpty){
+      if (logoutKey.isEmpty) {
         nodes.add(Node(
             label: 'Logout',
             key: '/logout',
-            icon: NodeIcon.fromIconData(Icons.logout)
-        ));
+            icon: NodeIcon.fromIconData(Icons.logout)));
       }
-    }else {
+    } else {
       var logoutKey = nodes.where((element) => element.key == "/logout");
-      if(logoutKey.isNotEmpty){
+      if (logoutKey.isNotEmpty) {
         nodes.removeWhere((element) => element.key == "/logout");
       }
     }
@@ -94,142 +93,144 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
             positionType: 1,
             eventHub: eventHub,
             treeViewController: treeViewController,
-            userNavigatorKey: userNavigatorKey
-        ),
+            userNavigatorKey: userNavigatorKey),
         visible: width < 960,
       ),
       body: SafeArea(
-        child: Row(
-          children: [
-            // side menu bar
-            Visibility(
+          child: Row(
+        children: [
+          // side menu bar
+          Visibility(
               child: DashboardLeftNavigation(
                   positionType: 2,
-                eventHub: eventHub,
-                treeViewController: treeViewController,
-                userNavigatorKey: userNavigatorKey
-              ),
-              visible: width > 960 && isSideNavOpen
-            ),
-            // body with top menu bar, title and body
-            Expanded(
-              child: Container(
-                child: Column(
-                  children: [
-                    // top menu bar
-                    DashboardTopNavigation(
-                        type: 2,
-                        eventHub: eventHub,
-                        userNavigatorKey: userNavigatorKey,
-                        totalUnseenNotification: userInfo["totalUnseenNotification"],
-                        userInfo: userInfo
-                    ),
-                    // component tile
-                    Container(
-                        height: 50,
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.all(5),
-                        color: Colors.black12,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                icon: Icon(Icons.arrow_back_ios),
-                                onPressed: (){
-                                  if(userNavigatorKey.currentState.canPop()){
-                                    userNavigatorKey.currentState.pop();
-                                  }
+                  eventHub: eventHub,
+                  treeViewController: treeViewController,
+                  userNavigatorKey: userNavigatorKey),
+              visible: width > 960 && isSideNavOpen),
+          // body with top menu bar, title and body
+          Expanded(
+            child: Container(
+              child: Column(
+                children: [
+                  // top menu bar
+                  DashboardTopNavigation(
+                      type: 2,
+                      eventHub: eventHub,
+                      userNavigatorKey: userNavigatorKey,
+                      totalUnseenNotification:
+                          userInfo["totalUnseenNotification"],
+                      userInfo: userInfo),
+                  // component tile
+                  Container(
+                      height: 50,
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(5),
+                      color: Colors.black12,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: () {
+                                if (userNavigatorKey.currentState.canPop()) {
+                                  userNavigatorKey.currentState.pop();
                                 }
-                            ),
-                            Text(
-                              viewTitle,
-                              style: TextStyle(fontSize: 20),
-                            )
-                          ],
-                        )
-                    ),
-                    // component body
-                    Expanded(
-                      child: Container(
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Navigator(
-                                  key: userNavigatorKey,
-                                  onGenerateRoute: (settings){
-                                    if(settings.name == "/transactions/requisition"){
-                                      return MaterialPageRoute(builder: (context) => Requisition(
+                              }),
+                          Text(
+                            viewTitle,
+                            style: TextStyle(fontSize: 20),
+                          )
+                        ],
+                      )),
+                  // component body
+                  Expanded(
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: Navigator(
+                            key: userNavigatorKey,
+                            onGenerateRoute: (settings) {
+                              if (settings.name ==
+                                  "/transactions/requisition") {
+                                return MaterialPageRoute(
+                                    builder: (context) => Requisition(
                                         eventHub: eventHub,
-                                        userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/admins/notifications"){
-                                      return MaterialPageRoute(builder: (context) => NotificationComponent(
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/admins/notifications") {
+                                return MaterialPageRoute(
+                                    builder: (context) => NotificationComponent(
+                                          eventHub: eventHub,
+                                          userInfo: userInfo,
+                                          type: 2,
+                                        ));
+                              } else if (settings.name ==
+                                  "/notifications/send") {
+                                return MaterialPageRoute(
+                                    builder: (context) => NotificationSender(
                                         eventHub: eventHub,
-                                        userInfo: userInfo,
-                                        type: 2,
-                                      ));
-                                    }else if(settings.name == "/notifications/send"){
-                                      return MaterialPageRoute(builder: (context) => NotificationSender(
+                                        userInfo: userInfo));
+                              } else if (settings.name == "/job/approve") {
+                                return MaterialPageRoute(
+                                    builder: (context) => JobManager(
                                         eventHub: eventHub,
-                                        userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/job/approve"){
-                                      return MaterialPageRoute(builder: (context) => JobManager(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/settings/general"){
-                                      return MaterialPageRoute(builder: (context) => General(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/categories/create"){
-                                      return MaterialPageRoute(builder: (context) => JobCategory(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/categories/create-sub-category"){
-                                      return MaterialPageRoute(builder: (context) => JobSubCategory(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/settings/advertisement-cost"){
-                                      return MaterialPageRoute(builder: (context) => AdvertisementCost(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/settings/support-info"){
-                                      return MaterialPageRoute(builder: (context) => SupportInfoManager(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    }else if(settings.name == "/settings/payment-gateway"){
-                                      return MaterialPageRoute(builder: (context) => PaymentGatewayManager(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo
-                                      ));
-                                    } else {
-                                      return MaterialPageRoute(builder: (context) => AdminDashboard(
+                                        userInfo: userInfo));
+                              } else if (settings.name == "/settings/general") {
+                                return MaterialPageRoute(
+                                    builder: (context) => General(
                                         eventHub: eventHub,
-                                        userInfo: userInfo
-                                      ));
-                                    }
-                                  },
-                                )
-                            )
-                          ],
-                        ),
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/categories/create") {
+                                return MaterialPageRoute(
+                                    builder: (context) => JobCategory(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/categories/create-sub-category") {
+                                return MaterialPageRoute(
+                                    builder: (context) => JobSubCategory(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/settings/advertisement-cost") {
+                                return MaterialPageRoute(
+                                    builder: (context) => AdvertisementCost(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/settings/support-info") {
+                                return MaterialPageRoute(
+                                    builder: (context) => SupportInfoManager(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              } else if (settings.name ==
+                                  "/settings/payment-gateway") {
+                                return MaterialPageRoute(
+                                    builder: (context) => PaymentGatewayManager(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              } else {
+                                return MaterialPageRoute(
+                                    builder: (context) => AdminDashboard(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo));
+                              }
+                            },
+                          ))
+                        ],
                       ),
-                      flex: 13,
-                    )
-                  ],
-                ),
+                    ),
+                    flex: 13,
+                  )
+                ],
               ),
-              flex: 4,
-            )
-          ],
-        )
-      ),
+            ),
+            flex: 4,
+          )
+        ],
+      )),
     );
   }
 }

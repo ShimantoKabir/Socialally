@@ -1,7 +1,7 @@
-import 'package:client/constants.dart';
-import 'package:client/models/Feedback.dart';
-import 'package:client/widgets/FeedbackCard.dart';
-import 'package:client/widgets/SectionTitle.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/Feedback.dart';
+import 'package:wengine/widgets/FeedbackCard.dart';
+import 'package:wengine/widgets/SectionTitle.dart';
 import 'package:flutter/material.dart';
 
 class UserFeedback extends StatelessWidget {

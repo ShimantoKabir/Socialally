@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:client/constants.dart';
-import 'package:client/models/FilterCriteria.dart';
-import 'package:client/models/Project.dart';
-import 'package:client/models/ProjectCategory.dart';
-import 'package:client/utilities/Alert.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/FilterCriteria.dart';
+import 'package:wengine/models/Project.dart';
+import 'package:wengine/models/ProjectCategory.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -107,19 +107,35 @@ class AvailableState extends State<Available> {
     return Scaffold(
       appBar: PreferredSize(
         child: Container(
-          padding: EdgeInsets.all(2),
+          padding: EdgeInsets.fromLTRB(0,0,5,0),
           color: Colors.green,
-          child: Center(
-            child: Text(
-              filterBy,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.filter_alt_outlined,
+                  size: 15,
+                  color: Colors.white,
+                ),
+                onPressed: (){
+                  eventHub.fire("redirectToJobFilter",{
+                    "type" : type
+                  });
+                }
               ),
-            ),
+              Text(
+                filterBy,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white
+                ),
+              )
+            ],
           ),
         ),
-        preferredSize: Size.fromHeight(25.0)
+        preferredSize: Size.fromHeight(40.0)
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -449,11 +465,6 @@ class AvailableState extends State<Available> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              IconButton(icon: Icon(Icons.filter_alt_outlined), onPressed: (){
-                eventHub.fire("redirectToJobFilter",{
-                  "type" : type
-                });
-              }),
               Visibility(
                 visible: needToFreezeUi,
                 child: CircularProgressIndicator(

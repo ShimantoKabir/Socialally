@@ -1,4 +1,4 @@
-import 'package:client/constants.dart';
+import 'package:wengine/constants.dart';
 import 'package:flutter/material.dart';
 
 class AboutSectionText extends StatelessWidget {

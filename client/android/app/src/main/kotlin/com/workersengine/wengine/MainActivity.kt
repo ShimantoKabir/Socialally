@@ -1,4 +1,4 @@
-package com.example.client
+package com.workersengine.wengine
 
 import io.flutter.embedding.android.FlutterActivity
 

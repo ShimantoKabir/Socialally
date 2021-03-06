@@ -1,7 +1,7 @@
-import 'package:client/constants.dart';
-import 'package:client/models/Service.dart';
-import 'package:client/widgets/SectionTitle.dart';
-import 'package:client/widgets/ServiceCard.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/models/Service.dart';
+import 'package:wengine/widgets/SectionTitle.dart';
+import 'package:wengine/widgets/ServiceCard.dart';
 import 'package:flutter/material.dart';
 
 class JobSeeker extends StatelessWidget {

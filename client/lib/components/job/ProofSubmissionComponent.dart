@@ -1,12 +1,12 @@
-import 'package:client/models/Project.dart';
-import 'package:client/models/ProofSubmission.dart';
+import 'package:wengine/models/Project.dart';
+import 'package:wengine/models/ProofSubmission.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:client/constants.dart';
-import 'package:client/utilities/Alert.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:universal_io/io.dart';

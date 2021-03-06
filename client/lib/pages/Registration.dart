@@ -1,8 +1,8 @@
-import 'package:client/constants.dart';
-import 'package:client/widgets/WelcomeNavBar.dart';
+import 'package:wengine/constants.dart';
+import 'package:wengine/widgets/WelcomeNavBar.dart';
+import 'package:wengine/utilities/HttpHandler.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:flutter/material.dart';
-import 'package:client/utilities/HttpHandler.dart';
-import 'package:client/utilities/Alert.dart';
 
 class Registration extends StatefulWidget {
   Registration({

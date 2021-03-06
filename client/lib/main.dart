@@ -1,4 +1,4 @@
-import 'package:client/route/RouterGenerator.dart';
+import 'package:wengine/route/RouterGenerator.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

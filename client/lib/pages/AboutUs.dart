@@ -1,4 +1,4 @@
-import 'package:client/widgets/WelcomeNavBar.dart';
+import 'package:wengine/widgets/WelcomeNavBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
