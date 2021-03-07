@@ -35,6 +35,7 @@ Route::get('/users/query', [UserInfoCtl::class, 'readByQuery']);
 // -- ?first-name=jon
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
+Route::get('/users/{id}', [UserInfoCtl::class, 'read']);
 
 // project category
 Route::get('/categories', [ProjectCategoryCtl::class, 'readCategory']);

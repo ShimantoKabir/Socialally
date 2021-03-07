@@ -25,7 +25,8 @@ class UserInfoSeeder extends Seeder
                 "firstName" => "WorkersEngineAi",
                 "quantityOfEarnByRefer" => -1,
                 "referId" => TokenGenerator::generate(),
-                "type" => 2
+                "type" => 2,
+                "userInfoId" => "WE-01-01-00000001"
             ],
             [
                 "id" => 2,
@@ -35,7 +36,8 @@ class UserInfoSeeder extends Seeder
                 "firstName" => "Admin",
                 "quantityOfEarnByRefer" => -1,
                 "referId" => TokenGenerator::generate(),
-                "type" => 2
+                "type" => 2,
+                "userInfoId" => "WE-01-01-00000002"
             ],
             [
                 "id" => 3,
@@ -45,7 +47,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => -1,
                 "referId" => TokenGenerator::generate(),
-                "type" => 2
+                "type" => 2,
+                "userInfoId" => "WE-01-01-00000003"
             ],
             [
                 "id" => 4,
@@ -55,7 +58,8 @@ class UserInfoSeeder extends Seeder
                 "quantityOfEarnByRefer" => -1,
                 "referId" => TokenGenerator::generate(),
                 "isEmailVerified" => true,
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000004"
             ],
             [
                 "id" => 5,
@@ -65,7 +69,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => 10,
                 "referId" => TokenGenerator::generate(),
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000005"
             ],
             [
                 "id" => 6,
@@ -75,7 +80,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => 9,
                 "referId" => TokenGenerator::generate(),
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000006"
             ],
             [
                 "id" => 7,
@@ -85,7 +91,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => 8,
                 "referId" => TokenGenerator::generate(),
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000007"
             ],
             [
                 "id" => 8,
@@ -95,7 +102,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => 7,
                 "referId" => TokenGenerator::generate(),
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000008"
             ],
             [
                 "id" => 9,
@@ -105,7 +113,8 @@ class UserInfoSeeder extends Seeder
                 "isEmailVerified" => true,
                 "quantityOfEarnByRefer" => 5,
                 "referId" => TokenGenerator::generate(),
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000009"
             ],
             [
                 "id" => 10,
@@ -115,7 +124,8 @@ class UserInfoSeeder extends Seeder
                 "quantityOfEarnByRefer" => 6,
                 "referId" => TokenGenerator::generate(),
                 "isEmailVerified" => true,
-                "type" => 1
+                "type" => 1,
+                "userInfoId" => "WE-01-01-00000010"
             ]
         ];
 
@@ -131,7 +141,8 @@ class UserInfoSeeder extends Seeder
                 "firstName" => $val['firstName'],
                 "referId" => $val['referId'],
                 "quantityOfEarnByRefer" => $val['quantityOfEarnByRefer'],
-                "type" => $val['type']
+                "type" => $val['type'],
+                "userInfoId" => $val['userInfoId']
             ]);
         }
     }

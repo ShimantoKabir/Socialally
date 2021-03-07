@@ -1,4 +1,5 @@
 import 'package:wengine/components/NotificationComponent.dart';
+import 'package:wengine/components/Profile.dart';
 import 'package:wengine/components/admin/AdminDashboard.dart';
 import 'package:wengine/components/admin/job/JobManager.dart';
 import 'package:wengine/components/admin/job/category/JobCategory.dart';
@@ -67,6 +68,14 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
         }
       }
     });
+
+    eventHub.on("redirectToProfile", (dynamic data) {
+      setState(() {
+        userInfo = data;
+        userNavigatorKey.currentState.pushNamed("/user/profile");
+      });
+    });
+
   }
 
   @override
@@ -98,139 +107,148 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
       ),
       body: SafeArea(
           child: Row(
-        children: [
-          // side menu bar
-          Visibility(
-              child: DashboardLeftNavigation(
-                  positionType: 2,
-                  eventHub: eventHub,
-                  treeViewController: treeViewController,
-                  userNavigatorKey: userNavigatorKey),
-              visible: width > 960 && isSideNavOpen),
-          // body with top menu bar, title and body
-          Expanded(
-            child: Container(
-              child: Column(
-                children: [
-                  // top menu bar
-                  DashboardTopNavigation(
-                      type: 2,
-                      eventHub: eventHub,
-                      userNavigatorKey: userNavigatorKey,
-                      totalUnseenNotification:
-                          userInfo["totalUnseenNotification"],
-                      userInfo: userInfo),
-                  // component tile
-                  Container(
-                      height: 50,
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.all(5),
-                      color: Colors.black12,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
-                              icon: Icon(Icons.arrow_back_ios),
-                              onPressed: () {
-                                if (userNavigatorKey.currentState.canPop()) {
-                                  userNavigatorKey.currentState.pop();
-                                }
-                              }),
-                          Text(
-                            viewTitle,
-                            style: TextStyle(fontSize: 20),
-                          )
-                        ],
-                      )),
-                  // component body
-                  Expanded(
-                    child: Container(
-                      child: Row(
-                        children: [
-                          Expanded(
+          children: [
+            // side menu bar
+            Visibility(
+                child: DashboardLeftNavigation(
+                    positionType: 2,
+                    eventHub: eventHub,
+                    treeViewController: treeViewController,
+                    userNavigatorKey: userNavigatorKey),
+                visible: width > 960 && isSideNavOpen),
+            // body with top menu bar, title and body
+            Expanded(
+              child: Container(
+                child: Column(
+                  children: [
+                    // top menu bar
+                    DashboardTopNavigation(
+                        type: 2,
+                        eventHub: eventHub,
+                        userNavigatorKey: userNavigatorKey,
+                        totalUnseenNotification:
+                            userInfo["totalUnseenNotification"],
+                        userInfo: userInfo),
+                    // component tile
+                    Container(
+                        height: 50,
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.all(5),
+                        color: Colors.black12,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.arrow_back_ios),
+                                onPressed: () {
+                                  if (userNavigatorKey.currentState.canPop()) {
+                                    userNavigatorKey.currentState.pop();
+                                  }
+                                }),
+                            Text(
+                              viewTitle,
+                              style: TextStyle(fontSize: 20),
+                            )
+                          ],
+                        )),
+                    // component body
+                    Expanded(
+                      child: Container(
+                        child: Row(
+                          children: [
+                            Expanded(
                               child: Navigator(
-                            key: userNavigatorKey,
-                            onGenerateRoute: (settings) {
-                              if (settings.name ==
-                                  "/transactions/requisition") {
-                                return MaterialPageRoute(
-                                    builder: (context) => Requisition(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/admins/notifications") {
-                                return MaterialPageRoute(
-                                    builder: (context) => NotificationComponent(
-                                          eventHub: eventHub,
-                                          userInfo: userInfo,
-                                          type: 2,
-                                        ));
-                              } else if (settings.name ==
-                                  "/notifications/send") {
-                                return MaterialPageRoute(
-                                    builder: (context) => NotificationSender(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name == "/job/approve") {
-                                return MaterialPageRoute(
-                                    builder: (context) => JobManager(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name == "/settings/general") {
-                                return MaterialPageRoute(
-                                    builder: (context) => General(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/categories/create") {
-                                return MaterialPageRoute(
-                                    builder: (context) => JobCategory(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/categories/create-sub-category") {
-                                return MaterialPageRoute(
-                                    builder: (context) => JobSubCategory(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/settings/advertisement-cost") {
-                                return MaterialPageRoute(
-                                    builder: (context) => AdvertisementCost(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/settings/support-info") {
-                                return MaterialPageRoute(
-                                    builder: (context) => SupportInfoManager(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else if (settings.name ==
-                                  "/settings/payment-gateway") {
-                                return MaterialPageRoute(
-                                    builder: (context) => PaymentGatewayManager(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              } else {
-                                return MaterialPageRoute(
-                                    builder: (context) => AdminDashboard(
-                                        eventHub: eventHub,
-                                        userInfo: userInfo));
-                              }
-                            },
-                          ))
-                        ],
+                                key: userNavigatorKey,
+                                onGenerateRoute: (settings) {
+                                  if (settings.name ==
+                                      "/transactions/requisition") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => Requisition(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/admins/notifications") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => NotificationComponent(
+                                              eventHub: eventHub,
+                                              userInfo: userInfo,
+                                              type: 2,
+                                            ));
+                                  } else if (settings.name ==
+                                      "/notifications/send") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => NotificationSender(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name == "/job/approve") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => JobManager(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name == "/settings/general") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => General(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/categories/create") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => JobCategory(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/categories/create-sub-category") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => JobSubCategory(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/settings/advertisement-cost") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => AdvertisementCost(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/settings/support-info") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => SupportInfoManager(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  } else if (settings.name ==
+                                      "/settings/payment-gateway") {
+                                    return MaterialPageRoute(
+                                        builder: (context) => PaymentGatewayManager(
+                                            eventHub: eventHub,
+                                            userInfo: userInfo));
+                                  }else if (settings.name ==
+                                      "/user/profile") {
+                                    return MaterialPageRoute( builder: (context) => Profile(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo,
+                                      type: 2
+                                    ));
+                                  } else {
+                                    return MaterialPageRoute(builder: (context) => AdminDashboard(
+                                      eventHub: eventHub,
+                                      userInfo: userInfo
+                                    ));
+                                  }
+                                },
+                              )
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    flex: 13,
-                  )
-                ],
+                      flex: 13,
+                    )
+                  ],
+                ),
               ),
-            ),
-            flex: 4,
-          )
-        ],
-      )),
+              flex: 4,
+            )
+          ],
+        )
+      ),
     );
   }
 }

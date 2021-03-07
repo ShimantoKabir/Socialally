@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
 use App\Utilities\AppConstantReader;
 use App\Utilities\PHPMailSender;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Storage;
 
 class UserRpo
@@ -94,7 +95,6 @@ class UserRpo
                 $userInfo->password = sha1($rUserInfo['password']);
                 $userInfo->ip = $request->ip();
                 $userInfo->token = $token;
-                $userInfo->isEmailVerified = true;
                 $userInfo->type = $rUserInfo['type'];
                 $userInfo->referId = $referId;
                 if ($rUserInfo['referredBy'] != "empty") {
@@ -102,6 +102,8 @@ class UserRpo
                 }
                 $userInfo->quantityOfEarnByRefer = $quantityOfEarnByRefer;
                 $userInfo->save();
+
+                self::addUserInfoId($userInfo->id);
 
                 $mailData = array(
                     'email' => $userInfo['email'],
@@ -216,7 +218,8 @@ class UserRpo
                         'wantNewsLetterNotification',
                         'imageUrl',
                         'referId',
-                        'type'
+                        'type',
+                        'userInfoId'
                     )
                     ->first();
 
@@ -240,6 +243,7 @@ class UserRpo
                         'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
                         'imageUrl' => $userInfo['imageUrl'],
                         'type' => $userInfo['type'],
+                        'userInfoId' => $userInfo['userInfoId'],
                         'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
                         'paymentGateways' => PaymentGateway::all(),
                         'takePerPound' => $appConstants["takePerPound"],
@@ -456,5 +460,55 @@ class UserRpo
         }
 
         return $res;
+    }
+
+    public function read(Request $request, $id)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            $res['userInfo'] = UserInfo::select(
+                "id",
+                "imageUrl",
+                "email",
+                "firstName",
+                "lastName",
+                "contactNumber",
+                "nationalId",
+                "passportId",
+                "agreedTermsAndCondition",
+                "wantNewsLetterNotification",
+                "regionName",
+                "countryName",
+                "userInfoId"
+            )->where('id', $id)->first();
+
+            $res['msg'] = "User info fetched successfully!";
+            $res['code'] = 200;
+        } catch (Exception $e) {
+            $res['code'] = 404;
+            $res['msg'] = $e->getMessage();
+        }
+
+        return $res;
+    }
+
+    public static function addUserInfoId($id)
+    {
+
+        $uid = str_pad($id, 8, "0", STR_PAD_LEFT);
+        $monthYear = date("m-y");
+        $companyCode = "WE";
+
+        $userInfoId = $companyCode . "-" . $monthYear . "-" . $uid;
+
+        UserInfo::where("id", $id)->update([
+            "userInfoId" => $userInfoId
+        ]);
     }
 }

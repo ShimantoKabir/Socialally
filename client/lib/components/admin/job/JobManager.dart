@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:universal_html/html.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/models/Project.dart';
 import 'package:wengine/utilities/Alert.dart';
@@ -47,6 +48,7 @@ class JobManagerState extends State<JobManager> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         body: FutureBuilder(
           future: futureProjects,
@@ -73,6 +75,9 @@ class JobManagerState extends State<JobManager> {
                           columns: <DataColumn>[
                             DataColumn(
                               label: Text('SL'),
+                            ),
+                            DataColumn(
+                              label: Text("Published By"),
                             ),
                             DataColumn(
                               label: Text("Title"),
@@ -111,6 +116,7 @@ class JobManagerState extends State<JobManager> {
                               },
                               cells: [
                                 DataCell(Text("${index+1}")),
+                                DataCell(Text("${projects[index].publisherName}")),
                                 DataCell(Text("${projects[index].title}")),
                                 DataCell(Text("${projects[index].regionName}")),
                                 DataCell(Text("${projects[index].countryName}")),
@@ -127,63 +133,77 @@ class JobManagerState extends State<JobManager> {
                       flex: 7
                     ),
                     Visibility(
-                        visible: project != null && project.status == "Pending",
-                        child: Expanded(
+                      visible: project != null && project.status == "Pending",
+                      child: Expanded(
+                        child: SingleChildScrollView(
                           child: Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                      color: Colors.grey
+                            height: height,
+                            child: Container(
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                        color: Colors.grey
+                                    ),
+                                  )
+                              ),
+                              child: project == null ? Container() : Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Title: ${project.title}"),
+                                  SizedBox(height: 10),
+                                  Text("Region: ${project.regionName}"),
+                                  SizedBox(height: 10),
+                                  Text("Country: ${project.countryName}"),
+                                  SizedBox(height: 10),
+                                  Text("Worker Needed: ${project.workerNeeded}"),
+                                  SizedBox(height: 10),
+                                  Text("Each Worker Earn: ${project.eachWorkerEarn}"),
+                                  SizedBox(height: 10),
+                                  SizedBox(height: 10),
+                                  Visibility(
+                                    child: OutlineButton(
+                                      onPressed: (){
+                                        onUpdate(context,"Approved",projects);
+                                      },
+                                      child: Text("Approved"),
+                                    ),
+                                    visible: project.status == "Pending",
                                   ),
-                                )
-                            ),
-                            child: project == null ? Container() : Column(
-                              children: [
-                                Text("Title: ${project.title}"),
-                                SizedBox(height: 10),
-                                Text("Region: ${project.regionName}"),
-                                SizedBox(height: 10),
-                                Text("Country: ${project.countryName}"),
-                                SizedBox(height: 10),
-                                Text("Worker Needed: ${project.workerNeeded}"),
-                                SizedBox(height: 10),
-                                Text("Each Worker Earn: ${project.eachWorkerEarn}"),
-                                SizedBox(height: 10),
-                                SizedBox(height: 10),
-                                Visibility(
-                                  child: OutlineButton(
+                                  SizedBox(height: 10),
+                                  Visibility(
+                                    child: OutlineButton(
+                                      onPressed: (){
+                                        onUpdate(context,"Declined",projects);
+                                      },
+                                      child: Text("Declined"),
+                                    ),
+                                    visible: project.status == "Pending",
+                                  ),
+                                  SizedBox(height: 10),
+                                  OutlineButton(
                                     onPressed: (){
-                                      onUpdate(context,"Approved",projects);
+                                      setState(() {
+                                        project = null;
+                                      });
                                     },
-                                    child: Text("Approved"),
+                                    child: Text("Close"),
                                   ),
-                                  visible: project.status == "Pending",
-                                ),
-                                SizedBox(height: 10),
-                                Visibility(
-                                  child: OutlineButton(
+                                  SizedBox(height: 10),
+                                  OutlineButton(
                                     onPressed: (){
-                                      onUpdate(context,"Declined",projects);
+                                      getUserInfoById(projects[listPosition].publishedBy);
                                     },
-                                    child: Text("Declined"),
-                                  ),
-                                  visible: project.status == "Pending",
-                                ),
-                                SizedBox(height: 10),
-                                OutlineButton(
-                                  onPressed: (){
-                                    setState(() {
-                                      project = null;
-                                    });
-                                  },
-                                  child: Text("Close"),
-                                )
-                              ],
+                                    child: Text("See Publisher Profile"),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                          flex: 3
-                        )
+                        ),
+                        flex: 3,
+                      )
                     )
                   ],
                 );
@@ -285,7 +305,8 @@ class JobManagerState extends State<JobManager> {
           eachWorkerEarn: value['eachWorkerEarn'],
           status: value['status'],
           createdAt: value['createdAt'],
-          publishedBy: value['publishedBy']
+          publishedBy: value['publishedBy'],
+          publisherName: value['firstName']
         ));
       });
     }
@@ -339,6 +360,16 @@ class JobManagerState extends State<JobManager> {
       Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
     });
 
+  }
+
+  Future<void> getUserInfoById(int publishedBy) async {
+    String url = baseUrl + "/users/$publishedBy";
+    var response = await get(url);
+    if (response.statusCode == 200) {
+      var res = jsonDecode(response.body);
+      print("res ${res['userInfo']}");
+      eventHub.fire("redirectToProfile",res['userInfo']);
+    }
   }
 
 }

@@ -12,20 +12,38 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
-  Profile({Key key, this.eventHub, this.userInfo}) : super(key: key);
+  Profile({
+    Key key,
+    this.eventHub,
+    this.userInfo,
+    this.type
+  }) : super(key: key);
+
   final EventHub eventHub;
   final userInfo;
+  final type;
 
   @override
   ProfileState createState() =>
-      ProfileState(key: key, eventHub: eventHub, userInfo: userInfo);
+  ProfileState(
+    key: key,
+    eventHub: eventHub,
+    userInfo: userInfo,
+    type: type
+  );
 }
 
 class ProfileState extends State<Profile> {
   EventHub eventHub;
   var userInfo;
+  int type;
 
-  ProfileState({Key key, this.eventHub, this.userInfo});
+  ProfileState({
+    Key key,
+    this.eventHub,
+    this.userInfo,
+    this.type
+  });
 
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
@@ -34,6 +52,7 @@ class ProfileState extends State<Profile> {
   TextEditingController contactNumberCtl = new TextEditingController();
   TextEditingController nationalIdCtl = new TextEditingController();
   TextEditingController passportIdCtl = new TextEditingController();
+  TextEditingController userInfoIdCtl = new TextEditingController();
   String regionName;
   String countryName;
   SharedPreferences preferences;
@@ -50,6 +69,7 @@ class ProfileState extends State<Profile> {
 
     eventHub.fire("viewTitle", "Profile");
 
+    userInfoIdCtl.text = userInfo['userInfoId'];
     emailCtl.text = userInfo['email'];
     firstNameCtl.text = userInfo['firstName'];
     lastNameCtl.text = userInfo['lastName'];
@@ -154,6 +174,30 @@ class ProfileState extends State<Profile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
+                        "ID",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                        readOnly: true,
+                        controller: userInfoIdCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
                         "Email",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
@@ -161,12 +205,14 @@ class ProfileState extends State<Profile> {
                         height: 10,
                       ),
                       TextField(
-                          readOnly: true,
-                          controller: emailCtl,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        readOnly: true,
+                        controller: emailCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -181,11 +227,13 @@ class ProfileState extends State<Profile> {
                         height: 10,
                       ),
                       TextField(
-                          controller: lastNameCtl,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true))
+                        controller: lastNameCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -222,12 +270,12 @@ class ProfileState extends State<Profile> {
                         height: 10,
                       ),
                       TextField(
-                          controller: nationalIdCtl,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Color(0xfff3f3f4),
-                              filled: true
-                          )
+                        controller: nationalIdCtl,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Color(0xfff3f3f4),
+                          filled: true
+                        )
                       )
                     ],
                   ),
@@ -350,25 +398,28 @@ class ProfileState extends State<Profile> {
                 SizedBox(
                   height: 20,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlineButton(
-                      onPressed: () {
-                        bool isInputVerified = verifyInput(context);
-                        if (isInputVerified) {
-                          onSave(context);
-                        }
-                      },
-                      child: Text("Save")
-                    ),
-                    OutlineButton(
-                      onPressed: () {
-                        onReset(context);
-                      },
-                      child: Text("Reset")
-                    )
-                  ],
+                Visibility(
+                  visible: type == null ? true : false,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlineButton(
+                          onPressed: () {
+                            bool isInputVerified = verifyInput(context);
+                            if (isInputVerified) {
+                              onSave(context);
+                            }
+                          },
+                          child: Text("Save")
+                      ),
+                      OutlineButton(
+                          onPressed: () {
+                            onReset(context);
+                          },
+                          child: Text("Reset")
+                      )
+                    ],
+                  )
                 )
               ]
             )

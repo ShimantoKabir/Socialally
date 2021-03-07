@@ -539,7 +539,18 @@ class ProjectRpo
                 $parPage = $request->query('par-page');
                 $pageIndex = $request->query('page-index');
 
-                $sql = "SELECT * FROM Projects WHERE status = '" . $status . "' ORDER BY id DESC LIMIT " . $pageIndex . ", " . $parPage;
+                $sql = "SELECT 
+                            p.*, 
+                            IFNULL(u.firstName, u.email) AS firstName 
+                        FROM 
+                            Projects AS p 
+                            INNER JOIN UserInfos AS u ON u.id = p.publishedBy 
+                        WHERE 
+                            p.status = '" . $status . "'
+                        ORDER BY 
+                            id DESC 
+                        LIMIT 
+                            " . $pageIndex . ", " . $parPage;
 
                 $res['projects'] = DB::select(DB::raw($sql));
                 $res['msg'] = "Job fetched successfully!";

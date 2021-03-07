@@ -1,4 +1,3 @@
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:wengine/components/NotificationComponent.dart';
 import 'package:wengine/components/ReferAndEarn.dart';
 import 'package:wengine/components/SupportInfoPresenter.dart';

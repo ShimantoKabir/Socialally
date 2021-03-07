@@ -52,7 +52,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
       eventHub.fire("viewTitle","Advertised Any");
     }
     futureAdvertisedAny = fetchAdvertisedAny();
-    alertText = "No operation running.";
+    alertText = "No operation running!";
     alertIcon = Container();
     needToFreezeUi = false;
     pageIndex = 0;
@@ -90,18 +90,18 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     );
 
     nextButton = IconButton(
-        icon: Icon(
-            Icons.arrow_forward_ios,
-            size: 15
-        ),
-        onPressed: (){
-          pageIndex = pageIndex + perPage;
-          needToFreezeUi = true;
-          pageNumber++;
-          setState(() {
-            futureAdvertisedAny = fetchAdvertisedAny();
-          });
-        }
+      icon: Icon(
+        Icons.arrow_forward_ios,
+        size: 15
+      ),
+      onPressed: (){
+        pageIndex = pageIndex + perPage;
+        needToFreezeUi = true;
+        pageNumber++;
+        setState(() {
+          futureAdvertisedAny = fetchAdvertisedAny();
+        });
+      }
     );
 
     previousButton = IconButton(

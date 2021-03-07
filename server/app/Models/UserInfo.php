@@ -17,9 +17,9 @@ class UserInfo extends Model
         'imageUrl',
         'password',
         'lastName',
-        'regionId',
+        'regionName',
         'firstName',
-        'countryId',
+        'countryName',
         'contactNumber',
         'nationalId',
         'passportId',
@@ -29,10 +29,11 @@ class UserInfo extends Model
         'accountNumber',
         'type',
         'referId',
+        'userInfoId',
         'referredBy',
         'quantityOfEarnByRefer',
         'ip',
         'modifiedBy',
-        'createdAt',
+        'createdAt'
     ];
 }
