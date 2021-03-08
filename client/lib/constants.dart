@@ -171,17 +171,17 @@ List<Node> userDashboardMenus = [
 
 List<Node> adminDashboardMenus = [
   Node(
-    label: 'Dashboard',
+    label: ' Dashboard',
     key: '/admin/dashboard',
     icon: NodeIcon.fromIconData(Icons.dashboard)
   ),
   Node(
-    label: 'Setting',
+    label: ' Setting',
     key: '/settings',
     icon: NodeIcon.fromIconData(Icons.settings),
     children: [
       Node(
-          label: 'General',
+          label: ' General',
           key: '/settings/general',
           icon: NodeIcon.fromIconData(Icons.settings_applications_rounded)
       ),
@@ -203,43 +203,48 @@ List<Node> adminDashboardMenus = [
     ],
   ),
   Node(
-    label: 'Transaction',
+    label: ' Transaction',
     key: '/transaction',
     icon: NodeIcon.fromIconData(Icons.monetization_on_sharp),
     children: [
       Node(
-        label: 'Requisition',
+        label: ' Requisition',
         key: '/transactions/requisition',
         icon: NodeIcon.fromIconData(Icons.request_page)
       )
     ],
   ),
   Node(
-      label: 'Manage Job Category',
+      label: ' Manage Job Category',
       key: '/categories/manage',
       icon: NodeIcon.fromIconData(Icons.category),
       children: [
         Node(
-            label: 'Create Category',
+            label: ' Create Category',
             key: '/categories/create',
             icon: NodeIcon.fromIconData(Icons.workspaces_filled)
         ),
         Node(
-            label: 'Create Sub Category',
+            label: ' Create Sub Category',
             key: '/categories/create-sub-category',
             icon: NodeIcon.fromIconData(Icons.bar_chart)
         )
       ]
   ),
   Node(
-      label: 'Send Notification',
+      label: ' Send Notification',
       key: '/notifications/send',
       icon: NodeIcon.fromIconData(Icons.notifications_active)
   ),
   Node(
-      label: 'Approve Job',
+      label: ' Approve Job',
       key: '/job/approve',
       icon: NodeIcon.fromIconData(Icons.done_all)
+  ),
+  Node(
+      label: ' Manage User',
+      key: '/user/manage',
+      icon: NodeIcon.fromIconData(Icons.people_outline)
   )
 ];
 

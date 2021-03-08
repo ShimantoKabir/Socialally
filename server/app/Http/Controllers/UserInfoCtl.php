@@ -59,8 +59,18 @@ class UserInfoCtl extends Controller
         return $this->userRpo->readByQuery($request);
     }
 
-    public function read(Request $request, $id)
+    public function readById(Request $request, $id)
     {
-        return $this->userRpo->read($request, $id);
+        return $this->userRpo->readById($request, $id);
+    }
+
+    public function changeStatus(Request $request)
+    {
+        return $this->userRpo->changeStatus($request);
+    }
+
+    public function read(Request $request)
+    {
+        return $this->userRpo->read($request);
     }
 }

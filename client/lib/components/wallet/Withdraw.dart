@@ -285,6 +285,9 @@ class WithdrawState extends State<Withdraw> {
     }  else if(amountDollarCtl.text.isEmpty){
       errMsg = "Please give your deposit amount!";
       isInputVerified = false;
+    }else if(userInfo['minimumWithdraw'] > double.tryParse(amountDollarCtl.text)){
+      errMsg = "Minimum withdraw ${userInfo['minimumWithdraw'].toString()} GBP!";
+      isInputVerified = false;
     }
 
     if (!isInputVerified) {

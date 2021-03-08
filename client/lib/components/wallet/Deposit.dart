@@ -49,10 +49,10 @@ class DepositState extends State<Deposit> {
     eventHub.fire("viewTitle", "Deposit");
     paymentGatewayDropDownList.clear();
     paymentGatewayDropDownList.add(
-        new DropdownMenuItem<String>(
-            value: "Select",
-            child: Text("Select")
-        )
+      new DropdownMenuItem<String>(
+        value: "Select",
+        child: Text("Select")
+      )
     );
     paymentGatewayName = "Select";
     paymentGateways = userInfo['paymentGateways'];
@@ -316,6 +316,9 @@ class DepositState extends State<Deposit> {
       isInputVerified = false;
     } else if(amountDollarCtl.text.isEmpty){
       errMsg = "Please give your deposit amount!";
+      isInputVerified = false;
+    }else if(userInfo['minimumDeposit'] > double.tryParse(amountDollarCtl.text)){
+      errMsg = "Minimum deposit ${userInfo['minimumDeposit'].toString()} GBP!";
       isInputVerified = false;
     }
 

@@ -198,73 +198,87 @@ class UserRpo
         DB::beginTransaction();
         try {
 
-            $isEmailVerified = UserInfo::where('email', $rUserInfo['email'])
-                ->where('isEmailVerified', true)
+            $isUserExists = UserInfo::where('email', $rUserInfo['email'])
+                ->where('password', sha1($rUserInfo['password']))
                 ->exists();
 
-            if ($isEmailVerified) {
+            if ($isUserExists) {
 
-                $userInfo = UserInfo::where('email', $rUserInfo['email'])
-                    ->where('password', sha1($rUserInfo['password']))
-                    ->select(
-                        'id',
-                        'email',
-                        'firstName',
-                        'lastName',
-                        'regionName',
-                        'countryName',
-                        'contactNumber',
-                        'agreedTermsAndCondition',
-                        'wantNewsLetterNotification',
-                        'imageUrl',
-                        'referId',
-                        'type',
-                        'userInfoId'
-                    )
-                    ->first();
+                $isEmailVerified = UserInfo::where('email', $rUserInfo['email'])
+                    ->where('isEmailVerified', true)
+                    ->exists();
 
-                if (!is_null($userInfo)) {
+                if ($isEmailVerified) {
 
-                    $referrerLink = env('APP_URL') . "#/user/registration/" . $userInfo['referId'];
+                    $userInfo = UserInfo::where('email', $rUserInfo['email'])
+                        ->where('password', sha1($rUserInfo['password']))
+                        ->select(
+                            'id',
+                            'email',
+                            'firstName',
+                            'lastName',
+                            'regionName',
+                            'countryName',
+                            'contactNumber',
+                            'agreedTermsAndCondition',
+                            'wantNewsLetterNotification',
+                            'imageUrl',
+                            'referId',
+                            'type',
+                            'userInfoId',
+                            'isActive'
+                        )
+                        ->first();
 
-                    $appConstants = AppConstantReader::read();
+                    if ($userInfo['isActive'] == 1) {
 
-                    $res['userInfo'] = [
-                        'id' => $userInfo['id'],
-                        'email' => $userInfo['email'],
-                        'firstName' => $userInfo['firstName'],
-                        'lastName' => $userInfo['lastName'],
-                        'regionName' => $userInfo['regionName'],
-                        'countryName' => $userInfo['countryName'],
-                        'contactNumber' => $userInfo['contactNumber'],
-                        'referId' => $userInfo['referId'],
-                        'referrerLink' => $referrerLink,
-                        'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
-                        'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
-                        'imageUrl' => $userInfo['imageUrl'],
-                        'type' => $userInfo['type'],
-                        'userInfoId' => $userInfo['userInfoId'],
-                        'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
-                        'paymentGateways' => PaymentGateway::all(),
-                        'takePerPound' => $appConstants["takePerPound"],
-                        'proofSubmissionStatus' => $appConstants["proofSubmissionStatus"],
-                        'adCostPlanList' => $appConstants['adCostPlanList'],
-                        "jobPostingCharge" =>  $appConstants['jobPostingCharge'],
-                        "supportInfoList" =>  $appConstants['supportInfoList'],
-                        "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
-                        "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
-                        "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),
-                        "projectCategories" => ProjectCategory::select('categoryId', 'categoryName')->distinct('categoryId')->get()
-                    ];
+                        $referrerLink = env('APP_URL') . "#/user/registration/" . $userInfo['referId'];
 
-                    $res['msg'] = "Login successful!";
-                    $res['code'] = 200;
+                        $appConstants = AppConstantReader::read();
+
+                        $res['userInfo'] = [
+                            'id' => $userInfo['id'],
+                            'email' => $userInfo['email'],
+                            'firstName' => $userInfo['firstName'],
+                            'lastName' => $userInfo['lastName'],
+                            'regionName' => $userInfo['regionName'],
+                            'countryName' => $userInfo['countryName'],
+                            'contactNumber' => $userInfo['contactNumber'],
+                            'referId' => $userInfo['referId'],
+                            'referrerLink' => $referrerLink,
+                            'agreedTermsAndCondition' => $userInfo['agreedTermsAndCondition'],
+                            'wantNewsLetterNotification' => $userInfo['wantNewsLetterNotification'],
+                            'imageUrl' => $userInfo['imageUrl'],
+                            'type' => $userInfo['type'],
+                            'userInfoId' => $userInfo['userInfoId'],
+                            'profileCompleted' => self::calculateProfileCompletionPercentage($userInfo),
+                            'paymentGateways' => PaymentGateway::all(),
+                            'takePerPound' => $appConstants["takePerPound"],
+                            'proofSubmissionStatus' => $appConstants["proofSubmissionStatus"],
+                            'adCostPlanList' => $appConstants['adCostPlanList'],
+                            "jobPostingCharge" =>  $appConstants['jobPostingCharge'],
+                            "supportInfoList" =>  $appConstants['supportInfoList'],
+                            "minimumWithdraw" =>  $appConstants['minimumWithdraw'],
+                            "minimumDeposit" =>  $appConstants['minimumDeposit'],
+                            "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
+                            "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
+                            "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),
+                            "projectCategories" => ProjectCategory::select('categoryId', 'categoryName')->distinct('categoryId')->get()
+                        ];
+
+                        $res['msg'] = "Login successful!";
+                        $res['code'] = 200;
+                    } else {
+
+                        $res['msg'] = "Your account has been deactivated!";
+                        $res['code'] = 404;
+                    }
                 } else {
-                    $res['msg'] = "This email and password did not with any account!";
+                    $res['msg'] = "Please verify your email address first!";
                     $res['code'] = 404;
                 }
             } else {
-                $res['msg'] = "Please verify your email address first!";
+                $res['msg'] = "Your given credential did not match with any account!";
                 $res['code'] = 404;
             }
 
@@ -462,7 +476,7 @@ class UserRpo
         return $res;
     }
 
-    public function read(Request $request, $id)
+    public function readById(Request $request, $id)
     {
 
         $res = [
@@ -510,5 +524,93 @@ class UserRpo
         UserInfo::where("id", $id)->update([
             "userInfoId" => $userInfoId
         ]);
+    }
+
+
+    public static function changeStatus(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rUserInfo = $request->userInfo;
+        DB::beginTransaction();
+        try {
+
+            UserInfo::where("id", $rUserInfo["id"])->update([
+                "isActive" => $rUserInfo['isActive']
+            ]);
+
+            $res['msg'] = "User status change successfully!";
+            $res['code'] = 200;
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200);
+    }
+
+    public static function read(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            if (!$request->has('par-page')) {
+                $res['msg'] = "Per page required!";
+                $res['code'] = 404;
+            } else if (!$request->has('page-index')) {
+                $res['msg'] = "Page index required!";
+                $res['code'] = 404;
+            } else if (!$request->has('type')) {
+                $res['msg'] = "User type required!";
+                $res['code'] = 404;
+            } else {
+
+                $perPage = $request->query('par-page');
+                $pageIndex = $request->query('page-index');
+                $type = $request->query('type');
+
+                $sql = "SELECT 
+                            id,
+                            IFNULL(email,'N/A') AS email,
+                            imageUrl,
+                            IFNULL(firstName,'N/A') AS firstName,
+                            IFNULL(lastName,'N/A') AS lastName,
+                            IFNULL(regionName,'N/A') AS regionName,
+                            IFNULL(countryName,'N/A') AS countryName,
+                            IF(agreedTermsAndCondition = 1,'Agreed','Disagreed') AS agreedTermsAndCondition,
+                            IF(wantNewsLetterNotification = 1,'Yes','No') AS wantNewsLetterNotification,
+                            isActive
+                        FROM 
+                            UserInfos 
+                        WHERE 
+                            type = " . $type . " 
+                        ORDER BY 
+                            id DESC 
+                        LIMIT 
+                            " . $pageIndex . ", " . $perPage;
+
+                $res["userInfos"] = DB::select(DB::raw($sql));
+
+                $res['msg'] = "User info fetched successfully!";
+                $res['code'] = 200;
+            }
+        } catch (Exception $e) {
+            $res['code'] = 404;
+            $res['msg'] = $e->getMessage();
+        }
+
+        return $res;
     }
 }

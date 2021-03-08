@@ -35,7 +35,10 @@ Route::get('/users/query', [UserInfoCtl::class, 'readByQuery']);
 // -- ?first-name=jon
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
-Route::get('/users/{id}', [UserInfoCtl::class, 'read']);
+Route::get('/users/{id}', [UserInfoCtl::class, 'readById']);
+Route::get('/users/paginate/query', [UserInfoCtl::class, 'read']);
+// -- ?par-page=5&page-index=1
+Route::put('/users/status', [UserInfoCtl::class, 'changeStatus']);
 
 // project category
 Route::get('/categories', [ProjectCategoryCtl::class, 'readCategory']);

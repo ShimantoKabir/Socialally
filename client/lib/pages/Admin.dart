@@ -10,6 +10,7 @@ import 'package:wengine/components/admin/setting/General.dart';
 import 'package:wengine/components/admin/setting/PaymentGatewayManager.dart';
 import 'package:wengine/components/admin/setting/SupportInfoManager.dart';
 import 'package:wengine/components/admin/transaction/Requisition.dart';
+import 'package:wengine/components/admin/user/UserManager.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/widgets/DashboardLeftNavigation.dart';
 import 'package:wengine/widgets/DashboardTopNavigation.dart';
@@ -226,6 +227,12 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                       eventHub: eventHub,
                                       userInfo: userInfo,
                                       type: 2
+                                    ));
+                                  }else if (settings.name ==
+                                      "/user/manage") {
+                                    return MaterialPageRoute( builder: (context) => UserManager(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
                                     ));
                                   } else {
                                     return MaterialPageRoute(builder: (context) => AdminDashboard(

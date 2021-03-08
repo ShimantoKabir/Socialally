@@ -26,6 +26,7 @@ class UserInfos extends Migration
             $table->string('contactNumber')->nullable();
             $table->string('nationalId')->nullable();
             $table->string('passportId')->nullable();
+            $table->boolean('isActive')->default(true);
             $table->boolean('isEmailVerified')->default(false);
             $table->boolean('agreedTermsAndCondition')->default(false);
             $table->boolean('wantNewsLetterNotification')->default(false);
