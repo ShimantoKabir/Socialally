@@ -60,7 +60,6 @@ class AvailableState extends State<Available> {
   int pageIndex = 0;
   int perPage = 5;
   int pageNumber = 0;
-  ProjectCategory defaultProjectCategory;
   String filterBy;
 
   @override

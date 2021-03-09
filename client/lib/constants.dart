@@ -108,6 +108,24 @@ List<Node> userDashboardMenus = [
       )
     ]
   ),
+  Node(
+    label: 'Advertisement',
+    key: '/advertisement',
+    icon: NodeIcon.fromIconData(Icons.account_tree),
+    children: [
+      Node(
+        label: 'Post',
+        key: '/advertisement/any',
+        icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
+      ),
+      Node(
+        label: 'My Advertisement',
+        key: '/advertisement/advertised/any',
+        icon: NodeIcon.fromIconData(Icons.mobile_friendly),
+      )
+    ]
+  ),
+
   // Node(
   //   label: 'Advertisement',
   //   key: '/advertisement',
@@ -152,11 +170,11 @@ List<Node> userDashboardMenus = [
         ),
       ]
   ),
-  Node(
-      label: 'Advertisement',
-      key: '/advertisement/any',
-      icon: NodeIcon.fromIconData(Icons.account_tree)
-  ),
+  // Node(
+  //     label: 'Advertisement',
+  //     key: '/advertisement/any',
+  //     icon: NodeIcon.fromIconData(Icons.account_tree)
+  // ),
   Node(
     label: 'Refer & Earn',
     key: '/refer-and-earn',

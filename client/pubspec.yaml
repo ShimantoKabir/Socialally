@@ -37,6 +37,8 @@ dependencies:
   scrollable_positioned_list: ^0.1.10
   enhanced_future_builder: ^1.0.3
   flutter_phoenix: "^0.1.0"
+  fl_chart: ^0.12.0
+  font_awesome_flutter: ^8.11.0
 
 dev_dependencies:
   flutter_test:

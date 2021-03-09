@@ -77,12 +77,12 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
       onPressed: (){
         scrollController.animateTo(
           scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 1500),
+          duration: Duration(milliseconds: 10000),
           curve: Curves.ease
         ).whenComplete((){
           scrollController.animateTo(
             scrollController.position.minScrollExtent,
-            duration: Duration(milliseconds: 1500),
+            duration: Duration(milliseconds: 10000),
             curve: Curves.ease
           );
         });
@@ -129,7 +129,6 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
          scrollButton.onPressed();
        }
     });
-
   }
 
   @override
@@ -163,41 +162,44 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                   });
                   return Card(
                     clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.fromLTRB(10,5,10,5),
-                          child: Text(
-                            advertisements[index].title,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15
-                            ),
-                          ),
-                          decoration: headingDecoration(),
-                        ),
-                        SizedBox(height: 5),
-                        InkWell(
-                          child: CachedNetworkImage(
-                            width: 300,
-                            height: 190,
-                            imageUrl: advertisements[index].bannerImageUrl,
-                            placeholder: (context, url) => Center(
-                              child: Padding(
-                                child: CircularProgressIndicator(),
-                                padding: EdgeInsets.all(20),
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10,5,10,5),
+                            child: Text(
+                              advertisements[index].title,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15
                               ),
                             ),
-                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            decoration: headingDecoration(),
                           ),
-                          onTap: (){
-                            isTappedToImage = true;
-                            openUrl(advertisements[index].targetedDestinationUrl, context);
-                          }
-                        )
-                      ],
+                          SizedBox(height: 5),
+                          InkWell(
+                              child: CachedNetworkImage(
+                                width: 300,
+                                height: 190,
+                                imageUrl: advertisements[index].bannerImageUrl,
+                                placeholder: (context, url) => Center(
+                                  child: Padding(
+                                    child: CircularProgressIndicator(),
+                                    padding: EdgeInsets.all(20),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Icon(Icons.error),
+                              ),
+                              onTap: (){
+                                isTappedToImage = true;
+                                openUrl(advertisements[index].targetedDestinationUrl, context);
+                              }
+                          )
+                        ],
+                      ),
                     ),
                   );
                 }
@@ -313,4 +315,9 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    scrollController.dispose();
+  }
 }

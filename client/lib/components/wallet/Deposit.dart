@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
@@ -88,6 +88,12 @@ class DepositState extends State<Deposit> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              IconButton(
+                icon: FaIcon(FontAwesomeIcons.facebook),
+                onPressed: (){
+
+                }
+              ),
               showRequiredHeading("Payment Gateway"),
               SizedBox(
                 height: 10,
@@ -110,9 +116,12 @@ class DepositState extends State<Deposit> {
                     paymentGateways.asMap().forEach((key, value) {
                       if(paymentGatewayName == value['paymentGatewayName']){
                         setState(() {
-                          cashInNumber = value['cashInNumber'].toString();
-                          agentNumber = value['agentNumber'].toString();
-                          personalNumber = value['personalNumber'].toString();
+                          cashInNumber = value['cashInNumber'] == null ? "N/A" :
+                            value['cashInNumber'].toString();
+                          agentNumber = value['agentNumber'] == null ? "N/A" :
+                            value['agentNumber'].toString();
+                          personalNumber = value['personalNumber'] == null ? "N/A" :
+                            value['personalNumber'].toString();
                         });
                       }
                     });

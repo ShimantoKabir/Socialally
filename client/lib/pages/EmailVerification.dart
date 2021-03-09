@@ -41,11 +41,11 @@ class EmailVerificationState extends State<EmailVerification> {
                       style: TextStyle(fontSize: 30, color: Colors.green)),
                   SizedBox(width: 10),
                   RaisedButton(
-                      onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, "/login", (r) => false);
-                      },
-                      child: Text("Got to Login"))
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(context, "/user/login", (r) => false);
+                    },
+                    child: Text("Got to Login")
+                  )
                 ],
               ),
             );

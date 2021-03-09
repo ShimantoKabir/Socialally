@@ -16,9 +16,9 @@ class PaymentGateways extends Migration
         Schema::create('PaymentGateways', function (Blueprint $table) {
             $table->id();
             $table->string('paymentGatewayName');
-            $table->string('cashInNumber');
-            $table->string('personalNumber');
-            $table->string('agentNumber');
+            $table->string('cashInNumber')->nullable();
+            $table->string('personalNumber')->nullable();
+            $table->string('agentNumber')->nullable();
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

@@ -57,6 +57,7 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return AbsorbPointer(
       absorbing: needToFreezeUi,
       child: Scaffold(
@@ -69,7 +70,7 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
                   return Center(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      child: inputForm(context),
+                      child: inputForm(context,height),
                     ),
                   );
                 }else {
@@ -126,7 +127,7 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
                       Visibility(
                         visible: isSideBoxOpen,
                         child: Expanded(
-                          child: inputForm(context),
+                          child: inputForm(context,height),
                           flex: 3
                         )
                       )
@@ -181,17 +182,17 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
     );
   }
 
-  Widget inputForm(BuildContext context){
+  Widget inputForm(BuildContext context,double h){
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
       child: Container(
+        height: h,
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-            border: Border(
-                left: BorderSide(
-                    color: Colors.grey
-                )
+          border: Border(
+            left: BorderSide(
+                color: Colors.grey
             )
+          )
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -199,22 +200,26 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
           children: [
             entryField(
                 title: "Payment Gateway",
-                controller: paymentGatewayNameCtl
+                controller: paymentGatewayNameCtl,
+                needToBeRequired: true
             ),
             SizedBox(height: 20),
             entryField(
                 title: "Cash In Number",
-                controller: cashInNumberCtl
+                controller: cashInNumberCtl,
+                needToBeRequired: false
             ),
             SizedBox(height: 10),
             entryField(
                 title: "Agent Number",
-                controller: agentNumberCtl
+                controller: agentNumberCtl,
+                needToBeRequired: false
             ),
             SizedBox(height: 10),
             entryField(
                 title: "Personal Number",
-                controller: personalNumberCtl
+                controller: personalNumberCtl,
+                needToBeRequired: false
             ),
             SizedBox(height: 10),
             OutlineButton(
@@ -248,13 +253,21 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
   Widget entryField({String title,
     TextEditingController controller,
     TextInputType textInputType,
-    List<TextInputFormatter> textInputFormatter,int maxLines}) {
+    List<TextInputFormatter> textInputFormatter,
+    int maxLines,
+    bool needToBeRequired}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          showRequiredHeading(title),
+          needToBeRequired ? showRequiredHeading(title) :
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold
+            ),
+          ),
           SizedBox(
             height: 10,
           ),
@@ -298,9 +311,12 @@ class PaymentGatewayManagerState extends State<PaymentGatewayManager> {
           paymentGatewayList.add(new PaymentGateway(
             id: value['id'],
             paymentGatewayName: value['paymentGatewayName'].toString(),
-            agentNumber: value['agentNumber'].toString(),
-            personalNumber: value['personalNumber'].toString(),
-            cashInNumber: value['cashInNumber'].toString()
+            agentNumber: value['agentNumber'] == null ? "N/A" :
+              value['agentNumber'].toString(),
+            personalNumber: value['personalNumber'] == null ? "N/A" :
+              value['personalNumber'].toString(),
+            cashInNumber: value['cashInNumber'] == null ? "N/A" :
+              value['cashInNumber'].toString()
           ));
         });
       }else {

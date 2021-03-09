@@ -406,16 +406,17 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlineButton(
-                        onPressed: () {
-                          onProofSubmissionStatusChange(context,"Approved");
-                        },
-                        child: Text("Approve")),
+                      onPressed: () {
+                        onProofSubmissionStatusChange(context,"Declined");
+                      },
+                      child: Text("Declined")
+                    ),
                     OutlineButton(
-                        onPressed: () {
-                          onProofSubmissionStatusChange(context,"Declined");
-                        },
-                        child: Text("Declined")
-                    )
+                      onPressed: () {
+                        onProofSubmissionStatusChange(context,"Approved");
+                      },
+                      child: Text("Approve")
+                    ),
                   ],
                 )
               )

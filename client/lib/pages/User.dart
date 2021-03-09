@@ -5,6 +5,7 @@ import 'package:wengine/components/job/Applicants.dart';
 import 'package:wengine/components/job/Available.dart';
 import 'package:wengine/components/Profile.dart';
 import 'package:wengine/components/job/JobFilter.dart';
+import 'package:wengine/components/job/JobFinder.dart';
 import 'package:wengine/components/job/Post.dart';
 import 'package:wengine/components/profile/ChangePassword.dart';
 import 'package:wengine/components/user/advertisement/AdvertisedAny.dart';
@@ -294,7 +295,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                   children: [
                                     getGoogleAdsenseView(),
                                     Container(
-                                      height: 700,
+                                      height: 1000,
                                       child: Navigator(
                                           key: userNavigatorKey,
                                           onGenerateRoute: (settings) {
@@ -319,11 +320,10 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                             } else if (settings.name ==
                                                 "/job/available") {
                                               return MaterialPageRoute(
-                                                  builder: (context) => Available(
+                                                  builder: (context) => JobFinder(
                                                       eventHub: eventHub,
                                                       userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 1));
+                                                      filterCriteria: filterCriteria));
                                             } else if (settings.name == "/job/accept") {
                                               return MaterialPageRoute(
                                                   builder: (context) => Available(
@@ -436,11 +436,11 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       project: project));
                                             } else {
                                               return MaterialPageRoute(
-                                                  builder: (context) => Available(
+                                                  builder: (context) => JobFinder(
                                                       eventHub: eventHub,
                                                       userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 1));
+                                                      filterCriteria: filterCriteria
+                                                  ));
                                             }
                                           }),
                                     ),
