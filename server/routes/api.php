@@ -73,6 +73,8 @@ Route::post('/transactions', [TransactionCtl::class, 'create']);
 Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
 Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBalanceSummary']);
+Route::get('/transactions/overview', [TransactionCtl::class, 'getTransactionOverview']);
+// -- ?start-date=2020-01-01&end-date=2020-01-31
 
 // notifications
 Route::get('/notifications/query', [NotificationCtl::class, 'readByQuery']);

@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Helpers\DateManager;
+use App\Models\ChartOfAccount;
 use App\Models\Notification;
 use App\Models\Transaction;
 use App\Utilities\CommissionManager;
@@ -96,38 +98,66 @@ class TransactionRpo
         $parPage = 10;
         $pageIndex = 10;
 
+        // deposit = creditAmount,101 , withdraw = debitAmount,102
+        $sql = "SELECT
+            Transactions.id AS id,
+            Transactions.accountHolderId AS accountHolderId,
+            IFNULL(transactionId,'N/A') AS transactionId,
+            IFNULL(Transactions.paymentGatewayName,'N/A') AS paymentGatewayName,
+            ChartOfAccounts.ledgerName,
+            IFNULL(accountNumber,'N/A') AS accountNumber,
+            Transactions.status,
+            Transactions.createdAt AS createdAt,
+            ChartOfAccounts.ledgerId,
+            IFNULL(Transactions.debitAmount,0) AS debitAmount,
+            IFNULL(Transactions.creditAmount,0) AS creditAmount,
+            IFNULL(Transactions.debitAmount,Transactions.creditAmount) AS amount 
+        FROM
+            Transactions 
+            JOIN
+            ChartOfAccounts 
+            on Transactions.ledgerId = ChartOfAccounts.ledgerId";
+
         if (!$request->has('par-page')) {
             $res['code'] = 404;
             $res['msg'] = "Par page required!";
         } else if (!$request->has('page-index')) {
             $res['code'] = 404;
             $res['msg'] = "Page index required!";
+        } else if ($request->has('ledger-id')) {
+            if (!$request->has("start-date")) {
+                $res['code'] = 404;
+                $res['msg'] = "Start date required!";
+            } else if (!$request->has("end-date")) {
+                $res['code'] = 404;
+                $res['msg'] = "End date required!";
+            } else {
+                try {
+
+                    $perPage = $request->query('par-page');
+                    $pageIndex = $request->query('page-index');
+                    $ledgerId = $request->query('ledger-id');
+                    $startDate = $request->query('start-date');
+                    $endDate = $request->query('end-date');
+
+                    $sql = $sql . " WHERE Transactions.ledgerId = " . $ledgerId .
+                        " AND (CAST(Transactions.createdAt AS DATE) BETWEEN '" . $startDate . "' AND '" . $endDate .
+                        "') ORDER BY Transactions.id DESC LIMIT " . $pageIndex . ", " . $parPage;
+
+                    $res['transactions'] = DB::select(DB::raw($sql));
+                    $res['code'] = 200;
+                    $res['msg'] = "Transactions fetched successfully!";
+                } catch (Exception $e) {
+                    $res['code'] = 404;
+                    $res['msg'] = $e->getMessage();
+                }
+            }
         } else {
 
             $parPage = $request->query('par-page');
             $pageIndex = $request->query('page-index');
 
             try {
-
-                // deposit = creditAmount,101 , withdraw = debitAmount,102
-                $sql = "SELECT
-                            Transactions.id AS id,
-                            Transactions.accountHolderId AS accountHolderId,
-                            IFNULL(transactionId,'N/A') AS transactionId,
-                            IFNULL(Transactions.paymentGatewayName,'N/A') AS paymentGatewayName,
-                            ChartOfAccounts.ledgerName,
-                            IFNULL(accountNumber,'N/A') AS accountNumber,
-                            Transactions.status,
-                            Transactions.createdAt AS createdAt,
-                            ChartOfAccounts.ledgerId,
-                            IFNULL(Transactions.debitAmount,0) AS debitAmount,
-                            IFNULL(Transactions.creditAmount,0) AS creditAmount,
-                            IFNULL(Transactions.debitAmount,Transactions.creditAmount) AS amount 
-                        FROM
-                            Transactions 
-                            JOIN
-                            ChartOfAccounts 
-                            on Transactions.ledgerId = ChartOfAccounts.ledgerId";
 
                 if ($request->has('user-info-id')) {
                     $userInfoId = $request->query('user-info-id');
@@ -299,5 +329,103 @@ class TransactionRpo
         $res = DB::select(DB::raw($sql));
 
         return $res[0];
+    }
+
+    public function getTransactionOverview($request)
+    {
+
+        $res = [
+            "code" => "",
+            "msg" => ""
+        ];
+
+
+        try {
+
+            if (!$request->has("start-date")) {
+                $res['code'] = 404;
+                $res['msg'] = "Start date required!";
+            } else if (!$request->has("end-date")) {
+                $res['code'] = 404;
+                $res['msg'] = "End date required!";
+            } else {
+
+                $startDate = $request->query("start-date");
+                $endDate = $request->query("end-date");
+
+                $dates = DateManager::getDatesFromRange($startDate, $endDate);
+
+                $depositLedgerId = ChartOfAccount::where("ledgerName", "Deposit")->first()['ledgerId'];
+                $withdrawLedgerId = ChartOfAccount::where("ledgerName", "Withdraw")->first()['ledgerId'];
+                $earningLedgerId = ChartOfAccount::where("ledgerName", "Earning")->first()['ledgerId'];
+
+                $depositHistory = [];
+                $withdrawHistory = [];
+                $earningHistory = [];
+
+                $grandTotalDeposit = 0;
+                $grandTotalWithdraw = 0;
+                $grandTotalEarning = 0;
+
+                foreach ($dates as $dateKey => $dateValue) {
+
+                    $dailyTotalDeposit = Transaction::where("ledgerId", $depositLedgerId)
+                        ->whereDate("createdAt", $dateValue)
+                        ->sum("creditAmount");
+
+                    $grandTotalDeposit = $grandTotalDeposit + $dailyTotalDeposit;
+
+                    $depositHistory[$dateKey] = [
+                        "dailyTotalDeposit" => $dailyTotalDeposit,
+                        "date" => $dateValue
+                    ];
+
+                    $dailyTotalWithdraw = Transaction::where("ledgerId", $withdrawLedgerId)
+                        ->whereDate("createdAt", $dateValue)
+                        ->sum("debitAmount");
+
+                    $grandTotalWithdraw = $grandTotalWithdraw + $dailyTotalWithdraw;
+
+                    $withdrawHistory[$dateKey] = [
+                        "dailyTotalWithdraw" => $dailyTotalWithdraw,
+                        "date" => $dateValue
+                    ];
+
+                    $dailyTotalEarning = Transaction::where("ledgerId", $earningLedgerId)
+                        ->whereDate("createdAt", $dateValue)
+                        ->sum("creditAmount");
+
+                    $grandTotalEarning = $grandTotalEarning + $dailyTotalEarning;
+
+                    $earningHistory[$dateKey] = [
+                        "dailyTotalEarning" => $dailyTotalEarning,
+                        "date" => $dateValue
+                    ];
+                }
+
+                $res['overView'] = [
+                    "deposit" => [
+                        "grandTotalDeposit" => $grandTotalDeposit,
+                        "history" => $depositHistory
+                    ],
+                    "withdraw" => [
+                        "grandTotalWithdraw" => $grandTotalWithdraw,
+                        "history" => $withdrawHistory
+                    ],
+                    "earning" => [
+                        "grandTotalEarning" => $grandTotalEarning,
+                        "history" => $earningHistory
+                    ]
+                ];
+                $res['code'] = 200;
+                $res['msg'] = "Transaction overview fetched successfully!";
+            }
+        } catch (Exception $e) {
+
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 }
