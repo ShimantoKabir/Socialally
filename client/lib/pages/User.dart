@@ -448,7 +448,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                   ],
                                 ),
                               ),
-                              flex: 5
+                              flex: 7
                             ),
                             Visibility(
                               child: Expanded(

@@ -82,8 +82,8 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
           children: [
             Center(
               child: Container(
-                height: 100.0,
-                width: 100.0,
+                height: 130.0,
+                width: 130.0,
                 child: Image.asset(
                   "assets/images/logo.png",
                   fit: BoxFit.contain,

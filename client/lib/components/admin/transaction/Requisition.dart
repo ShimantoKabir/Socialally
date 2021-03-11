@@ -9,17 +9,38 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 class Requisition extends StatefulWidget {
-  Requisition({Key key, this.userInfo, this.eventHub}) : super(key: key);
+
+  Requisition({
+    Key key,
+    this.userInfo,
+    this.eventHub,
+    this.transactionQuery
+  }) : super(key: key);
+
   final userInfo;
   final EventHub eventHub;
+  final Transaction transactionQuery;
+
   @override
-  RequisitionState createState() => RequisitionState(userInfo: userInfo, eventHub: eventHub);
+  RequisitionState createState() => RequisitionState(
+    userInfo: userInfo,
+    eventHub: eventHub,
+    transactionQuery: transactionQuery
+  );
 }
 
 class RequisitionState extends State<Requisition> {
+
   var userInfo;
   EventHub eventHub;
-  RequisitionState({Key key, this.userInfo, this.eventHub});
+  Transaction transactionQuery;
+
+  RequisitionState({
+    Key key,
+    this.userInfo,
+    this.eventHub,
+    this.transactionQuery
+  });
 
   AlertDialog alertDialog;
   Future futureTransactions;
@@ -270,7 +291,12 @@ class RequisitionState extends State<Requisition> {
   Future<List<Transaction>> fetchTransactions() async {
 
     List<Transaction> transactionList = [];
-    String url = baseUrl + "/transactions/query?par-page=$perPage&page-index=$pageIndex";
+    String url;
+    if(transactionQuery == null){
+      url = baseUrl + "/transactions/query?par-page=$perPage&page-index=$pageIndex";
+    }else {
+      url = baseUrl + "/transactions/query?par-page=$perPage&page-index=$pageIndex&ledger-id=${transactionQuery.ledgerId}&created-at=${transactionQuery.createdAt}";
+    }
 
     var response = await get(url);
     if (response.statusCode == 200) {

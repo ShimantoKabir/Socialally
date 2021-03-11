@@ -84,7 +84,7 @@ class UserRpo
             try {
 
                 $token = TokenGenerator::generate();
-                $referId = TokenGenerator::generate();
+                $referId = rand();
                 $quantityOfEarnByRefer = AppConstant::where(
                     "appConstantName",
                     "quantityOfEarnByRefer"
@@ -97,6 +97,8 @@ class UserRpo
                 $userInfo->token = $token;
                 $userInfo->type = $rUserInfo['type'];
                 $userInfo->referId = $referId;
+                $userInfo->agreedTermsAndCondition = $rUserInfo['agreedTermsAndCondition'];
+                $userInfo->regionName = $rUserInfo['regionName'];
                 if ($rUserInfo['referredBy'] != "empty") {
                     $userInfo->referredBy = $rUserInfo['referredBy'];
                 }

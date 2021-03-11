@@ -35,10 +35,14 @@ class RegistrationState extends State<Registration> {
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
   TextEditingController confirmPasswordCtl = new TextEditingController();
+  String regionName;
+  bool agreedTermsAndCondition;
 
   @override
   void initState() {
     super.initState();
+    regionName = "Select";
+    agreedTermsAndCondition = false;
   }
 
   @override
@@ -64,6 +68,51 @@ class RegistrationState extends State<Registration> {
                   ),
                   SizedBox(height: 20),
                   emailPasswordWidget(),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Region",style: TextStyle(
+                      fontWeight: FontWeight.bold
+                    )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                      child: DropdownButton<String>(
+                          value: regionName,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              regionName = newValue;
+                            });
+                          },
+                          items: regionDropDownList
+                      )
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: agreedTermsAndCondition,
+                        onChanged: (value) {
+                          setState(() {
+                            agreedTermsAndCondition = value;
+                          });
+                        },
+                      ),
+                      Text('Terms and conditions.')
+                    ],
+                  ),
                   SizedBox(height: 20),
                   submitButton(context),
                   SizedBox(height: 20),
@@ -123,7 +172,9 @@ class RegistrationState extends State<Registration> {
               "email": emailCtl.text,
               "password": passwordCtl.text,
               "referredBy": referrerId,
-              "type" : type
+              "type" : type,
+              "regionName" : regionName,
+              "agreedTermsAndCondition" : agreedTermsAndCondition
             },
             "clientUrl": Uri.base.origin
           };
@@ -364,6 +415,12 @@ class RegistrationState extends State<Registration> {
       isInputVerified = false;
     }else if (confirmPasswordCtl.text != passwordCtl.text){
       Alert.show(alertDialog, buildContext, Alert.ERROR, "Password and confirm password did not matched!");
+      isInputVerified = false;
+    }else if (regionName == "Select"){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, "Please select a region!");
+      isInputVerified = false;
+    }else if (agreedTermsAndCondition == false){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, "Please accept terms and conditions!");
       isInputVerified = false;
     }
     return isInputVerified;

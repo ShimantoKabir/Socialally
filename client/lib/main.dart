@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       onGenerateRoute: RouterGenerator().generate,
-      title: 'W-engine',
+      title: 'WorkersEngine',
       debugShowCheckedModeBanner: false
     );
   }

@@ -13,4 +13,9 @@ class DateManager{
     DateTime endDateTime = dateTime.add(Duration(days: DateTime.daysPerWeek - dateTime.weekday));
     return dateFormat.format(endDateTime);
   }
+
+  static getOnlyDate(DateTime dateTime){
+    return dateFormat.format(dateTime);
+  }
+
 }

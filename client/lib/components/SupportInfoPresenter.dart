@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wengine/utilities/Alert.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:event_hub/event_hub.dart';
@@ -71,11 +72,21 @@ class SupportInfoPresenterState extends State<SupportInfoPresenter> {
                               ),
                             )
                         ),
-                        IconButton(icon: Icon(Icons.copy), onPressed: (){
-                          FlutterClipboard.copy(supportInfo[index]["address"]).then((value){
-                            Alert.show(alertDialog, context, Alert.SUCCESS,"Copied");
-                          });
-                        })
+                        Row(
+                          children: [
+                            IconButton(icon: Icon(Icons.copy), onPressed: (){
+                              FlutterClipboard.copy(supportInfo[index]["address"]).then((value){
+                                Alert.show(alertDialog, context, Alert.SUCCESS,"Copied");
+                              });
+                            }),
+                            Visibility(
+                              child: IconButton(icon: Icon(Icons.arrow_forward_ios), onPressed: (){
+                                openUrl(supportInfo[index]["address"], context);
+                              }),
+                              visible: supportInfo[index]["address"].toString().contains("facebook"),
+                            )
+                          ],
+                        )
                       ],
                     ),
                     SizedBox(height: 20)
@@ -86,5 +97,13 @@ class SupportInfoPresenterState extends State<SupportInfoPresenter> {
         ),
       ),
     );
+  }
+
+  openUrl(String url,BuildContext context) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, "Can't open the url!");
+    }
   }
 }

@@ -125,24 +125,20 @@ class TransactionRpo
             $res['code'] = 404;
             $res['msg'] = "Page index required!";
         } else if ($request->has('ledger-id')) {
-            if (!$request->has("start-date")) {
+            if (!$request->has("created-at")) {
                 $res['code'] = 404;
-                $res['msg'] = "Start date required!";
-            } else if (!$request->has("end-date")) {
-                $res['code'] = 404;
-                $res['msg'] = "End date required!";
+                $res['msg'] = "Created date required!";
             } else {
                 try {
 
                     $perPage = $request->query('par-page');
                     $pageIndex = $request->query('page-index');
                     $ledgerId = $request->query('ledger-id');
-                    $startDate = $request->query('start-date');
-                    $endDate = $request->query('end-date');
+                    $createdAt = $request->query('created-at');
 
                     $sql = $sql . " WHERE Transactions.ledgerId = " . $ledgerId .
-                        " AND (CAST(Transactions.createdAt AS DATE) BETWEEN '" . $startDate . "' AND '" . $endDate .
-                        "') ORDER BY Transactions.id DESC LIMIT " . $pageIndex . ", " . $parPage;
+                        " AND CAST(Transactions.createdAt AS DATE) = '" . $createdAt .
+                        "' ORDER BY Transactions.id DESC LIMIT " . $pageIndex . ", " . $parPage;
 
                     $res['transactions'] = DB::select(DB::raw($sql));
                     $res['code'] = 200;
@@ -359,13 +355,11 @@ class TransactionRpo
                 $withdrawLedgerId = ChartOfAccount::where("ledgerName", "Withdraw")->first()['ledgerId'];
                 $earningLedgerId = ChartOfAccount::where("ledgerName", "Earning")->first()['ledgerId'];
 
-                $depositHistory = [];
-                $withdrawHistory = [];
-                $earningHistory = [];
+                $transactionHistory = [];
 
-                $grandTotalDeposit = 0;
-                $grandTotalWithdraw = 0;
-                $grandTotalEarning = 0;
+                $totalDeposit = 0;
+                $totalWithdraw = 0;
+                $totalEarning = 0;
 
                 foreach ($dates as $dateKey => $dateValue) {
 
@@ -373,49 +367,37 @@ class TransactionRpo
                         ->whereDate("createdAt", $dateValue)
                         ->sum("creditAmount");
 
-                    $grandTotalDeposit = $grandTotalDeposit + $dailyTotalDeposit;
-
-                    $depositHistory[$dateKey] = [
-                        "dailyTotalDeposit" => $dailyTotalDeposit,
-                        "date" => $dateValue
-                    ];
-
                     $dailyTotalWithdraw = Transaction::where("ledgerId", $withdrawLedgerId)
                         ->whereDate("createdAt", $dateValue)
                         ->sum("debitAmount");
-
-                    $grandTotalWithdraw = $grandTotalWithdraw + $dailyTotalWithdraw;
-
-                    $withdrawHistory[$dateKey] = [
-                        "dailyTotalWithdraw" => $dailyTotalWithdraw,
-                        "date" => $dateValue
-                    ];
 
                     $dailyTotalEarning = Transaction::where("ledgerId", $earningLedgerId)
                         ->whereDate("createdAt", $dateValue)
                         ->sum("creditAmount");
 
-                    $grandTotalEarning = $grandTotalEarning + $dailyTotalEarning;
+                    $totalDeposit = $totalDeposit + $dailyTotalDeposit;
+                    $totalWithdraw = $totalWithdraw + $dailyTotalWithdraw;
+                    $totalEarning = $totalEarning + $dailyTotalEarning;
 
-                    $earningHistory[$dateKey] = [
+                    $transactionHistory[$dateKey] = [
+                        "dailyTotalDeposit" => $dailyTotalDeposit,
+                        "dailyTotalWithdraw" => $dailyTotalWithdraw,
                         "dailyTotalEarning" => $dailyTotalEarning,
                         "date" => $dateValue
                     ];
                 }
 
                 $res['overView'] = [
-                    "deposit" => [
-                        "grandTotalDeposit" => $grandTotalDeposit,
-                        "history" => $depositHistory
-                    ],
-                    "withdraw" => [
-                        "grandTotalWithdraw" => $grandTotalWithdraw,
-                        "history" => $withdrawHistory
-                    ],
-                    "earning" => [
-                        "grandTotalEarning" => $grandTotalEarning,
-                        "history" => $earningHistory
-                    ]
+                    "totalDeposit" => $totalDeposit,
+                    "grandTotalDeposit" => Transaction::where("ledgerId", $depositLedgerId)->sum("creditAmount"),
+                    "depositLedgerId" => $depositLedgerId,
+                    "totalWithdraw" => $totalWithdraw,
+                    "grandTotalWithdraw" => Transaction::where("ledgerId", $withdrawLedgerId)->sum("debitAmount"),
+                    "withdrawLedgerId" => $withdrawLedgerId,
+                    "totalEarning" => $totalEarning,
+                    "grandTotalEarning" => Transaction::where("ledgerId", $earningLedgerId)->sum("creditAmount"),
+                    "earningLedgerId" => $earningLedgerId,
+                    "transactionHistory" => $transactionHistory
                 ];
                 $res['code'] = 200;
                 $res['msg'] = "Transaction overview fetched successfully!";

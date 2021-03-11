@@ -1,28 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:wengine/models/SupportInfo.dart';
 
 class WelcomeBanner extends StatefulWidget {
   WelcomeBanner({
     Key key,
-    this.data,
+    this.supportInfoList
   }) : super(key: key);
 
-  final data;
+  final List<SupportInfo> supportInfoList;
 
   @override
   WelcomeBannerState createState() => WelcomeBannerState(
-    data: data,
+    supportInfoList: supportInfoList,
   );
 }
 
 class WelcomeBannerState extends State<WelcomeBanner>{
 
-  var data;
+  List<SupportInfo> supportInfoList;
 
   WelcomeBannerState({
     Key key,
-    this.data,
+    this.supportInfoList,
   });
 
   @override
@@ -71,35 +72,37 @@ class WelcomeBannerState extends State<WelcomeBanner>{
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          "Workers Engine",
+          "WorkersEngine",
           style: TextStyle(
-              fontSize: data["lgFontSize"],
-              fontWeight: FontWeight.w700,
-              color: Colors.green),
+            fontSize: data["lgFontSize"],
+            fontWeight: FontWeight.w700,
+            color: Colors.green
+          ),
         ),
         SizedBox(
           height: 8,
         ),
         Text(
-          "Easy Approach makes it easy for every one to disseminate knowledge, and making "
-              "difficult problems easy to solve",
+          "WorkersEngine is an innovative crowdsources platform that connects Employer as well as Workers globally. WorkersEngine is a UK based registered company with registration number 13162011 is registered as WorkersEngine Ltd. We offer effective solutions to companies, businesses and persons in need to outsource their jobs and projects. Solutions may include constructive ways of breaking down vast tasks to be distributed to workers, minimizing your time to finish your project and collect results on your target date. Our platform concentrates in deploying micro jobs to workers such as data collection and analysis, moderation and/or extraction of data, annotation, classification, image or video tagging, conversion and transcription, product testing, research and survey jobs and more. WorkersEngine began in 2021 and is now one of the growing and trusted crowd-based outsourcing platforms online.",
           style: TextStyle(
-              fontSize: data["smFontSize"],
-              fontWeight: FontWeight.w300,
-              letterSpacing: 1.0,
-              color: Colors.grey[800]),
+            fontSize: data["smFontSize"],
+            fontWeight: FontWeight.w300,
+            letterSpacing: 1.0,
+            color: Colors.grey[800]
+          ),
         ),
         SizedBox(
           height: 16,
         ),
         FlatButton.icon(
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(context, "/user/login", (r) => false);
-            },
-            icon: Icon(Icons.login),
-            label: Text("Login"),
-            color: Colors.grey[800],
-            textColor: Colors.white)
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(context, "/user/login", (r) => false);
+          },
+          icon: Icon(Icons.login),
+          label: Text("Login"),
+          color: Colors.grey[800],
+          textColor: Colors.white
+        )
       ],
     );
   }
@@ -110,9 +113,13 @@ class WelcomeBannerState extends State<WelcomeBanner>{
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(
-            "assets/images/web.png",
-            fit: BoxFit.contain,
+          Container(
+            width: 500,
+            height: 500,
+            child: Image.asset(
+              "assets/images/logo_main.png",
+              fit: BoxFit.contain,
+            ),
           )
         ],
       ),

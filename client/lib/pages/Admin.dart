@@ -12,6 +12,7 @@ import 'package:wengine/components/admin/setting/SupportInfoManager.dart';
 import 'package:wengine/components/admin/transaction/Requisition.dart';
 import 'package:wengine/components/admin/user/UserManager.dart';
 import 'package:wengine/constants.dart';
+import 'package:wengine/models/Transaction.dart';
 import 'package:wengine/widgets/DashboardLeftNavigation.dart';
 import 'package:wengine/widgets/DashboardTopNavigation.dart';
 import 'package:event_hub/event_hub.dart';
@@ -44,11 +45,13 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
   var userNavigatorKey = GlobalKey<NavigatorState>();
   bool isSideNavOpen = true;
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  Transaction transaction;
 
   @override
   void initState() {
     super.initState();
     nodes = adminDashboardMenus;
+    transaction = null;
     treeViewController = TreeViewController(
       children: nodes,
       selectedKey: selectedKey,
@@ -74,6 +77,19 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
       setState(() {
         userInfo = data;
         userNavigatorKey.currentState.pushNamed("/user/profile");
+      });
+    });
+
+    eventHub.on("redirectToTransaction", (dynamic data) {
+      setState(() {
+        transaction = data;
+        userNavigatorKey.currentState.pushNamed("/transactions/requisition");
+      });
+    });
+
+    eventHub.on("clearStaffBeforeNavigate", (dynamic data) {
+      setState(() {
+        transaction = null;
       });
     });
 
@@ -165,8 +181,10 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                       "/transactions/requisition") {
                                     return MaterialPageRoute(
                                         builder: (context) => Requisition(
-                                            eventHub: eventHub,
-                                            userInfo: userInfo));
+                                          eventHub: eventHub,
+                                          userInfo: userInfo,
+                                          transactionQuery: transaction,
+                                        ));
                                   } else if (settings.name ==
                                       "/admins/notifications") {
                                     return MaterialPageRoute(

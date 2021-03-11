@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
+use App\Http\Controllers\WelcomeCtl;
 use App\Http\Controllers\UserInfoCtl;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppConstantCtl;
@@ -100,3 +101,6 @@ Route::get('/payment-gateways', [PaymentGatewayCtl::class, 'read']);
 Route::post('/payment-gateways', [PaymentGatewayCtl::class, 'create']);
 Route::put('/payment-gateways', [PaymentGatewayCtl::class, 'update']);
 Route::delete('/payment-gateways/{id}', [PaymentGatewayCtl::class, 'delete']);
+
+// welcome
+Route::get('/welcome', [WelcomeCtl::class, 'read']);

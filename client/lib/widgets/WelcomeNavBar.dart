@@ -1,3 +1,7 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:wengine/models/SupportInfo.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:wengine/widgets/DefaultButton.dart';
 import 'package:wengine/widgets/MenuItem.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,27 +11,34 @@ import 'package:responsive_builder/responsive_builder.dart';
 class WelcomeNavBar extends StatefulWidget {
   WelcomeNavBar({
     Key key,
-    this.data,
+    this.supportInfoList
   }) : super(key: key);
 
-  final data;
+  final List<SupportInfo> supportInfoList;
 
   @override
   WelcomeNavBarState createState() => WelcomeNavBarState(
-    data: data,
+    supportInfoList: supportInfoList
   );
 }
 
 class WelcomeNavBarState extends State<WelcomeNavBar>{
 
-  var data;
+  List<SupportInfo> supportInfoList;
 
   WelcomeNavBarState({
     Key key,
-    this.data,
+    this.supportInfoList,
   });
 
   bool isMobileNavOpen = false;
+  AlertDialog alertDialog;
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,30 +58,30 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
           ]
         ),
         child: ScreenTypeLayout(
-            desktop: getDesktopNavBar(context,{
-              "logoHeight" : 25.0,
-              "menuPadding" : 15.0,
-              "menuMargin" : 0.0,
-              "menuFontSize" : 15.0,
-              "needLogo" : true,
-              "screenWidth" : width
-            }),
-            tablet: getDesktopNavBar(context,{
-              "logoHeight" : 17.0,
-              "menuPadding" : 12.0,
-              "menuMargin" : 0.0,
-              "menuFontSize" : 12.0,
-              "needLogo" : true,
-              "screenWidth" : width
-            }),
-            mobile: getMobileNavBar(context,{
-              "logoHeight" : 17.0,
-              "menuPadding" : 12.0,
-              "menuMargin" : 10.0,
-              "menuFontSize" : 12.0,
-              "needLogo" : false,
-              "screenWidth" : width
-            })
+          desktop: getDesktopNavBar(context,{
+            "logoHeight" : 25.0,
+            "menuPadding" : 15.0,
+            "menuMargin" : 0.0,
+            "menuFontSize" : 15.0,
+            "needLogo" : true,
+            "screenWidth" : width
+          }),
+          tablet: getDesktopNavBar(context,{
+            "logoHeight" : 17.0,
+            "menuPadding" : 12.0,
+            "menuMargin" : 0.0,
+            "menuFontSize" : 12.0,
+            "needLogo" : true,
+            "screenWidth" : width
+          }),
+          mobile: getMobileNavBar(context,{
+            "logoHeight" : 17.0,
+            "menuPadding" : 12.0,
+            "menuMargin" : 10.0,
+            "menuFontSize" : 12.0,
+            "needLogo" : false,
+            "screenWidth" : width
+          })
         ),
       )
     );
@@ -84,11 +95,62 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
 
   List<Widget> getMenuItems(var data){
     return [
-      Visibility(child: Image.asset(
-        "assets/images/logo_without_text.png",
-        height: data["logoHeight"],
-        alignment: Alignment.topCenter,
-      ),visible: data["needLogo"]),
+      Visibility(
+          child: Image.asset(
+            "assets/images/logo_main.png",
+            height: data["logoHeight"],
+            alignment: Alignment.topCenter,
+          ),
+          visible: data["needLogo"]
+      ),
+      SizedBox(width: 30),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: FaIcon(
+              FontAwesomeIcons.youtube,
+              size: 15,
+              color: Color(0xffbc4302b),
+            ),
+            onPressed: () {
+              if(supportInfoList.length >= 1){
+                openUrl(supportInfoList[0].address, context);
+              }else {
+                Alert.show(alertDialog, context, Alert.ERROR, "Can't open the url!");
+              }
+            }
+          ),
+          IconButton(
+              icon: FaIcon(
+                FontAwesomeIcons.facebook,
+                size: 15,
+                color: Color(0xffb3b5998),
+              ),
+              onPressed: () {
+                if(supportInfoList.length >= 2){
+                  openUrl(supportInfoList[1].address, context);
+                }else {
+                  Alert.show(alertDialog, context, Alert.ERROR, "Can't open the url!");
+                }
+              }
+          ),
+          IconButton(
+              icon: FaIcon(
+                FontAwesomeIcons.twitter,
+                size: 15,
+                color: Color(0xffb1DA1F2),
+              ),
+              onPressed: () {
+                if(supportInfoList.length >= 3){
+                  openUrl(supportInfoList[2].address, context);
+                }else {
+                  Alert.show(alertDialog, context, Alert.ERROR, "Can't open the url!");
+                }
+              }
+          )
+        ],
+      ),
       Visibility(child: SizedBox(width: 5),visible: data["needLogo"]),
       Visibility(child: Spacer(),visible: data["needLogo"]),
       MenuItem(
@@ -144,7 +206,7 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
         onClick: () {
           Navigator.pushNamed(context, "/user/registration");
         },
-      ),
+      )
     ];
   }
 
@@ -190,6 +252,14 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
       ],
     );
 
+  }
+
+  openUrl(String url,BuildContext context) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, "Can't open the url!");
+    }
   }
 
 }

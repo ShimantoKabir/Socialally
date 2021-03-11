@@ -202,7 +202,7 @@ class PostState extends State<Post> {
           child: Center(
             child: Column(
               children: [
-                entryField("Title", titleCtl),
+                entryField("Title", titleCtl,50),
                 SizedBox(
                   height: 10,
                 ),
@@ -540,7 +540,7 @@ class PostState extends State<Post> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      showRequiredHeading("Estimated Day"),
+                      showRequiredHeading("Estimated Approval Day"),
                       SizedBox(
                         height: 10,
                       ),
@@ -670,7 +670,7 @@ class PostState extends State<Post> {
     );
   }
 
-  Widget entryField(String title, TextEditingController controller) {
+  Widget entryField(String title, TextEditingController controller,int maxLength) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -682,6 +682,7 @@ class PostState extends State<Post> {
           ),
           TextField(
             controller: controller,
+            maxLength: maxLength,
             readOnly: project == null ? false : true,
             decoration: InputDecoration(
               border: InputBorder.none,

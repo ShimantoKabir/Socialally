@@ -1,11 +1,13 @@
 import 'dart:convert';
-
+import 'dart:math';
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:event_hub/event_hub.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:wengine/constants.dart';
+import 'package:wengine/models/Transaction.dart';
+import 'package:wengine/utilities/Alert.dart';
 import 'package:wengine/utilities/DateManager.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -16,35 +18,27 @@ class AdminDashboard extends StatefulWidget {
   AdminDashboardState createState() => AdminDashboardState(userInfo: userInfo, eventHub: eventHub);
 }
 
+class Sales {
+  final String year;
+  final int sales;
+  Sales(this.year, this.sales);
+}
+
 class AdminDashboardState extends State<AdminDashboard> {
   var userInfo;
   EventHub eventHub;
   AdminDashboardState({Key key, this.userInfo, this.eventHub});
 
-  Color depositColor = Colors.green;
-  Color withdrawColor = Colors.red;
-  Color earningColor = Colors.blue;
-  double barWidth = 7.0;
-  double barSpace = 10.0;
   String startDate;
   String endDate;
-
-  List<BarChartGroupData> rawBarGroups;
-  List<BarChartGroupData> showingBarGroups;
   Future futureTransactionOverview;
-
-  int touchedGroupIndex;
-  var transactionData;
-
-  List<dynamic> depositHistory;
-  List<dynamic> withdrawHistory;
-  List<dynamic> earningHistory;
-
   AlertDialog alertDialog;
   Future futureUserInfos;
   Widget alertIcon;
   String alertText;
   bool needToFreezeUi;
+  DateTime startInitDate;
+  DateTime endInitDate;
 
   @override
   void initState() {
@@ -56,102 +50,14 @@ class AdminDashboardState extends State<AdminDashboard> {
     alertText = "No operation running!";
     alertIcon = Container();
     needToFreezeUi = false;
-
-    transactionData = {
-      "deposit": {
-        "totalDeposit" : 100,
-        "startDate" : "2021-03-08",
-        "endDate" : "2021-03-08",
-        "history" : [
-          {
-            "date" : "2021-03-08",
-            "totalDeposit" : 25
-          },
-          {
-            "date" : "2021-03-08",
-            "totalDeposit" : 50
-          },
-          {
-            "date" : "2021-03-08",
-            "totalDeposit" : 75
-          },
-          {
-            "date" : "2021-03-08",
-            "totalDeposit" : 100
-          }
-        ]
-      },
-      "withdraw": {
-        "totalWithdraw" : 100,
-        "startDate" : "2021-03-08",
-        "endDate" : "2021-03-08",
-        "history" : [
-          {
-            "date" : "2021-03-08",
-            "totalWithdraw" : 25
-          },
-          {
-            "date" : "2021-03-08",
-            "totalWithdraw" : 53
-          },
-          {
-            "date" : "2021-03-08",
-            "totalWithdraw" : 75
-          },
-          {
-            "date" : "2021-03-08",
-            "totalWithdraw" : 100
-          }
-        ]
-      },
-      "earning" : {
-        "totalEarning" : 100,
-        "startDate" : "2021-03-08",
-        "endDate" : "2021-03-08",
-        "history" : [
-          {
-            "date" : "2021-03-08",
-            "totalEarning" : 25
-          },
-          {
-            "date" : "2021-03-08",
-            "totalEarning" : 55
-          },
-          {
-            "date" : "2021-03-08",
-            "totalEarning" : 75
-          },
-          {
-            "date" : "2021-03-08",
-            "totalEarning" : 100
-          }
-        ]
-      }
-    };
-
-    List<BarChartGroupData> items = [];
-
-    depositHistory = transactionData['deposit']['history'];
-    withdrawHistory = transactionData['withdraw']['history'];
-    earningHistory = transactionData['earning']['history'];
-
-    int index = 0;
-    depositHistory.forEach((element) {
-      items.add(makeGroupData(
-          index,
-          element['totalDeposit'],
-          withdrawHistory[index]['totalWithdraw'],
-          earningHistory[index]['totalEarning']
-      ));
-      index++;
-    });
-
-    rawBarGroups = items;
-    showingBarGroups = rawBarGroups;
+    startInitDate = DateTime.parse(startDate);
+    endInitDate = DateTime.parse(endDate);
   }
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
         body: FutureBuilder(
           future: futureTransactionOverview,
@@ -162,101 +68,134 @@ class AdminDashboardState extends State<AdminDashboard> {
                 return Center(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("No Data found!"),
+                    child: Text("No data found!"),
                   ),
                 );
               }else {
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  color: const Color(0xff2c4260),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+                var overView = snapshot.data;
+                List<charts.Series<Transaction, String>> seriesList = overView['seriesList'];
+                return SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Container(
+                    padding: EdgeInsets.all(20),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            makeTransactionsIcon(),
-                            const SizedBox(
-                              width: 38,
-                            ),
-                            const Text(
-                              'Transactions',
-                              style: TextStyle(color: Colors.white, fontSize: 22),
-                            ),
-                            const SizedBox(
-                              width: 4,
-                            ),
-                            const Text(
-                              'state',
-                              style: TextStyle(color: Color(0xff77839a), fontSize: 16),
-                            ),
-                          ],
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: getHeading(
+                            overView['grandTotalDeposit'],
+                            overView['grandTotalWithdraw'],
+                            overView['grandTotalEarning']
+                          ),
                         ),
-                        const SizedBox(
-                          height: 38,
+                        Divider(
+                          height: 10,
+                          color: Colors.lightGreen,
+                          thickness: 1,
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: BarChart(
-                              BarChartData(
-                                barTouchData: BarTouchData(
-                                    touchTooltipData: BarTouchTooltipData(
-                                        tooltipBgColor: Colors.green,
-                                        getTooltipItem: (
-                                            BarChartGroupData barChartGroupData,
-                                            int a,
-                                            BarChartRodData barChartRodData,
-                                            int b){
-                                          return BarTooltipItem("A = $a, B = $b",TextStyle(
-                                              color: Colors.white
-                                          ));
-                                        }
-                                    )
-                                ),
-                                titlesData: FlTitlesData(
-                                  show: true,
-                                  bottomTitles: SideTitles(
-                                      showTitles: true,
-                                      getTextStyles: (value) => TextStyle(
-                                          color: Color(0xff7589a2),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14
+                        Container(
+                          padding: EdgeInsets.all(5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              OutlineButton(
+                                  child: Text("START DATE"),
+                                  onPressed: (){
+                                    showDatePicker(
+                                      context: context,
+                                      initialDate: startInitDate,
+                                      firstDate:  DateTime(
+                                        DateTime.now().year
                                       ),
-                                      margin: 20,
-                                      getTitles: (double value) {
-                                        return earningHistory[value.toInt()]['date'];
-                                      }
-                                  ),
-                                  leftTitles: SideTitles(
-                                      showTitles: false,
-                                      getTextStyles: (value) => const TextStyle(
-                                          color: Color(0xff7589a2),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14
-                                      ),
-                                      margin: 32,
-                                      reservedSize: 14
-                                  ),
-                                ),
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                barGroups: showingBarGroups,
+                                      lastDate: DateTime(
+                                        DateTime.now().year + 1
+                                      )
+                                    ).then((value){
+                                      setState(() {
+                                        startInitDate = value;
+                                        startDate = DateManager.getOnlyDate(value);
+                                      });
+                                    });
+                                  }
                               ),
+                              OutlineButton(
+                                  child: Text("END DATE"),
+                                  onPressed: (){
+                                    showDatePicker(
+                                      context: context,
+                                      initialDate: endInitDate,
+                                      firstDate:  DateTime(
+                                          DateTime.now().year
+                                      ),
+                                      lastDate: DateTime(
+                                          DateTime.now().year + 1
+                                      )
+                                    ).then((value){
+                                      setState(() {
+                                        endInitDate = value;
+                                        endDate = DateManager.getOnlyDate(value);
+                                      });
+                                    });
+                                  }
+                              ),
+                              OutlineButton(
+                                  child: Text("SUBMIT"),
+                                  onPressed: (){
+                                    int diffDays = endInitDate.difference(startInitDate).inDays;
+                                    if(diffDays > minimumDayDifferance){
+                                      Alert.show(alertDialog, context, Alert.ERROR,
+                                        "Day differance between start date and end date should be less then $minimumDayDifferance!"
+                                      );
+                                    } else {
+                                      futureTransactionOverview = fetchTransactionOverview();
+                                    }
+                                  }
+                              )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                              "Date Range: $startDate - $endDate",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 12,
-                        ),
+                        Container(
+                          width: width,
+                          height: height,
+                          padding: EdgeInsets.all(10),
+                          child: charts.BarChart(
+                              seriesList,
+                              animate: true,
+                              vertical: false,
+                              barGroupingType: charts.BarGroupingType.grouped,
+                              defaultRenderer: charts.BarRendererConfig(
+                                groupingType: charts.BarGroupingType.grouped,
+                                strokeWidthPx: 1.0,
+                              ),
+                              selectionModels: [
+                                charts.SelectionModelConfig(
+                                    changedListener: (charts.SelectionModel model) {
+                                      if(model.hasDatumSelection){
+
+                                        int ledgerId = int.tryParse(model.selectedSeries[0].id);
+                                        String createdAt = model.selectedSeries[0].domainFn(model.selectedDatum[0].index);
+                                        eventHub.fire("redirectToTransaction",Transaction(
+                                          ledgerId: ledgerId,
+                                          createdAt: createdAt
+                                        ));
+                                      }
+                                    }
+                                )
+                              ]
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -295,184 +234,166 @@ class AdminDashboardState extends State<AdminDashboard> {
           ),
         )
     );
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        color: const Color(0xff2c4260),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+  }
+
+  List<Widget> getHeading(double deposit,double withdraw,double earning){
+    return [
+      Card(
+        color: Colors.green,
+        child: Container(
+          padding: EdgeInsets.all(10),
+          height: 100,
+          width: 200,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  makeTransactionsIcon(),
-                  const SizedBox(
-                    width: 38,
-                  ),
-                  const Text(
-                    'Transactions',
-                    style: TextStyle(color: Colors.white, fontSize: 22),
-                  ),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  const Text(
-                    'state',
-                    style: TextStyle(color: Color(0xff77839a), fontSize: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 38,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: BarChart(
-                    BarChartData(
-                      barTouchData: BarTouchData(
-                        touchTooltipData: BarTouchTooltipData(
-                          tooltipBgColor: Colors.green,
-                          getTooltipItem: (
-                              BarChartGroupData barChartGroupData,
-                              int a,
-                              BarChartRodData barChartRodData,
-                              int b){
-                            return BarTooltipItem("A = $a, B = $b",TextStyle(
-                              color: Colors.white
-                            ));
-                          }
-                        )
-                      ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: SideTitles(
-                          showTitles: true,
-                          getTextStyles: (value) => TextStyle(
-                            color: Color(0xff7589a2),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14
-                          ),
-                          margin: 20,
-                          getTitles: (double value) {
-                            return earningHistory[value.toInt()]['date'];
-                          }
-                        ),
-                        leftTitles: SideTitles(
-                          showTitles: false,
-                          getTextStyles: (value) => const TextStyle(
-                            color: Color(0xff7589a2),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14
-                          ),
-                          margin: 32,
-                          reservedSize: 14
-                        ),
-                      ),
-                      borderData: FlBorderData(
-                        show: false,
-                      ),
-                      barGroups: showingBarGroups,
-                    ),
-                  ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${deposit.toString()}£",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
                 ),
               ),
-              const SizedBox(
-                height: 12,
-              ),
+              Text(
+                "Deposit",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25
+                ),
+              )
             ],
           ),
         ),
       ),
-    );
-  }
-
-  BarChartGroupData makeGroupData(int index,double deposit, double withdraw, double earning) {
-    return BarChartGroupData(barsSpace: barSpace, x: index, barRods: [
-      BarChartRodData(
-        y: deposit,
-        colors: [depositColor],
-        width: barWidth,
+      Card(
+        color: Colors.red,
+        child: Container(
+          height: 100,
+          width: 200,
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${withdraw.toString()}£",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
+                ),
+              ),
+              Text(
+                "Withdraw",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25
+                ),
+              )
+            ],
+          ),
+        ),
       ),
-      BarChartRodData(
-        y: withdraw,
-        colors: [withdrawColor],
-        width: barWidth,
-      ),
-      BarChartRodData(
-        y: earning,
-        colors: [earningColor],
-        width: barWidth,
+      Card(
+        color: Colors.blue,
+        child: Container(
+          height: 100,
+          width: 200,
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${earning.toString()}£",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
+                ),
+              ),
+              Text(
+                "Earning",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25
+                ),
+              )
+            ],
+          ),
+        ),
       )
-    ]);
-  }
-
-  Widget makeTransactionsIcon() {
-    const double width = 4.5;
-    const double space = 3.5;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          width: width,
-          height: 10,
-          color: Colors.white.withOpacity(0.4),
-        ),
-        SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 28,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 42,
-          color: Colors.white.withOpacity(1),
-        ),
-        SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 28,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        SizedBox(
-          width: space,
-        ),
-        Container(
-          width: width,
-          height: 10,
-          color: Colors.white.withOpacity(0.4),
-        ),
-      ],
-    );
+    ];
   }
 
   Future<dynamic> fetchTransactionOverview() async {
 
+    List<charts.Series<Transaction, String>> seriesList = [];
     var overView;
+    final random = Random();
     String url = baseUrl + "/transactions/overview?start-date=$startDate&end-date=$endDate";
 
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
       if(res['code'] == 200){
-        overView = res['overView'];
+
+        var transactionHistory = res['overView']['transactionHistory'];
+        List<Transaction> dth = [];
+        List<Transaction> wth = [];
+        List<Transaction> eth = [];
+
+        transactionHistory.forEach((element) {
+          dth.add(Transaction(
+              amount: element['dailyTotalDeposit'],
+              // amount: random.nextInt(100).toDouble(),
+              createdAt: element['date']
+          ));
+          wth.add(Transaction(
+              amount: element['dailyTotalWithdraw'],
+              // amount: random.nextInt(100).toDouble(),
+              createdAt: element['date']
+          ));
+          eth.add(Transaction(
+              amount: element['dailyTotalEarning'],
+              // amount: random.nextInt(100).toDouble(),
+              createdAt: element['date']
+          ));
+        });
+
+        seriesList.add(charts.Series<Transaction, String>(
+          id: "${res['overView']['depositLedgerId']}",
+          domainFn: (Transaction transaction, _) => transaction.createdAt,
+          measureFn: (Transaction transaction, _) => transaction.amount,
+          data: dth,
+          fillColorFn: (Transaction sales, _) {
+            return charts.MaterialPalette.green.shadeDefault;
+          },
+        ));
+
+        seriesList.add(charts.Series<Transaction, String>(
+          id: "${res['overView']['withdrawLedgerId']}",
+          domainFn: (Transaction transaction, _) => transaction.createdAt,
+          measureFn: (Transaction transaction, _) => transaction.amount,
+          data: wth,
+          fillColorFn: (Transaction sales, _) {
+            return charts.MaterialPalette.red.shadeDefault;
+          },
+        ));
+
+        seriesList.add(charts.Series<Transaction, String>(
+          id: "${res['overView']['earningLedgerId']}",
+          domainFn: (Transaction transaction, _) => transaction.createdAt,
+          measureFn: (Transaction transaction, _) => transaction.amount,
+          data: eth,
+          fillColorFn: (Transaction sales, _) {
+            return charts.MaterialPalette.blue.shadeDefault;
+          },
+        ));
+
+        overView = {
+          "grandTotalDeposit" : res['overView']['grandTotalDeposit'],
+          "grandTotalWithdraw" : res['overView']['grandTotalWithdraw'],
+          "grandTotalEarning" : res['overView']['grandTotalEarning'],
+          "seriesList" : seriesList,
+        };
+
       }
     }
 

@@ -428,3 +428,5 @@ Widget showRequiredHeading(String title){
     )
   );
 }
+
+int minimumDayDifferance = 30;
