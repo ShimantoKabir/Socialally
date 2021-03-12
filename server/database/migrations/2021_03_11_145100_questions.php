@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ChartOfAccounts extends Migration
+class Questions extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class ChartOfAccounts extends Migration
      */
     public function up()
     {
-        Schema::create('ChartOfAccounts', function (Blueprint $table) {
+        Schema::create('Questions', function (Blueprint $table) {
             $table->id();
-            $table->integer('ledgerId');
-            $table->string('ledgerName');
-            $table->tinyInteger('type')->nullable();
+            $table->string('question');
+            $table->json('options')->nullable();
+            $table->tinyInteger('correctOption')->nullable();
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();
@@ -31,6 +31,6 @@ class ChartOfAccounts extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("ChartOfAccounts");
+        Schema::dropIfExists("QuestionsAndAnswers");
     }
 }

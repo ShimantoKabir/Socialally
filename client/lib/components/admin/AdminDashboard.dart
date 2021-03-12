@@ -248,7 +248,7 @@ class AdminDashboardState extends State<AdminDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${deposit.toString()}£",
+                "£${deposit.toStringAsFixed(3)}",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20
@@ -275,7 +275,7 @@ class AdminDashboardState extends State<AdminDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${withdraw.toString()}£",
+                "£${withdraw.toStringAsFixed(3)}",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20
@@ -302,7 +302,7 @@ class AdminDashboardState extends State<AdminDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${earning.toString()}£",
+                "£${earning.toStringAsFixed(3)}",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20

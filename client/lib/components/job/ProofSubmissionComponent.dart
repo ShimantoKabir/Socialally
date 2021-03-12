@@ -131,7 +131,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("${project.eachWorkerEarn}£"),
+                        Text("£${project.eachWorkerEarn}"),
                       ],
                     ),
                     decoration: BoxDecoration(

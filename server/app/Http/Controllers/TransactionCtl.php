@@ -43,4 +43,9 @@ class TransactionCtl extends Controller
     {
         return $this->transactionRpo->getTransactionOverview($request);
     }
+
+    public function createManualTransaction(Request $request)
+    {
+        return $this->transactionRpo->createManualTransaction($request);
+    }
 }

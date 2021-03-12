@@ -11,6 +11,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\PaymentGateway;
 use App\Helpers\TokenGenerator;
+use App\Models\ChartOfAccount;
 use App\Models\ProjectCategory;
 use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -265,7 +266,8 @@ class UserRpo
                             "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
                             "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
                             "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),
-                            "projectCategories" => ProjectCategory::select('categoryId', 'categoryName')->distinct('categoryId')->get()
+                            "projectCategories" => ProjectCategory::select('categoryId', 'categoryName')->distinct('categoryId')->get(),
+                            "chartOfAccounts" => ChartOfAccount::where("type", 1)->get()
                         ];
 
                         $res['msg'] = "Login successful!";
@@ -614,5 +616,40 @@ class UserRpo
         }
 
         return $res;
+    }
+
+    public function readByUserInfoId(Request $request)
+    {
+
+        $res = [
+            'msg' => '',
+            'code' => ''
+        ];
+
+        $userInfoId = 0;
+
+        if (!$request->has('user-info-id')) {
+            $res['code'] = 404;
+            $res['msg'] = "User info id required!";
+        } else {
+
+            $userInfoId = $request->query('user-info-id');
+
+            try {
+
+                $res['userInfos'] = UserInfo::select("id", "userInfoId")
+                    ->where("userInfoId", 'like', '%' . $userInfoId . '%')
+                    ->where("type", 1)
+                    ->get();
+
+                $res['code'] = 200;
+                $res['msg'] = "User info1 fetched successfully!";
+            } catch (Exception $e) {
+                $res['msg'] = $e->getMessage();
+                $res['code'] = 404;
+            }
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 }

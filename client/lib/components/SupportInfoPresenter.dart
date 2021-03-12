@@ -63,7 +63,7 @@ class SupportInfoPresenterState extends State<SupportInfoPresenter> {
                       children: [
                         Flexible(
                             child: Text(
-                              supportInfo[index]["address"],
+                              supportInfo[index]["address"].toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               softWrap: false,

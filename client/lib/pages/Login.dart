@@ -39,7 +39,7 @@ class LoginState extends State<Login> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            WelcomeNavBar(),
+            WelcomeNavBar(type: 2),
             Container(
               width: 500,
               padding: EdgeInsets.all(10),
@@ -52,7 +52,7 @@ class LoginState extends State<Login> {
                     thickness: 1,
                   ),
                   SizedBox(height: 20),
-                  emailPasswordWidget(),
+                  emailPasswordWidget(context),
                   SizedBox(height: 20),
                   submitButton(context),
                   Container(
@@ -81,7 +81,7 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget entryField(String title, {bool isPassword = false}) {
+  Widget entryField(BuildContext context, String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -95,8 +95,12 @@ class LoginState extends State<Login> {
             height: 10,
           ),
           TextField(
+            textInputAction: TextInputAction.newline,
             controller: isPassword ? passwordCtl : emailCtl,
             obscureText: isPassword,
+            onSubmitted: (value){
+              onSubmit(context);
+            },
             decoration: InputDecoration(
               border: InputBorder.none,
               fillColor: Color(0xfff3f3f4),
@@ -111,54 +115,7 @@ class LoginState extends State<Login> {
   Widget submitButton(BuildContext buildContext) {
     return InkWell(
       onTap: () {
-        bool isInputVerified = verifyInput(buildContext);
-        if (isInputVerified) {
-          var request = {
-            "userInfo": {
-              "email": emailCtl.text,
-              "password": passwordCtl.text,
-              "type" : type
-            }
-          };
-          Alert.show(
-              alertDialog, buildContext, Alert.LOADING, Alert.LOADING_MSG);
-          HttpHandler().createPost("/users/login", request).then((res) {
-            Navigator.of(buildContext).pop(false);
-            if (res.statusCode == 200) {
-              if (res.data['code'] == 200) {
-                MySharedPreferences.setStringValue(
-                  'userInfo', jsonEncode(res.data['userInfo'])
-                );
-                var ui = res.data['userInfo'];
-                if(ui['type'] == 1){
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>User(userInfo: ui)
-                    ),(route) => false
-                  );
-                }else {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Admin(userInfo: ui)
-                    ),(route) => false
-                  );
-                }
-              } else {
-                Alert.show(
-                    alertDialog, buildContext, Alert.ERROR, res.data['msg']);
-              }
-            } else {
-              Alert.show(
-                  alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
-            }
-          }).catchError((err) {
-            print("err = $err");
-            Navigator.of(buildContext).pop(false);
-            Alert.show(alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
-          });
-        }
+        onSubmit(buildContext);
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -183,6 +140,57 @@ class LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  onSubmit(BuildContext context){
+    bool isInputVerified = verifyInput(context);
+    if (isInputVerified) {
+      var request = {
+        "userInfo": {
+          "email": emailCtl.text,
+          "password": passwordCtl.text,
+          "type" : type
+        }
+      };
+      Alert.show(
+          alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+      HttpHandler().createPost("/users/login", request).then((res) {
+        Navigator.of(context).pop(false);
+        if (res.statusCode == 200) {
+          if (res.data['code'] == 200) {
+            MySharedPreferences.setStringValue(
+                'userInfo', jsonEncode(res.data['userInfo'])
+            );
+            var ui = res.data['userInfo'];
+            if(ui['type'] == 1){
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>User(userInfo: ui)
+                  ),(route) => false
+              );
+            }else {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Admin(userInfo: ui)
+                  ),(route) => false
+              );
+            }
+          } else {
+            Alert.show(
+                alertDialog, context, Alert.ERROR, res.data['msg']);
+          }
+        } else {
+          Alert.show(
+              alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+        }
+      }).catchError((err) {
+        print("err = $err");
+        Navigator.of(context).pop(false);
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      });
+    }
   }
 
   Widget divider() {
@@ -386,11 +394,11 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget emailPasswordWidget() {
+  Widget emailPasswordWidget(BuildContext context) {
     return Column(
       children: <Widget>[
-        entryField("Email id"),
-        entryField("Password", isPassword: true),
+        entryField(context,"Email id"),
+        entryField(context,"Password", isPassword: true),
       ],
     );
   }

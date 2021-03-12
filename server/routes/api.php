@@ -3,6 +3,7 @@
 use App\Http\Controllers\TestCtl;
 use App\Http\Controllers\ProjectCtl;
 use App\Http\Controllers\WelcomeCtl;
+use App\Http\Controllers\QuestionCtl;
 use App\Http\Controllers\UserInfoCtl;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppConstantCtl;
@@ -37,6 +38,7 @@ Route::get('/users/query', [UserInfoCtl::class, 'readByQuery']);
 Route::post('/users/image', [UserInfoCtl::class, 'uploadImage']);
 Route::put('/users/password', [UserInfoCtl::class, 'changePassword']);
 Route::get('/users/{id}', [UserInfoCtl::class, 'readById']);
+Route::get('/users/user-info-id/query', [UserInfoCtl::class, 'readByUserInfoId']);
 Route::get('/users/paginate/query', [UserInfoCtl::class, 'read']);
 // -- ?par-page=5&page-index=1
 Route::put('/users/status', [UserInfoCtl::class, 'changeStatus']);
@@ -75,6 +77,7 @@ Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
 Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBalanceSummary']);
 Route::get('/transactions/overview', [TransactionCtl::class, 'getTransactionOverview']);
+Route::get('/transactions/manual', [TransactionCtl::class, 'createManualTransaction']);
 // -- ?start-date=2020-01-01&end-date=2020-01-31
 
 // notifications
@@ -104,3 +107,10 @@ Route::delete('/payment-gateways/{id}', [PaymentGatewayCtl::class, 'delete']);
 
 // welcome
 Route::get('/welcome', [WelcomeCtl::class, 'read']);
+// time=12:00:00
+
+// questions
+Route::get('/questions/query', [QuestionCtl::class, 'readByQuery']);
+Route::post('/questions', [QuestionCtl::class, 'create']);
+Route::put('/questions', [QuestionCtl::class, 'update']);
+Route::delete('/questions/{id}', [QuestionCtl::class, 'delete']);

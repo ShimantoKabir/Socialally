@@ -5,10 +5,12 @@ import 'package:wengine/components/admin/job/JobManager.dart';
 import 'package:wengine/components/admin/job/category/JobCategory.dart';
 import 'package:wengine/components/admin/job/category/JobSubCategory.dart';
 import 'package:wengine/components/admin/notification/NotificationSender.dart';
+import 'package:wengine/components/admin/referandearn/QuestionManager.dart';
 import 'package:wengine/components/admin/setting/AdvertisementCost.dart';
 import 'package:wengine/components/admin/setting/General.dart';
 import 'package:wengine/components/admin/setting/PaymentGatewayManager.dart';
 import 'package:wengine/components/admin/setting/SupportInfoManager.dart';
+import 'package:wengine/components/admin/transaction/ManualTransaction.dart';
 import 'package:wengine/components/admin/transaction/Requisition.dart';
 import 'package:wengine/components/admin/user/UserManager.dart';
 import 'package:wengine/constants.dart';
@@ -249,6 +251,18 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                   }else if (settings.name ==
                                       "/user/manage") {
                                     return MaterialPageRoute( builder: (context) => UserManager(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                    ));
+                                  }else if (settings.name ==
+                                      "/question/manage") {
+                                    return MaterialPageRoute( builder: (context) => QuestionManager(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
+                                    ));
+                                  }else if (settings.name ==
+                                      "/transactions/manual") {
+                                    return MaterialPageRoute( builder: (context) => ManualTransaction(
                                         eventHub: eventHub,
                                         userInfo: userInfo
                                     ));

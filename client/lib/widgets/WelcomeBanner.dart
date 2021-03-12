@@ -117,7 +117,7 @@ class WelcomeBannerState extends State<WelcomeBanner>{
             width: 500,
             height: 500,
             child: Image.asset(
-              "assets/images/logo_main.png",
+              "assets/images/welcome_banner.png",
               fit: BoxFit.contain,
             ),
           )

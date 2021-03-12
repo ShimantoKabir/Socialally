@@ -410,4 +410,38 @@ class TransactionRpo
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
+
+    public function createManualTransaction(Request $request)
+    {
+        $res = [
+            "code" => "",
+            "msg" => ""
+        ];
+
+        $rTransaction = $request->transaction;
+
+        DB::beginTransaction();
+        try {
+
+            self::saveTransaction($rTransaction);
+
+            Notification::create([
+                "message" => "You got " . $rTransaction['creditAmount'] . " GBP for " . $rTransaction['ledgerName'],
+                "receiverId" => $rTransaction["accountHolderId"],
+                "senderId" => 2, // 2 means admin
+                "isSeen" => 0,
+                "type" => 1 // 1 means notification goes to user
+            ]);
+
+            DB::commit();
+            $res['code'] = 200;
+            $res['msg'] = "Manual transactions successfully done!";
+        } catch (Exception $e) {
+            DB::rollback();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
 }

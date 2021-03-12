@@ -228,7 +228,8 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
             children: <Widget>[
               scrollButton,
               Visibility(
-                visible: needToFreezeUi,
+                // visible: needToFreezeUi,
+                visible: false,
                 child: Container(
                   padding: EdgeInsets.all(5),
                   child: CircularProgressIndicator(

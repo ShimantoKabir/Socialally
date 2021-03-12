@@ -59,7 +59,7 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
         AdCostPlan acp = new AdCostPlan(
             day: plan["day"],
             cost: plan["cost"],
-            txt: "Day = ${plan['day']}, Cost = ${plan['cost']}£"
+            txt: "Day = ${plan['day']}, Cost = £${plan['cost']}"
         );
         adCostPlanDropDownList.add(DropdownMenuItem(
             value: acp,
@@ -100,27 +100,28 @@ class AnyAdvertisementSenderState extends State<AnyAdvertisementSender> {
                 height: 10,
               ),
               Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                  child: DropdownButton<AdCostPlan>(
-                      value: adCostPlan,
-                      isExpanded: true,
-                      underline: SizedBox(),
-                      onChanged: (AdCostPlan acp) {
-                        setState(() {
-                          adCostPlan = new AdCostPlan(
-                            day: acp.day,
-                            cost: acp.cost,
-                            txt: acp.txt
-                          );
-                        });
-                      },
-                      items: adCostPlanDropDownList
-                  )
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                child: DropdownButton<AdCostPlan>(
+                  value: adCostPlan,
+                  isExpanded: true,
+                  underline: SizedBox(),
+                  onChanged: (AdCostPlan acp) {
+                    setState(() {
+                      adCostPlan = new AdCostPlan(
+                          day: acp.day,
+                          cost: acp.cost,
+                          txt: acp.txt
+                      );
+                    });
+                  },
+                  items: adCostPlanDropDownList,
+
+                )
               ),
               SizedBox(
                 height: 10,

@@ -48,12 +48,12 @@ class WelcomeState extends State<Welcome> {
           if (snapshot.hasData) {
             var welcomeData = snapshot.data;
             if(welcomeData != null){
-              print("w $welcomeData");
               return SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
                     WelcomeNavBar(
                       supportInfoList: welcomeData['supportInfoList'],
+                      type: 1,
                     ),
                     WelcomeBanner(),
                     // JobSeeker(),
@@ -61,6 +61,27 @@ class WelcomeState extends State<Welcome> {
                     // UserFeedback(),
                     // AboutUsComponent(),
                     // Footer()
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                            "Our Payment Partners",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Container(
+                          height: 450,
+                          width: 600,
+                          child: Image.asset(
+                            "assets/images/all_payment_partners.png",
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                      ],
+                    )
                   ],
                 ),
               );

@@ -249,14 +249,14 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                       userInfo: userInfo
                     ),
                     Container(
-                      height: 25,
+                      height: 35,
                       child: ListView(
                         children: [
                           Marquee(
                             text: userInfo['clientDashboardHeadline'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                             scrollAxis: Axis.horizontal,
-                            crossAxisAlignment: CrossAxisAlignment.center
+                            crossAxisAlignment: CrossAxisAlignment.end
                           )
                         ].map(wrapWithStuff).toList(),
                       ),

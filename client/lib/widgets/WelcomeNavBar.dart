@@ -11,24 +11,29 @@ import 'package:responsive_builder/responsive_builder.dart';
 class WelcomeNavBar extends StatefulWidget {
   WelcomeNavBar({
     Key key,
-    this.supportInfoList
+    this.supportInfoList,
+    this.type
   }) : super(key: key);
 
   final List<SupportInfo> supportInfoList;
+  final type;
 
   @override
   WelcomeNavBarState createState() => WelcomeNavBarState(
-    supportInfoList: supportInfoList
+    supportInfoList: supportInfoList,
+    type: type
   );
 }
 
 class WelcomeNavBarState extends State<WelcomeNavBar>{
 
   List<SupportInfo> supportInfoList;
+  int type;
 
   WelcomeNavBarState({
     Key key,
     this.supportInfoList,
+    this.type
   });
 
   bool isMobileNavOpen = false;
@@ -96,21 +101,21 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
   List<Widget> getMenuItems(var data){
     return [
       Visibility(
-          child: Image.asset(
-            "assets/images/logo_main.png",
-            height: data["logoHeight"],
-            alignment: Alignment.topCenter,
-          ),
-          visible: data["needLogo"]
+        child: Image.asset(
+          "assets/images/logo_main.png",
+          height: data["logoHeight"],
+          alignment: Alignment.topCenter,
+        ),
+        visible: data["needLogo"]
       ),
       SizedBox(width: 30),
-      Row(
+      type == 1 ? Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
             icon: FaIcon(
               FontAwesomeIcons.youtube,
-              size: 15,
+              size: 20,
               color: Color(0xffbc4302b),
             ),
             onPressed: () {
@@ -123,8 +128,8 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
           ),
           IconButton(
               icon: FaIcon(
-                FontAwesomeIcons.facebook,
-                size: 15,
+                FontAwesomeIcons.facebookMessenger,
+                size: 20,
                 color: Color(0xffb3b5998),
               ),
               onPressed: () {
@@ -138,7 +143,7 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
           IconButton(
               icon: FaIcon(
                 FontAwesomeIcons.twitter,
-                size: 15,
+                size: 20,
                 color: Color(0xffb1DA1F2),
               ),
               onPressed: () {
@@ -150,6 +155,11 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
               }
           )
         ],
+      ) : Text(
+        "WorkersEngine",
+        style: TextStyle(
+          fontWeight: FontWeight.bold
+        ),
       ),
       Visibility(child: SizedBox(width: 5),visible: data["needLogo"]),
       Visibility(child: Spacer(),visible: data["needLogo"]),

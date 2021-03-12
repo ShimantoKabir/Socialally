@@ -67,7 +67,7 @@ class JobFinderState extends State<JobFinder> {
     needToFreezeUi = false;
     pageIndex = 0;
 
-    filterBy = "Filtered By [";
+    filterBy = "[";
 
     if(filterCriteria.categoryName == null){
       filterBy = filterBy + "Category: None";
@@ -102,17 +102,27 @@ class JobFinderState extends State<JobFinder> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  IconButton(
-                      icon: Icon(
-                        Icons.filter_alt_outlined,
-                        size: 15,
-                        color: Colors.white,
+                  Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(
+                            Icons.filter_alt_outlined,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                          onPressed: (){
+                            eventHub.fire("redirectToJobFilter",{
+                              "type" : 1
+                            });
+                          }
                       ),
-                      onPressed: (){
-                        eventHub.fire("redirectToJobFilter",{
-                          "type" : 1
-                        });
-                      }
+                      Text(
+                        "Filter",
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                      )
+                    ],
                   ),
                   Text(
                     filterBy,

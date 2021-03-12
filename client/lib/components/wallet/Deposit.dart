@@ -88,12 +88,6 @@ class DepositState extends State<Deposit> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: FaIcon(FontAwesomeIcons.facebook),
-                onPressed: (){
-
-                }
-              ),
               showRequiredHeading("Payment Gateway"),
               SizedBox(
                 height: 10,

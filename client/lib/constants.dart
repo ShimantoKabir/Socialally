@@ -1,4 +1,5 @@
 import 'package:wengine/models/AdCostPlan.dart';
+import 'package:wengine/models/ChartOfAccount.dart';
 import 'package:wengine/models/ProjectCategory.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/material.dart';
@@ -229,6 +230,11 @@ List<Node> adminDashboardMenus = [
         label: ' Requisition',
         key: '/transactions/requisition',
         icon: NodeIcon.fromIconData(Icons.request_page)
+      ),
+      Node(
+          label: ' Manual',
+          key: '/transactions/manual',
+          icon: NodeIcon.fromIconData(Icons.transform)
       )
     ],
   ),
@@ -263,6 +269,11 @@ List<Node> adminDashboardMenus = [
       label: ' Manage User',
       key: '/user/manage',
       icon: NodeIcon.fromIconData(Icons.people_outline)
+  ),
+  Node(
+      label: ' Manage Question',
+      key: '/question/manage',
+      icon: NodeIcon.fromIconData(Icons.question_answer)
   )
 ];
 
@@ -368,6 +379,20 @@ List<DropdownMenuItem<AdCostPlan>> adCostPlanDropDownList = [
   );
 }).toList();
 
+List<DropdownMenuItem<ChartOfAccount>> chartOfAccountDropDownList = [
+  ChartOfAccount(
+    id: null,
+    ledgerName: "Select",
+    ledgerId: null,
+    type: null
+  )
+].map<DropdownMenuItem<ChartOfAccount>>((var chartOfAccount) {
+  return DropdownMenuItem<ChartOfAccount>(
+      value: chartOfAccount,
+      child: Text(chartOfAccount.ledgerName)
+  );
+}).toList();
+
 List<DropdownMenuItem<String>> notificationForDropDownList = [
   'Select',
   'All',
@@ -398,6 +423,8 @@ List<DropdownMenuItem<String>> referCommissionTypeDropDownList = [
     child: Text(value),
   );
 }).toList();
+
+
 
 Widget showRequiredHeading(String title){
   return RichText(

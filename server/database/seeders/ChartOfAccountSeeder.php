@@ -18,27 +18,38 @@ class ChartOfAccountSeeder extends Seeder
         $chartOfAccounts = [
             [
                 "ledgerId" => 101,
-                "ledgerName" => "Deposit"
+                "ledgerName" => "Deposit",
+                "type" => 1
             ],
             [
                 "ledgerId" => 102,
-                "ledgerName" => "Withdraw"
+                "ledgerName" => "Withdraw",
+                "type" => 2
             ],
             [
                 "ledgerId" => 103,
-                "ledgerName" => "Earning"
+                "ledgerName" => "Earning",
+                "type" => 1
             ],
             [
                 "ledgerId" => 104,
-                "ledgerName" => "Job Posting"
+                "ledgerName" => "Job Posting",
+                "type" => 2
             ],
             [
                 "ledgerId" => 105,
-                "ledgerName" => "Advertisement Cost"
+                "ledgerName" => "Advertisement Cost",
+                "type" => 2
             ],
             [
                 "ledgerId" => 106,
-                "ledgerName" => "Referring Commission"
+                "ledgerName" => "Referring Commission",
+                "type" => 1
+            ],
+            [
+                "ledgerId" => 107,
+                "ledgerName" => "Refer And Earn",
+                "type" => 1
             ]
         ];
 
@@ -48,7 +59,8 @@ class ChartOfAccountSeeder extends Seeder
 
             DB::table('ChartOfAccounts')->insert([
                 "ledgerId" => $val['ledgerId'],
-                "ledgerName" => $val['ledgerName']
+                "ledgerName" => $val['ledgerName'],
+                "type" => $val['type']
             ]);
         }
     }
