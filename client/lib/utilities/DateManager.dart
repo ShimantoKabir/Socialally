@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateManager{
@@ -16,6 +17,16 @@ class DateManager{
 
   static getOnlyDate(DateTime dateTime){
     return dateFormat.format(dateTime);
+  }
+
+  static TimeOfDay getTimeOfDayFromString(String time) {
+    int hh = 0;
+    if (time.endsWith('PM')) hh = 12;
+    time = time.split(' ')[0];
+    return TimeOfDay(
+      hour: hh + int.parse(time.split(":")[0]) % 24, // in case of a bad time format entered manually by the user
+      minute: int.parse(time.split(":")[1]) % 60,
+    );
   }
 
 }

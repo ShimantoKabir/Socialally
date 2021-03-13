@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:http/http.dart';
 import 'package:wengine/constants.dart';
+import 'package:wengine/models/MyLocation.dart';
 import 'package:wengine/widgets/WelcomeNavBar.dart';
 import 'package:wengine/utilities/HttpHandler.dart';
 import 'package:wengine/utilities/Alert.dart';
@@ -36,13 +40,24 @@ class RegistrationState extends State<Registration> {
   TextEditingController passwordCtl = new TextEditingController();
   TextEditingController confirmPasswordCtl = new TextEditingController();
   String regionName;
+  String countryName;
   bool agreedTermsAndCondition;
+  bool isLoading;
+  Future futureLocations;
+  MyLocation myLocation;
 
   @override
   void initState() {
     super.initState();
     regionName = "Select";
+    countryName = "Select";
     agreedTermsAndCondition = false;
+    isLoading = true;
+    futureLocations = fetchLocations();
+    myLocation = new MyLocation(
+      countryName: "Select",
+      regionName: null
+    );
   }
 
   @override
@@ -68,34 +83,86 @@ class RegistrationState extends State<Registration> {
                   ),
                   SizedBox(height: 20),
                   emailPasswordWidget(),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Align(
                     alignment: Alignment.bottomLeft,
-                    child: Text("Region",style: TextStyle(
+                    child: Text("Country",style: TextStyle(
                       fontWeight: FontWeight.bold
                     )),
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                      child: DropdownButton<String>(
-                          value: regionName,
-                          isExpanded: true,
-                          underline: SizedBox(),
-                          onChanged: (String newValue) {
-                            setState(() {
-                              regionName = newValue;
+                  FutureBuilder(
+                    future: futureLocations,
+                    builder: (context,snapshot){
+                      if (snapshot.hasData) {
+                        List<MyLocation> locations = snapshot.data;
+                        if(locations.length > 0){
+
+                          locations.forEach((loc) {
+                            bool isValueExist = false;
+                            locationDropDownList.forEach((drp) {
+                              if(loc.countryName == drp.value.countryName){
+                                isValueExist = true;
+                              }
                             });
-                          },
-                          items: regionDropDownList
-                      )
+                            if(!isValueExist){
+                              locationDropDownList.add(new DropdownMenuItem<MyLocation>(
+                                value: MyLocation(
+                                    regionName: loc.regionName,
+                                    countryName: loc.countryName
+                                ),
+                                child: Text(loc.countryName),
+                              ));
+                            }
+                          });
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                            ),
+                            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                            child: DropdownButton<MyLocation>(
+                              value: myLocation,
+                              isExpanded: true,
+                              underline: SizedBox(),
+                              onChanged: (MyLocation mln) {
+                                setState(() {
+                                  myLocation = MyLocation(
+                                    regionName: mln.regionName,
+                                    countryName: mln.countryName
+                                  );
+                                });
+                              },
+                              items: locationDropDownList
+                            )
+                          );
+                        }else {
+                          return Center(
+                            child: Text("No notification found!"),
+                          );
+                        }
+                      }else {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    }
                   ),
                   SizedBox(
                     height: 20,
@@ -173,7 +240,8 @@ class RegistrationState extends State<Registration> {
               "password": passwordCtl.text,
               "referredBy": referrerId,
               "type" : type,
-              "regionName" : regionName,
+              "countryName" : myLocation.countryName,
+              "regionName" : myLocation.regionName,
               "agreedTermsAndCondition" : agreedTermsAndCondition
             },
             "clientUrl": Uri.base.origin
@@ -416,8 +484,8 @@ class RegistrationState extends State<Registration> {
     }else if (confirmPasswordCtl.text != passwordCtl.text){
       Alert.show(alertDialog, buildContext, Alert.ERROR, "Password and confirm password did not matched!");
       isInputVerified = false;
-    }else if (regionName == "Select"){
-      Alert.show(alertDialog, buildContext, Alert.ERROR, "Please select a region!");
+    }else if (myLocation.countryName == "Select"){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, "Please select a country!");
       isInputVerified = false;
     }else if (agreedTermsAndCondition == false){
       Alert.show(alertDialog, buildContext, Alert.ERROR, "Please accept terms and conditions!");
@@ -461,6 +529,48 @@ class RegistrationState extends State<Registration> {
         ),
       ),
     );
+  }
+
+  Future<List<MyLocation>> fetchLocations() async {
+
+    List<MyLocation> locationList = [];
+
+    if(locationDropDownList.isNotEmpty){
+      locationDropDownList.clear();
+    }
+
+    locationDropDownList.add(new DropdownMenuItem<MyLocation>(
+      value: MyLocation(
+          regionName: null,
+          countryName: "Select"
+      ),
+      child: Text("Select"),
+    ));
+
+    setState(() {
+      myLocation = MyLocation(
+        regionName: null,
+        countryName: "Select"
+      );
+    });
+
+    var response = await get("https://restcountries.eu/rest/v2/all");
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      List<dynamic> locations = jsonResponse;
+      locations.asMap().forEach((key, location) {
+        locationList.add(new MyLocation(
+          countryName: location['name'],
+          regionName: location['region']
+        ));
+      });
+    } else {
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    }
+
+    return locationList;
+
   }
 
 }

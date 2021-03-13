@@ -1,4 +1,5 @@
 import 'package:wengine/components/NotificationComponent.dart';
+import 'package:wengine/components/PlayAndEarn.dart';
 import 'package:wengine/components/ReferAndEarn.dart';
 import 'package:wengine/components/SupportInfoPresenter.dart';
 import 'package:wengine/components/job/Applicants.dart';
@@ -434,6 +435,13 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       eventHub: eventHub,
                                                       userInfo: userInfo,
                                                       project: project));
+                                            }else if (settings.name ==
+                                                "/play-and-earn") {
+                                              return MaterialPageRoute(
+                                                  builder: (context) => PlayAndEarn(
+                                                      eventHub: eventHub,
+                                                      userInfo: userInfo
+                                                  ));
                                             } else {
                                               return MaterialPageRoute(
                                                   builder: (context) => JobFinder(

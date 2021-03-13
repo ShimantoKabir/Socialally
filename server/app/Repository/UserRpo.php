@@ -100,6 +100,7 @@ class UserRpo
                 $userInfo->referId = $referId;
                 $userInfo->agreedTermsAndCondition = $rUserInfo['agreedTermsAndCondition'];
                 $userInfo->regionName = $rUserInfo['regionName'];
+                $userInfo->countryName = $rUserInfo['countryName'];
                 if ($rUserInfo['referredBy'] != "empty") {
                     $userInfo->referredBy = $rUserInfo['referredBy'];
                 }
@@ -263,6 +264,7 @@ class UserRpo
                             "supportInfoList" =>  $appConstants['supportInfoList'],
                             "minimumWithdraw" =>  $appConstants['minimumWithdraw'],
                             "minimumDeposit" =>  $appConstants['minimumDeposit'],
+                            "questionShowingTime" =>  $appConstants['questionShowingTime'],
                             "clientDashboardHeadline" =>  $appConstants['clientDashboardHeadline'],
                             "quantityOfJoinByYourRefer" => UserInfo::select("id")->where("referredBy", $userInfo['referId'])->count(),
                             "totalUnseenNotification" => Notification::where("receiverId", $userInfo['id'])->where("isSeen", false)->count(),

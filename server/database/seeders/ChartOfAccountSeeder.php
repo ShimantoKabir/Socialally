@@ -48,7 +48,7 @@ class ChartOfAccountSeeder extends Seeder
             ],
             [
                 "ledgerId" => 107,
-                "ledgerName" => "Refer And Earn",
+                "ledgerName" => "Play And Earn",
                 "type" => 1
             ]
         ];

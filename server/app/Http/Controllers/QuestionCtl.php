@@ -18,9 +18,9 @@ class QuestionCtl extends Controller
         $this->questionRpo = new QuestionRpo();
     }
 
-    public function read(Request $request)
+    public function readByTime(Request $request)
     {
-        return $this->questionRpo->read($request);
+        return $this->questionRpo->readByTime($request);
     }
 
     public function create(Request $request)

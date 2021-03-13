@@ -2,15 +2,17 @@
 
 namespace App\Repository;
 
+use App\Models\AppConstant;
 use Exception;
 use App\Models\Question;
+use App\Utilities\AppConstantReader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class QuestionRpo
 {
 
-    public function read(Request $request)
+    public function readByTime(Request $request)
     {
 
         $res = [
@@ -20,8 +22,29 @@ class QuestionRpo
 
         try {
 
-            $res["code"] = 200;
-            $res['msg'] = "OK";
+            if (!$request->has('time-of-day')) {
+                $res['code'] = 404;
+                $res['msg'] = "Time of the day required!";
+            } else {
+
+                $timeOfDay = $request->query('time-of-day');
+
+                $appConstant = AppConstantReader::read();
+                $res['questionShowingTime'] = $appConstant["questionShowingTime"];
+
+                $qst = str_replace(' ', '', $res['questionShowingTime']);
+
+                if ($timeOfDay == $qst) {
+                    $sql = "SELECT * FROM Questions ORDER BY id DESC LIMIT 0,5";
+                    $res['questions'] = DB::select(DB::raw($sql));
+                    $res["code"] = 200;
+                    $res['msg'] = "Question fetched successfully!";
+                } else {
+                    $res['questions'] = [];
+                    $res["code"] = 200;
+                    $res['msg'] = "Question showing time not come yet!";
+                }
+            }
         } catch (Exception $e) {
             $res['msg'] = $e->getMessage();
             $res['code'] = $e->getCode();
@@ -85,7 +108,6 @@ class QuestionRpo
 
         return $res;
     }
-
 
     public function delete(Request $request, $id)
     {

@@ -77,7 +77,7 @@ Route::get('/transactions/query', [TransactionCtl::class, 'readByQuery']);
 Route::put('/transactions', [TransactionCtl::class, 'update']);
 Route::get('/transactions/balance-summary-query', [TransactionCtl::class, 'getBalanceSummary']);
 Route::get('/transactions/overview', [TransactionCtl::class, 'getTransactionOverview']);
-Route::get('/transactions/manual', [TransactionCtl::class, 'createManualTransaction']);
+Route::post('/transactions/manual', [TransactionCtl::class, 'createManualTransaction']);
 // -- ?start-date=2020-01-01&end-date=2020-01-31
 
 // notifications
@@ -88,6 +88,7 @@ Route::post('/notifications', [NotificationCtl::class, 'create']);
 // advertisements
 Route::get('/advertisements/query', [AdvertisementCtl::class, 'readByQuery']);
 Route::post('/advertisements', [AdvertisementCtl::class, 'create']);
+Route::put('/advertisements', [AdvertisementCtl::class, 'update']);
 
 // app constant
 Route::get('/app-constants/settings/general', [AppConstantCtl::class, 'getGeneralSettingData']);
@@ -111,6 +112,7 @@ Route::get('/welcome', [WelcomeCtl::class, 'read']);
 
 // questions
 Route::get('/questions/query', [QuestionCtl::class, 'readByQuery']);
+Route::get('/questions/time/query', [QuestionCtl::class, 'readByTime']);
 Route::post('/questions', [QuestionCtl::class, 'create']);
 Route::put('/questions', [QuestionCtl::class, 'update']);
 Route::delete('/questions/{id}', [QuestionCtl::class, 'delete']);

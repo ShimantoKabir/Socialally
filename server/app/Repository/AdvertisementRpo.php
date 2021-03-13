@@ -104,26 +104,63 @@ class AdvertisementRpo
             } else if (!$request->has('page-index')) {
                 $res['code'] = 404;
                 $res['msg'] = "Page index required!";
+            } else if (!$request->has('type')) {
+                $res['code'] = 404;
+                $res['msg'] = "Type required!";
             } else {
 
                 $perPage = $request->query('per-page');
                 $pageIndex = $request->query('page-index');
+                $type = $request->query('type');
 
                 $sql = "SELECT * FROM Advertisements";
 
-                if ($request->has('given-by')) {
+                if ($type == 1) {
+
+                    $sql = $sql . " WHERE status = 'Approved' ";
+                } else if ($type == 2) {
 
                     $givenBy = $request->query('given-by');
                     $sql = $sql . " WHERE givenBy = " . $givenBy;
+                } else {
+
+                    $sql = $sql . " WHERE status = 'Pending' ";
                 }
 
-                $sql = $sql . " LIMIT " . $pageIndex . ", " . $perPage;
+                $sql = $sql . " ORDER BY id DESC LIMIT " . $pageIndex . ", " . $perPage;
 
                 $res["advertisements"] = DB::select(DB::raw($sql));
                 $res['msg'] = "Advertisement fetched successfully!";
                 $res['code'] = 200;
                 $res["sql"] = $sql;
             }
+        } catch (Exception $e) {
+            $res['msg'] = $e->getMessage();
+            $res['code'] = $e->getCode();
+        }
+
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public function update(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $advertisement = $request->advertisement;
+        try {
+
+            Advertisement::where("id", $advertisement['id'])
+                ->update([
+                    "status" => $advertisement['status']
+                ]);
+
+            $res["msg"] = "Status updated successfully!";
+            $res["code"] = 200;
         } catch (Exception $e) {
             $res['msg'] = $e->getMessage();
             $res['code'] = $e->getCode();

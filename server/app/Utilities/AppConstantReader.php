@@ -48,6 +48,9 @@ class AppConstantReader
             if ($val["appConstantName"] == "supportInfoList") {
                 $res["supportInfoList"] = $val["appConstantJsonValue"];
             }
+            if ($val["appConstantName"] == "questionShowingTime") {
+                $res["questionShowingTime"] = $val["appConstantStringValue"];
+            }
         }
 
         return $res;

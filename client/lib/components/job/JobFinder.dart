@@ -163,27 +163,33 @@ class JobFinderState extends State<JobFinder> {
                             eventHub.fire("redirectToProofSubmission",projects[index]);
                           },
                           child: Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(10),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  projects[index].title,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      projects[index].title,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15
+                                      ),
+                                    ),
+                                    Text("Worker Needed: ${projects[index].workerNeeded}"),
+                                  ],
                                 ),
+                                SizedBox(height: 5),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("Publish By: ${projects[index].publisherName}"),
-                                    Text(
-                                        "Volume: ${projects[index].workerNeeded}"
-                                        "/Budget: ${projects[index].estimatedCost} GBP"
+                                    Text("Budget: £${projects[index].estimatedCost}"
                                     )
                                   ],
                                 )

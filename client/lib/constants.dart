@@ -1,5 +1,6 @@
 import 'package:wengine/models/AdCostPlan.dart';
 import 'package:wengine/models/ChartOfAccount.dart';
+import 'package:wengine/models/MyLocation.dart';
 import 'package:wengine/models/ProjectCategory.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,8 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-const baseUrl = "http://127.0.0.1:8000/api";
-// const baseUrl = "https://workersengine.com/server/public/api";
+// const baseUrl = "http://127.0.0.1:8000/api";
+const baseUrl = "https://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -177,12 +178,17 @@ List<Node> userDashboardMenus = [
   //     icon: NodeIcon.fromIconData(Icons.account_tree)
   // ),
   Node(
-    label: 'Refer & Earn',
+    label: ' Refer & Earn',
     key: '/refer-and-earn',
     icon: NodeIcon.fromIconData(Icons.monetization_on_outlined)
   ),
   Node(
-    label: 'Support',
+      label: ' Play & Earn',
+      key: '/play-and-earn',
+      icon: NodeIcon.fromIconData(Icons.playlist_play_sharp)
+  ),
+  Node(
+    label: ' Support',
     key: '/support',
     icon: NodeIcon.fromIconData(Icons.support)
   )
@@ -274,6 +280,11 @@ List<Node> adminDashboardMenus = [
       label: ' Manage Question',
       key: '/question/manage',
       icon: NodeIcon.fromIconData(Icons.question_answer)
+  ),
+  Node(
+      label: ' Manage Advertisement',
+      key: '/advertisement/manage',
+      icon: NodeIcon.fromIconData(Icons.approval)
   )
 ];
 
@@ -424,7 +435,17 @@ List<DropdownMenuItem<String>> referCommissionTypeDropDownList = [
   );
 }).toList();
 
-
+List<DropdownMenuItem<MyLocation>> locationDropDownList = [
+  MyLocation(
+    regionName: null,
+    countryName: "Select"
+  )
+].map<DropdownMenuItem<MyLocation>>((MyLocation location) {
+  return DropdownMenuItem<MyLocation>(
+    value: location,
+    child: Text(location.countryName),
+  );
+}).toList();
 
 Widget showRequiredHeading(String title){
   return RichText(

@@ -21,6 +21,7 @@ class Advertisements extends Migration
             $table->double('adCost');
             $table->integer('adDuration');
             $table->integer('givenBy');
+            $table->string('status')->default("Pending")->comment("Pending, Approved, Declined");
             $table->string('ip')->nullable();
             $table->integer('modifiedBy')->nullable();
             $table->timestamp('createdAt')->useCurrent();

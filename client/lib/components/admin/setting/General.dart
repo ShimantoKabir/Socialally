@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:wengine/constants.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:wengine/utilities/DateManager.dart';
 
 class General extends StatefulWidget {
   General({Key key, this.userInfo, this.eventHub}) : super(key: key);
@@ -31,6 +32,7 @@ class GeneralState extends State<General> {
   bool needToFreezeUi;
   String jobApprovalType;
   String referCommissionType;
+  String questionShowingTime;
 
   TextEditingController minimumDepositCtl = new TextEditingController();
   TextEditingController minimumWithdrawCtl = new TextEditingController();
@@ -50,6 +52,7 @@ class GeneralState extends State<General> {
     jobApprovalType = "Manual";
     referCommissionType = "Lifetime";
     futureGeneralSettingData = fetchGeneralSettingData();
+    questionShowingTime = "12:00 PM";
   }
 
   @override
@@ -214,6 +217,36 @@ class GeneralState extends State<General> {
                 height: 20,
               ),
               Row(
+                children: [
+                  Text(
+                      "Question Showing Time",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold
+                      )
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  OutlineButton(
+                    onPressed: () {
+                      showTimePicker(
+                          context: context,
+                          initialTime: DateManager.getTimeOfDayFromString(questionShowingTime)
+                      ).then((value){
+                        setState(() {
+                          questionShowingTime = value.format(context).toString();
+                        });
+                      });
+                    },
+                    child: Text(questionShowingTime),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   OutlineButton(
@@ -294,6 +327,7 @@ class GeneralState extends State<General> {
           referCommissionCtl.text = res['referCommission'].toString();
           minimumWithdrawCtl.text = res['minimumWithdraw'].toString();
           minimumDepositCtl.text = res['minimumDeposit'].toString();
+          questionShowingTime = res['questionShowingTime'];
           jobApprovalType = res['jobApprovalType'] == 1 ? "Automatic" : "Manual";
           referCommissionType = res['quantityOfEarnByRefer'] == -1 ? "Lifetime" : "Limited";
           if(res['quantityOfEarnByRefer'] != -1){
@@ -353,6 +387,7 @@ class GeneralState extends State<General> {
         "jobPostingCharge": double.tryParse(jobPostingChargeCtl.text),
         "referCommission": double.tryParse(referCommissionCtl.text),
         "clientDashboardHeadline": clientDashboardHeadlineCtl.text,
+        "questionShowingTime": questionShowingTime,
         "jobApprovalType": jobApprovalType == "Manual" ? 0 : 1,
         "quantityOfEarnByRefer": referCommissionType == "Lifetime" ? -1 :
             int.tryParse(quantityOfReferCommissionCtl.text)

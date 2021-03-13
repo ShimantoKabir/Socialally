@@ -61,7 +61,7 @@ class WelcomeState extends State<Welcome> {
                     // UserFeedback(),
                     // AboutUsComponent(),
                     // Footer()
-                    Row(
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -73,8 +73,7 @@ class WelcomeState extends State<Welcome> {
                           ),
                         ),
                         Container(
-                          height: 450,
-                          width: 600,
+                          height: 50,
                           child: Image.asset(
                             "assets/images/all_payment_partners.png",
                             fit: BoxFit.contain,

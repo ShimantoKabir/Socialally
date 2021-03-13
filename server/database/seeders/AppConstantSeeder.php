@@ -105,6 +105,10 @@ class AppConstantSeeder extends Seeder
                     [
                         "name" => "WhatsApp",
                         "address" => "+447456336006"
+                    ],
+                    [
+                        "name" => "AnswerSendMail",
+                        "address" => "help.workersengine@gmail.com"
                     ]
                 ]),
                 "appConstantIntegerValue" => null,
@@ -134,6 +138,13 @@ class AppConstantSeeder extends Seeder
             [
                 "appConstantName" => "clientDashboardHeadline",
                 "appConstantStringValue" => "This is earning application. You can send job, apply new job, withdraw directly to bkash or Rocket.",
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => 0,
+                "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "questionShowingTime",
+                "appConstantStringValue" => "11:30 AM",
                 "appConstantJsonValue" => null,
                 "appConstantIntegerValue" => 0,
                 "appConstantDoubleValue" => null

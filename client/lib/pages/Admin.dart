@@ -5,7 +5,7 @@ import 'package:wengine/components/admin/job/JobManager.dart';
 import 'package:wengine/components/admin/job/category/JobCategory.dart';
 import 'package:wengine/components/admin/job/category/JobSubCategory.dart';
 import 'package:wengine/components/admin/notification/NotificationSender.dart';
-import 'package:wengine/components/admin/referandearn/QuestionManager.dart';
+import 'package:wengine/components/admin/playandearn/QuestionManager.dart';
 import 'package:wengine/components/admin/setting/AdvertisementCost.dart';
 import 'package:wengine/components/admin/setting/General.dart';
 import 'package:wengine/components/admin/setting/PaymentGatewayManager.dart';
@@ -13,6 +13,7 @@ import 'package:wengine/components/admin/setting/SupportInfoManager.dart';
 import 'package:wengine/components/admin/transaction/ManualTransaction.dart';
 import 'package:wengine/components/admin/transaction/Requisition.dart';
 import 'package:wengine/components/admin/user/UserManager.dart';
+import 'package:wengine/components/user/advertisement/AdvertisedAny.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/models/Transaction.dart';
 import 'package:wengine/widgets/DashboardLeftNavigation.dart';
@@ -265,6 +266,13 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                     return MaterialPageRoute( builder: (context) => ManualTransaction(
                                         eventHub: eventHub,
                                         userInfo: userInfo
+                                    ));
+                                  }else if (settings.name ==
+                                      "/advertisement/manage") {
+                                    return MaterialPageRoute( builder: (context) => AdvertisedAny(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo,
+                                        type: 3
                                     ));
                                   } else {
                                     return MaterialPageRoute(builder: (context) => AdminDashboard(

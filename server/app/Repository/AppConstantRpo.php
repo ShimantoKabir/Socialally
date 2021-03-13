@@ -31,6 +31,7 @@ class AppConstantRpo
             $res["takePerPound"] = $appConstants["takePerPound"];
             $res["jobApprovalType"] = $appConstants["jobApprovalType"];
             $res["quantityOfEarnByRefer"] = $appConstants["quantityOfEarnByRefer"];
+            $res["questionShowingTime"] = $appConstants["questionShowingTime"];
 
             $res['msg'] = "App constant value fetched successfully!";
             $res['code'] = 200;
@@ -85,6 +86,10 @@ class AppConstantRpo
 
             AppConstant::where('appConstantName', 'quantityOfEarnByRefer')->update(array(
                 'appConstantIntegerValue' => $generalSetting['quantityOfEarnByRefer']
+            ));
+
+            AppConstant::where('appConstantName', 'questionShowingTime')->update(array(
+                'appConstantStringValue' => $generalSetting['questionShowingTime']
             ));
 
             DB::commit();

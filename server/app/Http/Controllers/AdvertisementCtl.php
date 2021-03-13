@@ -27,4 +27,9 @@ class AdvertisementCtl extends Controller
     {
         return $this->advertisementRpo->readByQuery($request);
     }
+
+    public function update(Request $request)
+    {
+        return $this->advertisementRpo->update($request);
+    }
 }

@@ -155,10 +155,13 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
               }
           )
         ],
-      ) : Text(
+      ) :
+      SelectableText(
         "WorkersEngine",
         style: TextStyle(
-          fontWeight: FontWeight.bold
+          fontWeight: FontWeight.bold,
+          color: Colors.green,
+          fontSize: 20
         ),
       ),
       Visibility(child: SizedBox(width: 5),visible: data["needLogo"]),

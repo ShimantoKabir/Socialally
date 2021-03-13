@@ -29,7 +29,7 @@ class WelcomeBannerState extends State<WelcomeBanner>{
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(50),
+      padding: EdgeInsets.fromLTRB(50,50,50,0),
       child: ScreenTypeLayout(
         desktop: getDesktopBanner({
           "lgFontSize" : 65.0,
@@ -71,7 +71,7 @@ class WelcomeBannerState extends State<WelcomeBanner>{
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        SelectableText(
           "WorkersEngine",
           style: TextStyle(
             fontSize: data["lgFontSize"],
@@ -82,7 +82,7 @@ class WelcomeBannerState extends State<WelcomeBanner>{
         SizedBox(
           height: 8,
         ),
-        Text(
+        SelectableText(
           "WorkersEngine is an innovative crowdsources platform that connects Employer as well as Workers globally. WorkersEngine is a UK based registered company with registration number 13162011 is registered as WorkersEngine Ltd. We offer effective solutions to companies, businesses and persons in need to outsource their jobs and projects. Solutions may include constructive ways of breaking down vast tasks to be distributed to workers, minimizing your time to finish your project and collect results on your target date. Our platform concentrates in deploying micro jobs to workers such as data collection and analysis, moderation and/or extraction of data, annotation, classification, image or video tagging, conversion and transcription, product testing, research and survey jobs and more. WorkersEngine began in 2021 and is now one of the growing and trusted crowd-based outsourcing platforms online.",
           style: TextStyle(
             fontSize: data["smFontSize"],

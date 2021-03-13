@@ -7,6 +7,7 @@ class Advertisement {
   int adDuration;
   int givenBy;
   String createdAt;
+  String status;
 
   Advertisement({
     this.id,
@@ -16,6 +17,7 @@ class Advertisement {
     this.adCost,
     this.adDuration,
     this.givenBy,
-    this.createdAt
+    this.createdAt,
+    this.status
   });
 }

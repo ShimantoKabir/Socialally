@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart';
 import 'package:wengine/models/ChartOfAccount.dart';
@@ -131,11 +132,11 @@ class ManualTransactionState extends State<ManualTransaction> {
             TypeAheadField(
               suggestionsBoxController: suggestionsBoxController,
               textFieldConfiguration: TextFieldConfiguration(
-                  controller: userInfoIdCtl,
-                  decoration: InputDecoration(
-                      hintText: "Search your posted job ....",
-                      border: OutlineInputBorder()
-                  )
+                controller: userInfoIdCtl,
+                decoration: InputDecoration(
+                  hintText: "Search user id ....",
+                  border: OutlineInputBorder()
+                )
               ),
               suggestionsCallback: (pattern) async {
                 return fetchProject(pattern);
@@ -147,11 +148,9 @@ class ManualTransactionState extends State<ManualTransaction> {
                 );
               },
               onSuggestionSelected: (UserInfo selectedUi) {
-                setState(() {
-                  userInfoIdCtl.text = ui.userInfoId;
-                  ui.id = selectedUi.id;
-                  ui.userInfoId = selectedUi.userInfoId;
-                });
+                userInfoIdCtl.text = selectedUi.userInfoId;
+                ui.id = selectedUi.id;
+                ui.userInfoId = selectedUi.userInfoId;
               },
             ),
             SizedBox(
@@ -186,6 +185,20 @@ class ManualTransactionState extends State<ManualTransaction> {
             SizedBox(
               height: 10,
             ),
+            entryField(
+                controller: amountCtl,
+                title: "Amount(GBP)",
+                needToBeRequired: true,
+                textInputFormatter: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[0-9.]')
+                  ),
+                ],
+                textInputType: TextInputType.number
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -210,9 +223,9 @@ class ManualTransactionState extends State<ManualTransaction> {
         ),
       ),
       bottomNavigationBar: Alert.addBottomLoader(
-          needToFreezeUi,
-          alertIcon,
-          alertText
+        needToFreezeUi,
+        alertIcon,
+        alertText
       ),
     );
   }
@@ -223,6 +236,43 @@ class ManualTransactionState extends State<ManualTransaction> {
     ui.id = null;
     ui.firstName = null;
     ui.userInfoId = null;
+  }
+
+  Widget entryField({String title,
+    TextEditingController controller,
+    TextInputType textInputType,
+    List<TextInputFormatter> textInputFormatter,
+    int maxLines,
+    bool needToBeRequired}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          needToBeRequired ? showRequiredHeading(title) :
+          Text(
+            title,
+            style: TextStyle(
+                fontWeight: FontWeight.bold
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          TextField(
+              maxLines: maxLines == null ? 1 : maxLines,
+              keyboardType: textInputType,
+              controller: controller,
+              inputFormatters: textInputFormatter,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  fillColor: Color(0xfff3f3f4),
+                  filled: true
+              )
+          )
+        ],
+      ),
+    );
   }
 
   Future<List<UserInfo>> fetchProject(String pattern) async {
@@ -269,11 +319,63 @@ class ManualTransactionState extends State<ManualTransaction> {
   }
 
   void onSave(BuildContext context) {
+    setState(() {
+      needToFreezeUi = true;
+      alertIcon = Alert.showIcon(Alert.LOADING);
+      alertText = Alert.LOADING_MSG;
+    });
 
+    var request = {
+      "transaction": {
+        "accountHolderId": ui.id,
+        "ledgerId": chartOfAccount.ledgerId,
+        "ledgerName": chartOfAccount.ledgerName,
+        "creditAmount" : double.tryParse(amountCtl.text),
+        "status" : "Approved",
+        "debitAmount" : null,
+        "transactionId" : null,
+        "accountNumber" : null,
+        "paymentGatewayName" : null
+      }
+    };
+
+    String url = baseUrl + '/transactions/manual';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    post(url, headers: headers, body: json.encode(request)).then((response) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body['code'] == 200) {
+          onReset(context);
+          Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
   }
 
   void onReset(BuildContext context) {
-
+    setState(() {
+      clearSuggestion(context);
+      amountCtl.clear();
+      chartOfAccount = ChartOfAccount(
+        id: null,
+        ledgerName: "Select",
+        ledgerId: null,
+        type: null
+      );
+    });
   }
 
 }

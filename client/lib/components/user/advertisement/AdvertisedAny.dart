@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/models/Advertisement.dart';
 import 'package:wengine/utilities/Alert.dart';
@@ -64,7 +62,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
           nextCounter++;
         }
       }
-      if(nextCounter == 2){
+      if(nextCounter == 2 && type == 1){
         nextCounter = 0;
         nextButton.onPressed();
       }
@@ -143,8 +141,8 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
               goToFirstPage(context);
               return Center(
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("No advertisement found!")
+                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                  child: Text("No advertisement found!")
                 ),
               );
             }else {
@@ -156,7 +154,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                 itemCount: advertisements.length,
                 itemBuilder: (context, index) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if(advertisements.length == (index+1)){
+                    if(advertisements.length == (index+1) && type == 1){
                       scrollButton.onPressed();
                     }
                   });
@@ -169,13 +167,32 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                         children: [
                           Container(
                             padding: EdgeInsets.fromLTRB(10,5,10,5),
-                            child: Text(
-                              advertisements[index].title,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  advertisements[index].title,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15
+                                  ),
+                                ),
+                                Visibility(
+                                  child: Text(
+                                    advertisements[index].status,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: advertisements[index].status == "Pending" ?
+                                      Colors.blue : advertisements[index].status == "Approved" ?
+                                      Colors.green : Colors.red
+                                    ),
+                                  ),
+                                  visible: type != 1,
+                                )
+                              ],
                             ),
                             decoration: headingDecoration(),
                           ),
@@ -197,6 +214,37 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                                 isTappedToImage = true;
                                 openUrl(advertisements[index].targetedDestinationUrl, context);
                               }
+                          ),
+                          Visibility(
+                            visible: type == 3,
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  OutlineButton(
+                                    onPressed: (){
+                                      onUpdate(
+                                          context,
+                                          advertisements[index],
+                                          "Approved"
+                                      );
+                                    },
+                                    child: Text("Approve"),
+                                  ),
+                                  OutlineButton(
+                                    onPressed: (){
+                                      onUpdate(
+                                          context,
+                                          advertisements[index],
+                                          "Declined"
+                                      );
+                                    },
+                                    child: Text("Declined"),
+                                  )
+                                ],
+                              ),
+                            )
                           )
                         ],
                       ),
@@ -262,13 +310,18 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
 
   Future<List<Advertisement>> fetchAdvertisedAny() async {
 
+    // type = 1 [view right side of user dashboard]
+    // type = 2 [view when click My Advertisement]
+    // type = 3 [view at the admin panel]
     List<Advertisement> advertisedAnyList = [];
 
     String url;
-    if(type == 2){
-      url = baseUrl + "/advertisements/query?given-by=${userInfo['id']}&per-page=$perPage&page-index=$pageIndex";
+    if(type == 1){
+      url = baseUrl + "/advertisements/query?type=1&per-page=$perPage&page-index=$pageIndex";
+    }else if(type == 2){
+      url = baseUrl + "/advertisements/query?type=2&given-by=${userInfo['id']}&per-page=$perPage&page-index=$pageIndex";
     }else {
-      url = baseUrl + "/advertisements/query?per-page=$perPage&page-index=$pageIndex";
+      url = baseUrl + "/advertisements/query?type=3&per-page=$perPage&page-index=$pageIndex";
     }
 
     var response = await get(url);
@@ -285,7 +338,8 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
             adCost: advertisement['adCost'],
             adDuration: advertisement['adDuration'],
             givenBy: advertisement['givenBy'],
-            createdAt: advertisement['createdAt']
+            createdAt: advertisement['createdAt'],
+            status: advertisement['status']
           ));
         });
       }
@@ -320,5 +374,46 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   void dispose() {
     super.dispose();
     scrollController.dispose();
+  }
+
+  void onUpdate(BuildContext context, Advertisement advertisement,String status) {
+
+    setState(() {
+      needToFreezeUi = true;
+    });
+
+    var request = {
+      "advertisement": {
+        "id" : advertisement.id,
+        "status": status,
+      }
+    };
+
+    String url = baseUrl + '/advertisements';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    put(url, headers: headers, body: json.encode(request)).then((response) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      if (response.statusCode == 200) {
+        var body = json.decode(response.body);
+        if (body['code'] == 200) {
+          setState(() {
+            futureAdvertisedAny = fetchAdvertisedAny();
+          });
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      setState(() {
+        needToFreezeUi = false;
+      });
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
+
   }
 }
