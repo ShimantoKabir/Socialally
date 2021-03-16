@@ -139,7 +139,7 @@ class ManualTransactionState extends State<ManualTransaction> {
                 )
               ),
               suggestionsCallback: (pattern) async {
-                return fetchProject(pattern);
+                return fetchUserInfos(pattern);
               },
               itemBuilder: (context, UserInfo ui) {
                 return ListTile(
@@ -275,7 +275,7 @@ class ManualTransactionState extends State<ManualTransaction> {
     );
   }
 
-  Future<List<UserInfo>> fetchProject(String pattern) async {
+  Future<List<UserInfo>> fetchUserInfos(String pattern) async {
 
     List<UserInfo> userInfoList = [];
     String url = baseUrl + "/users/user-info-id/query?user-info-id=$pattern";

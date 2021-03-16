@@ -70,6 +70,7 @@ Route::put('/projects/status', [ProjectCtl::class, 'updateStatus']);
 // proof submission
 Route::post('/proof-submissions', [ProofSubmissionCtl::class, 'create']);
 Route::put('/proof-submissions', [ProofSubmissionCtl::class, 'update']);
+Route::get('/proof-submissions/pending', [ProofSubmissionCtl::class, 'readPendingAfterDayGone']);
 
 // transactions
 Route::post('/transactions', [TransactionCtl::class, 'create']);

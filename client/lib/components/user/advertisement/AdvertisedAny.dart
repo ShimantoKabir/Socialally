@@ -39,13 +39,13 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   IconButton scrollButton;
   IconButton nextButton;
   IconButton previousButton;
-  int nextCounter = 0;
-  int onPressedCounter = 0;
   bool isTappedToImage = false;
+  int scrollCompletionCounter = 0;
+  Timer timer;
 
   @override
   void initState() {
-    super.initState();
+
     if(type == 2){
       eventHub.fire("viewTitle","Advertised Any");
     }
@@ -54,36 +54,30 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     alertIcon = Container();
     needToFreezeUi = false;
     pageIndex = 0;
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge) {
-        if( scrollController.position.pixels == 0){
-          nextCounter++;
-        }else {
-          nextCounter++;
-        }
-      }
-      if(nextCounter == 2 && type == 1){
-        nextCounter = 0;
-        nextButton.onPressed();
-      }
-    });
 
     scrollButton = IconButton(
       icon: Icon(
         Icons.keyboard_arrow_down
       ),
       onPressed: (){
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 10000),
-          curve: Curves.ease
-        ).whenComplete((){
+        if(scrollController.hasClients){
           scrollController.animateTo(
-            scrollController.position.minScrollExtent,
-            duration: Duration(milliseconds: 10000),
-            curve: Curves.ease
-          );
-        });
+              scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 10000),
+              curve: Curves.ease
+          ).whenComplete((){
+            scrollCompletionCounter++;
+            if(scrollController.hasClients){
+              scrollController.animateTo(
+                  scrollController.position.minScrollExtent,
+                  duration: Duration(milliseconds: 10000),
+                  curve: Curves.ease
+              ).whenComplete((){
+                scrollCompletionCounter++;
+              });
+            }
+          });
+        }
       }
     );
 
@@ -121,12 +115,20 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
       }
     );
 
-    Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
        if(isTappedToImage){
          isTappedToImage = false;
          scrollButton.onPressed();
        }
+
+       if(scrollCompletionCounter >= 2){
+         scrollCompletionCounter = 0;
+         scrollButton.onPressed();
+       }
     });
+
+    super.initState();
+
   }
 
   @override
@@ -138,119 +140,131 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
           if (snapshot.hasData) {
             List<Advertisement> advertisements = snapshot.data;
             if(advertisements.length == 0){
-              goToFirstPage(context);
               return Center(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                  child: Text("No advertisement found!")
+                  child: Text(
+                    "No advertisement found!",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red
+                    ),
+                  )
                 ),
               );
             }else {
-              if(perPage > advertisements.length){
-                goToFirstPage(context);
-              }
+              Future.delayed(Duration(days: 0,hours: 0,seconds: 10), () async {
+                try {
+                  if(advertisements.length >= 3 && type == 1){
+                    scrollButton.onPressed();
+                  }
+                }catch (error) {
+                  print("er $error");
+                }
+              });
               return ListView.builder(
-                controller: scrollController,
-                itemCount: advertisements.length,
-                itemBuilder: (context, index) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if(advertisements.length == (index+1) && type == 1){
-                      scrollButton.onPressed();
-                    }
-                  });
-                  return Card(
-                    clipBehavior: Clip.antiAlias,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.fromLTRB(10,5,10,5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  advertisements[index].title,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15
-                                  ),
-                                ),
-                                Visibility(
-                                  child: Text(
-                                    advertisements[index].status,
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: advertisements[index].status == "Pending" ?
-                                      Colors.blue : advertisements[index].status == "Approved" ?
-                                      Colors.green : Colors.red
-                                    ),
-                                  ),
-                                  visible: type != 1,
-                                )
-                              ],
-                            ),
-                            decoration: headingDecoration(),
-                          ),
-                          SizedBox(height: 5),
-                          InkWell(
-                              child: CachedNetworkImage(
-                                width: 300,
-                                height: 190,
-                                imageUrl: advertisements[index].bannerImageUrl,
-                                placeholder: (context, url) => Center(
-                                  child: Padding(
-                                    child: CircularProgressIndicator(),
-                                    padding: EdgeInsets.all(20),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Icon(Icons.error),
-                              ),
-                              onTap: (){
-                                isTappedToImage = true;
-                                openUrl(advertisements[index].targetedDestinationUrl, context);
-                              }
-                          ),
-                          Visibility(
-                            visible: type == 3,
-                            child: Container(
-                              padding: EdgeInsets.all(5),
+                  controller: scrollController,
+                  itemCount: advertisements.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.fromLTRB(10,5,10,5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  OutlineButton(
-                                    onPressed: (){
-                                      onUpdate(
-                                          context,
-                                          advertisements[index],
-                                          "Approved"
-                                      );
-                                    },
-                                    child: Text("Approve"),
+                                  Text(
+                                    advertisements[index].title,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15
+                                    ),
                                   ),
-                                  OutlineButton(
-                                    onPressed: (){
-                                      onUpdate(
-                                          context,
-                                          advertisements[index],
-                                          "Declined"
-                                      );
-                                    },
-                                    child: Text("Declined"),
+                                  Visibility(
+                                    child: Text(
+                                      advertisements[index].status,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: advertisements[index].status == "Pending" ?
+                                          Colors.blue : advertisements[index].status == "Approved" ?
+                                          Colors.green : Colors.red
+                                      ),
+                                    ),
+                                    visible: type != 1,
                                   )
                                 ],
                               ),
+                              decoration: headingDecoration(),
+                            ),
+                            SizedBox(height: 5),
+                            InkWell(
+                                child: CachedNetworkImage(
+                                  width: 300,
+                                  height: 190,
+                                  imageUrl: advertisements[index].bannerImageUrl,
+                                  placeholder: (context, url) => Center(
+                                    child: Padding(
+                                      child: CircularProgressIndicator(),
+                                      padding: EdgeInsets.all(20),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => Icon(Icons.error),
+                                ),
+                                onTap: (){
+                                  isTappedToImage = true;
+                                  openUrl(advertisements[index].targetedDestinationUrl, context);
+                                }
+                            ),
+                            Visibility(
+                                visible: type == 3,
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(10,10,10,0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Duration ${advertisements[index].adDuration} Day, Cost ${advertisements[index].adCost}"),
+                                      Row(
+                                        children: [
+                                          OutlineButton(
+                                            onPressed: (){
+                                              onUpdate(
+                                                  context,
+                                                  advertisements[index],
+                                                  "Approved"
+                                              );
+                                            },
+                                            child: Text("Approve"),
+                                          ),
+                                          SizedBox(width: 5),
+                                          OutlineButton(
+                                            onPressed: (){
+                                              onUpdate(
+                                                  context,
+                                                  advertisements[index],
+                                                  "Declined"
+                                              );
+                                            },
+                                            child: Text("Declined"),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                )
                             )
-                          )
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
               );
             }
           } else {
@@ -276,8 +290,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
             children: <Widget>[
               scrollButton,
               Visibility(
-                // visible: needToFreezeUi,
-                visible: false,
+                visible: needToFreezeUi,
                 child: Container(
                   padding: EdgeInsets.all(5),
                   child: CircularProgressIndicator(
@@ -286,26 +299,21 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
                   ),
                 )
               ),
-              Row(
-                children: [
-                  previousButton,
-                  Text("${pageNumber+1}"),
-                  nextButton
-                ],
+              Visibility(
+                child: Row(
+                  children: [
+                    previousButton,
+                    Text("${pageNumber+1}"),
+                    nextButton
+                  ],
+                ),
+                visible: type != 1,
               )
             ],
           ),
         ),
       ),
     );
-  }
-
-  goToFirstPage(BuildContext context){
-    Future.delayed(Duration(days: 0,hours: 0,seconds: 5), () async {
-      pageIndex = 0;
-      pageNumber = 0;
-      nextButton.onPressed();
-    });
   }
 
   Future<List<Advertisement>> fetchAdvertisedAny() async {
@@ -344,9 +352,11 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
         });
       }
     }
+
     setState(() {
       needToFreezeUi = false;
     });
+
     return advertisedAnyList;
 
   }
@@ -374,6 +384,7 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
   void dispose() {
     super.dispose();
     scrollController.dispose();
+    timer.cancel();
   }
 
   void onUpdate(BuildContext context, Advertisement advertisement,String status) {
@@ -416,4 +427,6 @@ class AdvertisedAnyState extends State<AdvertisedAny> {
     });
 
   }
+
+
 }

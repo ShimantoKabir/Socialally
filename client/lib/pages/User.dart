@@ -56,9 +56,12 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   int type;
   FilterCriteria filterCriteria;
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  ScrollController scrollController = new ScrollController();
+
 
   @override
   void initState() {
+
     super.initState();
     nodes = userDashboardMenus;
     type = 1;
@@ -197,6 +200,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     if (width < 960) {
       var logoutKey = nodes.where((element) => element.key == "/logout");
       if (logoutKey.isEmpty) {
@@ -292,16 +296,18 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                           children: [
                             Expanded(
                               child: SingleChildScrollView(
+                                controller: scrollController,
                                 child: Column(
                                   children: [
                                     getGoogleAdsenseView(),
                                     Container(
-                                      height: 1000,
+                                      height: height,
                                       child: Navigator(
                                           key: userNavigatorKey,
                                           onGenerateRoute: (settings) {
                                             if (settings.name ==
                                                 "/user/profile/update") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) => Profile(
                                                       eventHub: eventHub,
@@ -313,6 +319,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       eventHub: eventHub,
                                                       userInfo: userInfo));
                                             } else if (settings.name == "/job/post") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) => Post(
                                                       eventHub: eventHub,
@@ -348,6 +355,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       filterCriteria: filterCriteria,
                                                       type: 4));
                                             } else if (settings.name == "/job/submit") {
+                                              scrollController.jumpTo(200);
                                               return MaterialPageRoute(
                                                   builder: (context) =>
                                                       ProofSubmissionComponent(
@@ -356,12 +364,14 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                           project: project));
                                             } else if (settings.name ==
                                                 "/wallet/deposit") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) => Deposit(
                                                       eventHub: eventHub,
                                                       userInfo: userInfo));
                                             } else if (settings.name ==
                                                 "/wallet/withdraw") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) => Withdraw(
                                                       eventHub: eventHub,
@@ -374,6 +384,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       userInfo: userInfo));
                                             } else if (settings.name ==
                                                 "/advertisement/job") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) =>
                                                       JobAdvertisementSender(
@@ -389,6 +400,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                       type: 5));
                                             } else if (settings.name ==
                                                 "/advertisement/any") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) =>
                                                       AnyAdvertisementSender(
@@ -410,6 +422,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                                           userInfo: userInfo,
                                                           type: 1));
                                             } else if (settings.name == "/job/filter") {
+                                              scrollController.jumpTo(googleAdsenseHeight);
                                               return MaterialPageRoute(
                                                   builder: (context) => JobFilter(
                                                       eventHub: eventHub,
@@ -584,7 +597,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
   Widget getGoogleAdsenseView(){
     return Container(
       color: Colors.blueGrey,
-      height: 200,
+      height: googleAdsenseHeight,
       child: Center(
         child: Text(
           "[For Google Adsense]",

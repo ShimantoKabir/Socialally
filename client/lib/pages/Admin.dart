@@ -1,6 +1,7 @@
 import 'package:wengine/components/NotificationComponent.dart';
 import 'package:wengine/components/Profile.dart';
 import 'package:wengine/components/admin/AdminDashboard.dart';
+import 'package:wengine/components/admin/job/AfterApprovalDay.dart';
 import 'package:wengine/components/admin/job/JobManager.dart';
 import 'package:wengine/components/admin/job/category/JobCategory.dart';
 import 'package:wengine/components/admin/job/category/JobSubCategory.dart';
@@ -273,6 +274,12 @@ class AdminState extends State<Admin> with SingleTickerProviderStateMixin {
                                         eventHub: eventHub,
                                         userInfo: userInfo,
                                         type: 3
+                                    ));
+                                  }else if (settings.name ==
+                                      "/job/after-approval-day") {
+                                    return MaterialPageRoute( builder: (context) => AfterApprovalDay(
+                                        eventHub: eventHub,
+                                        userInfo: userInfo
                                     ));
                                   } else {
                                     return MaterialPageRoute(builder: (context) => AdminDashboard(

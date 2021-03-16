@@ -12,8 +12,8 @@ EventHub eventHub = EventHub();
 const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
-// const baseUrl = "http://127.0.0.1:8000/api";
-const baseUrl = "https://workersengine.com/server/public/api";
+const baseUrl = "http://127.0.0.1:8000/api";
+// const baseUrl = "https://workersengine.com/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;
@@ -21,6 +21,7 @@ const maxFileSize = 2097152;
 List<String> allowedImageType = ["jpg","JPG","png","PNG"];
 List<String> allowedFileType = ["pdf","docx"];
 const oneMegaByte = 1048576;
+double googleAdsenseHeight = 200;
 
 final kDefaultShadow = BoxShadow(
   offset: Offset(0, 50),
@@ -72,12 +73,12 @@ List<Node> userDashboardMenus = [
     icon: NodeIcon.fromIconData(Icons.work),
     children: [
       Node(
-        label: 'Post A New Job',
+        label: 'Post',
         key: '/job/post',
         icon: NodeIcon.fromIconData(Icons.post_add)
       ),
       Node(
-        label: 'My Job',
+        label: 'Posted',
         key: '/job/posted',
         icon: NodeIcon.fromIconData(Icons.event_available)
       ),
@@ -116,45 +117,27 @@ List<Node> userDashboardMenus = [
     icon: NodeIcon.fromIconData(Icons.account_tree),
     children: [
       Node(
-        label: 'Post',
+        label: 'Job',
+        key: '/advertisement/job',
+        icon: NodeIcon.fromIconData(Icons.send_to_mobile),
+      ),
+      Node(
+        label: 'Advertised Job',
+        key: '/advertisement/advertised/job',
+        icon: NodeIcon.fromIconData(Icons.description),
+      ),
+      Node(
+        label: 'Any',
         key: '/advertisement/any',
         icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
       ),
       Node(
-        label: 'My Advertisement',
+        label: 'Advertised Any',
         key: '/advertisement/advertised/any',
         icon: NodeIcon.fromIconData(Icons.mobile_friendly),
       )
     ]
   ),
-
-  // Node(
-  //   label: 'Advertisement',
-  //   key: '/advertisement',
-  //   icon: NodeIcon.fromIconData(Icons.account_tree),
-  //   children: [
-  //     Node(
-  //       label: 'Job',
-  //       key: '/advertisement/job',
-  //       icon: NodeIcon.fromIconData(Icons.send_to_mobile),
-  //     ),
-  //     Node(
-  //       label: 'Advertised Job',
-  //       key: '/advertisement/advertised/job',
-  //       icon: NodeIcon.fromIconData(Icons.description),
-  //     ),
-  //     Node(
-  //       label: 'Any',
-  //       key: '/advertisement/any',
-  //       icon: NodeIcon.fromIconData(Icons.mobile_screen_share_rounded),
-  //     ),
-  //     Node(
-  //       label: 'Advertised Any',
-  //       key: '/advertisement/advertised/any',
-  //       icon: NodeIcon.fromIconData(Icons.mobile_friendly),
-  //     )
-  //   ]
-  // ),
   Node(
       label: 'Profile',
       key: '/user/profile',
@@ -245,7 +228,7 @@ List<Node> adminDashboardMenus = [
     ],
   ),
   Node(
-      label: ' Manage Job Category',
+      label: ' Job Category',
       key: '/categories/manage',
       icon: NodeIcon.fromIconData(Icons.category),
       children: [
@@ -262,29 +245,41 @@ List<Node> adminDashboardMenus = [
       ]
   ),
   Node(
+      label: ' Manage',
+      key: '/manage',
+      icon: NodeIcon.fromIconData(Icons.handyman),
+      children: [
+        Node(
+            label: ' Approve Job',
+            key: '/job/approve',
+            icon: NodeIcon.fromIconData(Icons.done_all)
+        ),
+        Node(
+            label: ' User',
+            key: '/user/manage',
+            icon: NodeIcon.fromIconData(Icons.people_outline)
+        ),
+        Node(
+            label: ' Question',
+            key: '/question/manage',
+            icon: NodeIcon.fromIconData(Icons.question_answer)
+        ),
+        Node(
+            label: ' Advertisement',
+            key: '/advertisement/manage',
+            icon: NodeIcon.fromIconData(Icons.approval)
+        ),
+        Node(
+            label: ' Job After Approval Day',
+            key: '/job/after-approval-day',
+            icon: NodeIcon.fromIconData(Icons.pending)
+        )
+      ]
+  ),
+  Node(
       label: ' Send Notification',
       key: '/notifications/send',
       icon: NodeIcon.fromIconData(Icons.notifications_active)
-  ),
-  Node(
-      label: ' Approve Job',
-      key: '/job/approve',
-      icon: NodeIcon.fromIconData(Icons.done_all)
-  ),
-  Node(
-      label: ' Manage User',
-      key: '/user/manage',
-      icon: NodeIcon.fromIconData(Icons.people_outline)
-  ),
-  Node(
-      label: ' Manage Question',
-      key: '/question/manage',
-      icon: NodeIcon.fromIconData(Icons.question_answer)
-  ),
-  Node(
-      label: ' Manage Advertisement',
-      key: '/advertisement/manage',
-      icon: NodeIcon.fromIconData(Icons.approval)
   )
 ];
 
@@ -293,22 +288,23 @@ TreeViewTheme tvt = TreeViewTheme(
     type: ExpanderType.caret,
     modifier: ExpanderModifier.none,
     position: ExpanderPosition.start,
-    color: Colors.red.shade800,
+    color: Colors.green,
     size: 20,
   ),
   labelStyle: TextStyle(
     fontSize: 16,
     letterSpacing: 0.3,
+    color: Colors.grey
   ),
   parentLabelStyle: TextStyle(
     fontSize: 16,
     letterSpacing: 0.1,
     fontWeight: FontWeight.w800,
-    color: Colors.red.shade600,
+    color: Colors.green,
   ),
   iconTheme: IconThemeData(
     size: 18,
-    color: Colors.grey.shade800,
+    color: Colors.green,
   ),
   colorScheme: ColorScheme.light(),
 );

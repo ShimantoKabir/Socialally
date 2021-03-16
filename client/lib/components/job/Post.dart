@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'package:multi_select_flutter/multi_select_flutter.dart' as ms;
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:universal_html/html.dart';
+import 'package:wengine/models/MyLocation.dart';
 import 'package:wengine/models/Project.dart';
 import 'package:http/http.dart';
 import 'package:wengine/constants.dart';
@@ -9,7 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/io.dart' as uio;
 
 class Post extends StatefulWidget {
   Post({Key key, this.eventHub, this.userInfo, this.project}) : super(key: key);
@@ -41,7 +45,6 @@ class PostState extends State<Post> {
   ProjectCategory defaultProjectSubCategory;
   AlertDialog alertDialog;
   String regionName;
-  String countryName;
   int estimatedCost = 0;
   double jobPostingCharge = 0.0;
   var fileInfo;
@@ -49,12 +52,17 @@ class PostState extends State<Post> {
   Widget alertIcon;
   String alertText;
 
+  List<MultiSelectItem<MyLocation>> multiSelectItems = [];
+  List<MyLocation> multiSelectInitialItems = [];
+  List<MyLocation> selectedItems = [];
+
   @override
   void initState() {
     super.initState();
 
     alertText = "No operation running!";
     alertIcon = Container();
+    regionName = "Select";
 
     clearListControllers();
     resetCategories();
@@ -83,30 +91,6 @@ class PostState extends State<Post> {
       }
     });
 
-    if (userInfo['regionName'] == null) {
-      regionName = "Select";
-    } else {
-      regionName = userInfo['regionName'];
-    }
-
-    if (userInfo['countryName'] == null) {
-      countryName = "Select";
-    } else {
-      bool isValueExist = false;
-      countryDropDownList.forEach((element) {
-        if (element.value == userInfo['countryName']) {
-          isValueExist = true;
-        }
-      });
-
-      countryName = userInfo['countryName'];
-      if (!isValueExist) {
-        countryDropDownList.add(new DropdownMenuItem<String>(
-          value: userInfo['countryName'],
-          child: Text(userInfo['countryName']),
-        ));
-      }
-    }
 
     workerNeededCtl.addListener(() {
       setState(() {
@@ -178,9 +162,14 @@ class PostState extends State<Post> {
 
       });
 
-      fetchCountriesByRegion(null,project.regionName).whenComplete((){
-        countryName = project.countryName;
+      project.countryNames.forEach((cty) {
+        multiSelectInitialItems.add(MyLocation(
+          countryName: cty,
+          regionName: project.regionName
+        ));
       });
+
+      fetchCountriesByRegion(null,project.regionName);
 
       workerNeededCtl.text = project.workerNeeded.toString();
       eachWorkerEarnCtl.text = project.eachWorkerEarn.toString();
@@ -400,6 +389,7 @@ class PostState extends State<Post> {
                   height: 10,
                 ),
                 Container(
+                  height: 50,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.grey),
@@ -411,11 +401,11 @@ class PostState extends State<Post> {
                     isExpanded: true,
                     underline: SizedBox(),
                     onChanged: project == null ? (String rn) {
+                      clearMultiselectDropdown();
                       if (rn == "Select") {
                         setState(() {
                           regionName = "Select";
                         });
-                        clearCountryDropdown();
                       } else {
                         fetchCountriesByRegion(context, rn);
                       }
@@ -433,24 +423,27 @@ class PostState extends State<Post> {
                 SizedBox(
                   height: 10,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                AbsorbPointer(
+                  child: ms.MultiSelectDialogField(
+                      items: multiSelectItems,
+                      title: Text("Select"),
+                      searchable: true,
+                      initialValue: multiSelectInitialItems,
+                      selectedColor: Colors.green,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      buttonIcon: Icon(
+                          Icons.arrow_drop_down_sharp,
+                          color: Colors.grey
+                      ),
+                      onConfirm: (items) {
+                        selectedItems = items;
+                      }
                   ),
-                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                  child: DropdownButton<String>(
-                    value: countryName,
-                    isExpanded: true,
-                    underline: SizedBox(),
-                    onChanged: project == null ? (String newValue) {
-                      setState(() {
-                        countryName = newValue;
-                      });
-                    } : null,
-                    items: countryDropDownList
-                  )
+                  absorbing: project != null
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
@@ -761,27 +754,32 @@ class PostState extends State<Post> {
 
   Future<void> fetchCountriesByRegion(
       BuildContext context, String region) async {
+
     setState(() {
       needToFreezeUi = true;
       alertIcon = Alert.showIcon(Alert.LOADING);
       alertText = Alert.LOADING_MSG;
     });
 
-    clearCountryDropdown();
-
     var response = await get("https://restcountries.eu/rest/v2/region/$region");
+
     if (response.statusCode == 200) {
+
       setState(() {
         needToFreezeUi = false;
       });
+
       var jsonResponse = jsonDecode(response.body);
       List<dynamic> countryNames = jsonResponse;
       countryNames.asMap().forEach((key, country) {
-        countryDropDownList.add(new DropdownMenuItem<String>(
-          value: country['name'],
-          child: Text(country['name']),
+        multiSelectItems.add(ms.MultiSelectItem(
+          MyLocation(
+            countryName: country['name'],
+            regionName: region
+          ),country['name']
         ));
       });
+
     } else {
       setState(() {
         needToFreezeUi = false;
@@ -796,20 +794,16 @@ class PostState extends State<Post> {
     });
   }
 
-  void clearCountryDropdown() {
-    setState(() {
-      countryDropDownList.clear();
-      countryName = "Select";
-      countryDropDownList.add(new DropdownMenuItem<String>(
-        value: "Select",
-        child: Text("Select"),
-      ));
-    });
+  void clearMultiselectDropdown() {
+    multiSelectInitialItems.clear();
+    multiSelectItems.clear();
+    selectedItems.clear();
   }
 
   void onSave(BuildContext context) {
     List<String> todoSteps = [];
     List<String> requiredProofs = [];
+    List<String> countryNames = [];
 
     todoStepsControllers.forEach((todoStep) {
       todoSteps.add(todoStep.text);
@@ -817,6 +811,10 @@ class PostState extends State<Post> {
 
     requiredProofsControllers.forEach((requiredProof) {
       requiredProofs.add(requiredProof.text);
+    });
+
+    selectedItems.forEach((element) {
+      countryNames.add(element.countryName);
     });
 
     var request = {
@@ -827,7 +825,7 @@ class PostState extends State<Post> {
         "categoryId": defaultProjectCategory.categoryId,
         "subCategoryId": defaultProjectSubCategory.id,
         "regionName": regionName,
-        "countryName": countryName,
+        "countryNames": countryNames,
         "workerNeeded": int.parse(workerNeededCtl.text),
         "estimatedDay": int.parse(estimatedDayCtl.text),
         "estimatedCost": double.parse(estimatedCostCtl.text),
@@ -888,8 +886,8 @@ class PostState extends State<Post> {
     if (result != null) {
       PlatformFile objFile = result.files.single;
 
-      if (Platform.isAndroid || Platform.isIOS) {
-        base64String = base64.encode(File(objFile.path).readAsBytesSync());
+      if (uio.Platform.isAndroid || uio.Platform.isIOS) {
+        base64String = base64.encode(uio.File(objFile.path).readAsBytesSync());
       } else {
         base64String = base64.encode(objFile.bytes);
       }
@@ -956,8 +954,8 @@ class PostState extends State<Post> {
     } else if(defaultProjectSubCategory.categoryName == "Select"){
       errMsg = "Please select an sub category!";
       isInputVerified = false;
-    } else if(countryName == "Select"){
-      errMsg = "Please select an country!";
+    } else if(selectedItems.length == 0){
+      errMsg = "Please select at least one country!";
       isInputVerified = false;
     } else if(regionName == "Select"){
       errMsg = "Please select an region!";
@@ -1002,12 +1000,12 @@ class PostState extends State<Post> {
 
   void onReset() {
     setState(() {
+      clearMultiselectDropdown();
       titleCtl.clear();
       clearListControllers();
       requiredScreenShotsCtl.clear();
       resetCategories();
       regionName = "Select";
-      countryName = "Select";
       workerNeededCtl.clear();
       eachWorkerEarnCtl.clear();
       estimatedCostCtl.clear();

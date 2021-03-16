@@ -315,6 +315,7 @@ class JobFinderState extends State<JobFinder> {
 
           List<String> tdSteps = [];
           List<String> rProofs = [];
+          List<String> cNames = [];
           List<String> gProofs = [];
           List<String> gScreenshotUrls = [];
 
@@ -328,6 +329,11 @@ class JobFinderState extends State<JobFinder> {
             rProofs.add(requiredProof);
           });
 
+          List<dynamic> countryNames = jsonDecode(project['countryNames']);
+          countryNames.forEach((countryName) {
+            cNames.add(countryName);
+          });
+
           projectList.add(new Project(
               id: project['id'],
               title: project['title'],
@@ -338,7 +344,7 @@ class JobFinderState extends State<JobFinder> {
               subCategoryId: project['subCategoryId'],
               subCategoryName: project['subCategoryName'],
               regionName: project['regionName'],
-              countryName: project['countryName'],
+              countryNames: cNames,
               workerNeeded: project['workerNeeded'],
               requiredScreenShots: project['requiredScreenShots'],
               estimatedDay: project['estimatedDay'],

@@ -5,9 +5,10 @@ namespace App\Repository;
 use Exception;
 use App\Models\Project;
 use Faker\Provider\Uuid;
+use App\Models\Transaction;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\Advertisement;
-use App\Models\Transaction;
 use App\Utilities\FileUploader;
 use Illuminate\Support\Facades\DB;
 
@@ -45,8 +46,6 @@ class AdvertisementRpo
 
             if ($rTransaction['debitAmount'] < $balance) {
 
-                TransactionRpo::saveTransaction($rTransaction);
-
                 $advertisement = new Advertisement();
                 $advertisement->title = $rAdvertisement["title"];
                 $advertisement->targetedDestinationUrl = $rAdvertisement["targetedDestinationUrl"];
@@ -54,6 +53,16 @@ class AdvertisementRpo
                 $advertisement->adDuration = $rAdvertisement["adDuration"];
                 $advertisement->givenBy = $rAdvertisement["givenBy"];
                 $advertisement->save();
+
+                $adminNotification = [
+                    "message" =>  "Advertisement approver request. Duration " . $rAdvertisement["adDuration"] . " Days and Cost " . $rAdvertisement["adCost"] . " GBP",
+                    "receiverId" => 2,
+                    "senderId" => $rAdvertisement['givenBy'],
+                    "isSeen" => 0,
+                    "type" => 2
+                ];
+
+                Notification::create($adminNotification);
 
                 if (!is_null($rAdvertisement['bannerImageString'])) {
                     $imageName = Uuid::uuid() . "." . $rAdvertisement['bannerImageExt'];
@@ -113,11 +122,18 @@ class AdvertisementRpo
                 $pageIndex = $request->query('page-index');
                 $type = $request->query('type');
 
-                $sql = "SELECT * FROM Advertisements";
+                $sql = "SELECT * FROM Advertisements ";
 
                 if ($type == 1) {
 
-                    $sql = $sql . " WHERE status = 'Approved' ";
+                    $sql =  $sql . "WHERE 
+                            (
+                                NOW() BETWEEN approvedOrDeclinedDate 
+                                AND DATE_ADD(
+                                    approvedOrDeclinedDate, INTERVAL adDuration DAY
+                                )
+                            ) 
+                            AND status = 'Approved' ORDER BY id DESC ";
                 } else if ($type == 2) {
 
                     $givenBy = $request->query('given-by');
@@ -127,7 +143,9 @@ class AdvertisementRpo
                     $sql = $sql . " WHERE status = 'Pending' ";
                 }
 
-                $sql = $sql . " ORDER BY id DESC LIMIT " . $pageIndex . ", " . $perPage;
+                if ($type != 1) {
+                    $sql = $sql . " ORDER BY id DESC LIMIT " . $pageIndex . ", " . $perPage;
+                }
 
                 $res["advertisements"] = DB::select(DB::raw($sql));
                 $res['msg'] = "Advertisement fetched successfully!";
@@ -139,24 +157,55 @@ class AdvertisementRpo
             $res['code'] = $e->getCode();
         }
 
-
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
     }
 
     public function update(Request $request)
     {
 
+        date_default_timezone_set('Asia/Dhaka');
+
         $res = [
             "msg" => "",
             "code" => ""
         ];
 
-        $advertisement = $request->advertisement;
+        $rAdvertisement = $request->advertisement;
         try {
 
-            Advertisement::where("id", $advertisement['id'])
+            if ($rAdvertisement['status'] == "Approved") {
+
+                $ad = Advertisement::where("id", $rAdvertisement['id'])->first();
+
+                $rTransaction = [
+                    "accountHolderId" => $ad['givenBy'],
+                    "debitAmount" => $ad['adCost'],
+                    "creditAmount" => null,
+                    "ledgerId" => 105,
+                    "status" => "Approved",
+                    "transactionId" => null,
+                    "accountNumber" => null,
+                    "paymentGatewayName" => null
+                ];
+
+                TransactionRpo::saveTransaction($rTransaction);
+
+
+                $clientNotification = [
+                    "message" => "Your advertisement has been approved. Your account has been debited " . $ad['adCost'] . " GBP.",
+                    "receiverId" => $ad['givenBy'],
+                    "senderId" => 2,
+                    "isSeen" => 0,
+                    "type" => 1
+                ];
+
+                Notification::create($clientNotification);
+            }
+
+            Advertisement::where("id", $rAdvertisement['id'])
                 ->update([
-                    "status" => $advertisement['status']
+                    "status" => $rAdvertisement['status'],
+                    "approvedOrDeclinedDate" => date('Y-m-d H:i:s')
                 ]);
 
             $res["msg"] = "Status updated successfully!";

@@ -28,4 +28,9 @@ class ProofSubmissionCtl extends Controller
     {
         return $this->proofSubmissionRpo->update($request);
     }
+
+    public function readPendingAfterDayGone(Request $request)
+    {
+        return $this->proofSubmissionRpo->readPendingAfterDayGone($request);
+    }
 }

@@ -10,7 +10,7 @@ class Project {
   int subCategoryId;
   String subCategoryName;
   String regionName;
-  String countryName;
+  List<String> countryNames;
   int workerNeeded;
   int requiredScreenShots;
   int estimatedDay;
@@ -41,7 +41,7 @@ class Project {
     this.subCategoryId,
     this.subCategoryName,
     this.regionName,
-    this.countryName,
+    this.countryNames,
     this.workerNeeded,
     this.requiredScreenShots,
     this.estimatedDay,

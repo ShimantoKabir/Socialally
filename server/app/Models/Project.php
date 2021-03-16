@@ -20,7 +20,7 @@ class Project extends Model
         'categoryId',
         'subCategoryId',
         'regionName',
-        'countryName',
+        'countryNames',
         'workerNeeded',
         'requiredScreenShots',
         'estimatedDay',
@@ -41,6 +41,7 @@ class Project extends Model
 
     protected $casts = [
         'todoSteps' => 'array',
-        'requiredProofs' => 'array'
+        'requiredProofs' => 'array',
+        'countryNames' => 'array'
     ];
 }

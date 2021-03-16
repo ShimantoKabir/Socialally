@@ -38,7 +38,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
@@ -54,8 +54,8 @@ return [
 
         'ftp' => [
             'driver' => 'ftp',
-            'host' => 'ftp.workersengine.com',
-            'username' => 'storage@workersengine.com',
+            'host' => '127.0.0.1',
+            'username' => 'storage@localhost.com',
             'password' => 'pAZaymmszCs7',
             'port'     => 21
             // 'passive'  => true,

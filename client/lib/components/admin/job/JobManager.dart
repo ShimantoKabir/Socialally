@@ -119,7 +119,7 @@ class JobManagerState extends State<JobManager> {
                                 DataCell(Text("${projects[index].publisherName}")),
                                 DataCell(Text("${projects[index].title}")),
                                 DataCell(Text("${projects[index].regionName}")),
-                                DataCell(Text("${projects[index].countryName}")),
+                                DataCell(Text("${projects[index].countryNames.toString()}")),
                                 DataCell(Text("${projects[index].workerNeeded}")),
                                 DataCell(Text("${projects[index].eachWorkerEarn}")),
                                 DataCell(Text("${projects[index].estimatedCost}")),
@@ -155,7 +155,7 @@ class JobManagerState extends State<JobManager> {
                                   SizedBox(height: 10),
                                   Text("Region: ${project.regionName}"),
                                   SizedBox(height: 10),
-                                  Text("Country: ${project.countryName}"),
+                                  Text("Country: ${project.countryNames.toString()}"),
                                   SizedBox(height: 10),
                                   Text("Worker Needed: ${project.workerNeeded}"),
                                   SizedBox(height: 10),
@@ -288,18 +288,26 @@ class JobManagerState extends State<JobManager> {
     List<Project> projectList = [];
     String url = baseUrl + "/projects/approve-query?par-page=$perPage&page-index=$pageIndex&status=pending";
 
+
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
 
       List<dynamic> projects = res['projects'];
-
       projects.asMap().forEach((key, value) {
+
+
+        List<String> countryNames = [];
+        List<dynamic> countryNameList = jsonDecode(value['countryNames']);
+        countryNameList.forEach((element) {
+          countryNames.add(element);
+        });
+
         projectList.add(new Project(
           id: value["id"],
           title: value['title'],
           regionName: value['regionName'],
-          countryName: value['countryName'],
+          countryNames: countryNames,
           workerNeeded: value['workerNeeded'],
           estimatedCost: value['estimatedCost'],
           eachWorkerEarn: value['eachWorkerEarn'],
@@ -310,6 +318,7 @@ class JobManagerState extends State<JobManager> {
         ));
       });
     }
+
     setState(() {
       needToFreezeUi = false;
     });
@@ -342,7 +351,6 @@ class JobManagerState extends State<JobManager> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
-          print("res = ${body['projects']}");
           setState(() {
             projects[listPosition].status = status;
           });
@@ -367,7 +375,6 @@ class JobManagerState extends State<JobManager> {
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
-      print("res ${res['userInfo']}");
       eventHub.fire("redirectToProfile",res['userInfo']);
     }
   }

@@ -68,7 +68,7 @@ class ProjectRpo
                 $project->categoryId = $rProject['categoryId'];
                 $project->subCategoryId = $rProject['subCategoryId'];
                 $project->regionName = $rProject['regionName'];
-                $project->countryName = $rProject['countryName'];
+                $project->countryNames = $rProject['countryNames'];
                 $project->workerNeeded = $rProject['workerNeeded'];
                 $project->requiredScreenShots = $rProject['requiredScreenShots'];
                 $project->estimatedDay = $rProject['estimatedDay'];
@@ -176,7 +176,7 @@ class ProjectRpo
                     Projects.imageUrl,
                     Projects.fileUrl,
                     Projects.status,
-                    Projects.countryName,
+                    Projects.countryNames,
                     Projects.workerNeeded,
                     Projects.estimatedDay,
                     Projects.eachWorkerEarn,
@@ -425,6 +425,7 @@ class ProjectRpo
                     'adCost' => $rProject['adCost'],
                     'adDuration' => $rProject['adDuration'],
                     'adPublishDate' => date('Y-m-d H:i:s'),
+                    'adStatus' => 1
                 ));
 
                 $res['code'] = 200;
@@ -489,7 +490,8 @@ class ProjectRpo
 
             Project::where("id", $rProject['id'])
                 ->update(array(
-                    "status" => $rProject['status']
+                    "status" => $rProject['status'],
+                    "approvedOrDeclinedDate" => date('Y-m-d H:i:s')
                 ));
 
             Notification::create([

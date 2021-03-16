@@ -146,4 +146,74 @@ class ProofSubmissionRpo
 
         return $fileUrl;
     }
+
+    public function readPendingAfterDayGone(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        try {
+
+            if (!$request->has('par-page')) {
+                $res['code'] = 404;
+                $res['msg'] = "Par page required!";
+            } else if (!$request->has('page-index')) {
+                $res['code'] = 404;
+                $res['msg'] = "Par index required!";
+            } else {
+
+                $parPage = $request->query('par-page');
+                $pageIndex = $request->query('page-index');
+
+                $sql = "SELECT
+                    pf.id AS pfId,
+                    p.id AS pId,
+                    pf.status AS pfStatus,
+                    pf.submittedBy,
+                    p.title,
+                    p.regionName,
+                    p.countryNames,
+                    p.workerNeeded,
+                    p.estimatedCost,
+                    p.eachWorkerEarn,
+                    p.fileUrl,
+                    p.imageUrl,
+                    p.publishedBy,
+                    p.adDuration,
+                    p.adCost,
+                    p.adPublishDate,
+                    p.approvedOrDeclinedDate,
+                    p.status AS pStatus,
+                    IFNULL(applicant.firstName,applicant.email) AS applicantName,
+                    IFNULL(publisher.firstName,publisher.email) AS publisherName
+                FROM
+                    ProofSubmissions AS pf
+                        JOIN Projects AS p ON pf.projectId = p.id
+                        JOIN UserInfos AS applicant ON applicant.id = pf.submittedBy
+                        JOIN UserInfos AS publisher ON publisher.id = p.publishedBy
+                WHERE
+                        pf.status = 'Pending'
+                AND DATE_ADD(
+                    p.approvedOrDeclinedDate, INTERVAL p.estimatedDay DAY
+                ) < NOW()
+                ORDER BY 
+                    pf.id DESC 
+                LIMIT 
+                " . $pageIndex . ", " . $parPage;
+
+                $res['projects'] = DB::select(DB::raw($sql));
+                $res['msg'] = "Unapproved job fetched successfully!";
+                $res['code'] = 200;
+            }
+        } catch (Exception $e) {
+
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 200;
+        }
+
+        return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
 }

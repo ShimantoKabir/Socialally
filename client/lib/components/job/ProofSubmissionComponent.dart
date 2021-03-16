@@ -95,7 +95,7 @@ class ProofSubmissionComponentState extends State<ProofSubmissionComponent> {
                       ),
                     ),
                     Text(
-                      "${project.regionName}/${project.countryName}",
+                      "${project.regionName}/${project.countryNames.toString()}",
                     )
                   ],
                 ),

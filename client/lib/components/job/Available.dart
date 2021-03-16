@@ -191,7 +191,7 @@ class AvailableState extends State<Available> {
                                   ),
                                 ),
                                 Text(
-                                  "${projects[index].regionName}/${projects[index].countryName}",
+                                  "${projects[index].regionName}/${projects[index].countryNames.toString()}",
                                 )
                               ],
                             ),
@@ -566,6 +566,7 @@ class AvailableState extends State<Available> {
 
           List<String> tdSteps = [];
           List<String> rProofs = [];
+          List<String> cNames = [];
           List<String> gProofs = [];
           List<String> gScreenshotUrls = [];
           List<dynamic> givenScreenshotUrls = [];
@@ -579,6 +580,11 @@ class AvailableState extends State<Available> {
           List<dynamic> requiredProofs = jsonDecode(project['requiredProofs']);
           requiredProofs.forEach((requiredProof) {
             rProofs.add(requiredProof);
+          });
+
+          List<dynamic> countryNames = jsonDecode(project['countryNames']);
+          countryNames.forEach((countryName) {
+            cNames.add(countryName);
           });
 
           if(type == 2){
@@ -603,7 +609,7 @@ class AvailableState extends State<Available> {
               subCategoryId: project['subCategoryId'],
               subCategoryName: project['subCategoryName'],
               regionName: project['regionName'],
-              countryName: project['countryName'],
+              countryNames: cNames,
               workerNeeded: project['workerNeeded'],
               requiredScreenShots: project['requiredScreenShots'],
               estimatedDay: project['estimatedDay'],

@@ -21,7 +21,7 @@ class Projects extends Migration
             $table->integer('categoryId');
             $table->integer('subCategoryId');
             $table->string('regionName');
-            $table->string('countryName');
+            $table->json('countryNames');
             $table->integer('workerNeeded');
             $table->integer('requiredScreenShots')->nullable();
             $table->integer('estimatedDay');
@@ -33,6 +33,8 @@ class Projects extends Migration
             $table->integer('adCost')->nullable();
             $table->integer('adDuration')->nullable();
             $table->dateTime("adPublishDate")->nullable();
+            $table->dateTime('approvedOrDeclinedDate')->nullable();
+            $table->tinyInteger("adStatus")->default(2)->comment("2 = this job is not advertised, 1 = this job is advertised");
             $table->string("status")->default("Pending")->comment("Pending, Approved, Declined");
             $table->string('ip')->nullable();
             $table->boolean('isFinished')->default(false);

@@ -209,6 +209,7 @@ class ApplicantsState extends State<Applicants> {
         projects.asMap().forEach((key, project) {
 
           List<String> tdSteps = [];
+          List<String> cNames = [];
           List<String> rProofs = [];
           List<String> gProofs = [];
           List<String> gScreenshotUrls = [];
@@ -223,6 +224,11 @@ class ApplicantsState extends State<Applicants> {
           List<dynamic> requiredProofs = jsonDecode(project['requiredProofs']);
           requiredProofs.forEach((requiredProof) {
             rProofs.add(requiredProof);
+          });
+
+          List<dynamic> countryNames = jsonDecode(project['countryNames']);
+          countryNames.forEach((countryName) {
+            cNames.add(countryName);
           });
 
           givenScreenshotUrls = jsonDecode(project['givenScreenshotUrls']);
@@ -245,7 +251,7 @@ class ApplicantsState extends State<Applicants> {
               subCategoryId: project['subCategoryId'],
               subCategoryName: project['subCategoryName'],
               regionName: project['regionName'],
-              countryName: project['countryName'],
+              countryNames: cNames,
               workerNeeded: project['workerNeeded'],
               requiredScreenShots: project['requiredScreenShots'],
               estimatedDay: project['estimatedDay'],
