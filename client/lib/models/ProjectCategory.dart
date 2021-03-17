@@ -6,16 +6,24 @@ class ProjectCategory extends Equatable{
   int categoryId;
   String categoryName;
   String subCategoryName;
+  double chargeByCategory;
 
   ProjectCategory({
     this.id,
     this.categoryId,
     this.categoryName,
-    this.subCategoryName
+    this.subCategoryName,
+    this.chargeByCategory
   });
 
   @override
-  List<Object> get props => [id, categoryId, categoryName, subCategoryName];
+  List<Object> get props => [
+    id,
+    categoryId,
+    categoryName,
+    subCategoryName,
+    chargeByCategory
+  ];
 
   @override
   bool get stringify => false;

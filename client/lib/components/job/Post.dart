@@ -78,10 +78,11 @@ class PostState extends State<Post> {
 
       if (!isValueExist) {
         ProjectCategory pc = new ProjectCategory(
-          id: null,
+          id: 0,
           subCategoryName: null,
           categoryId: projectCategory['categoryId'],
           categoryName: projectCategory['categoryName'],
+          chargeByCategory: 0.0
         );
 
         projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
@@ -146,18 +147,20 @@ class PostState extends State<Post> {
       requiredScreenShotsCtl.text = project.requiredScreenShots.toString();
 
       fetchSubCategoriesById(null,ProjectCategory(
-        id: null,
+        id: 0,
         categoryId: project.categoryId,
         categoryName: project.categoryName,
-        subCategoryName: null
+        subCategoryName: null,
+        chargeByCategory: 0.0
       ))
       .whenComplete((){
 
         defaultProjectSubCategory = ProjectCategory(
             id: project.subCategoryId,
-            categoryId: null,
+            categoryId: 0,
             categoryName: null,
-            subCategoryName: project.subCategoryName
+            subCategoryName: project.subCategoryName,
+            chargeByCategory: project.chargeByCategory
         );
 
       });
@@ -334,6 +337,7 @@ class PostState extends State<Post> {
                     isExpanded: true,
                     underline: SizedBox(),
                     onChanged: project == null ? (ProjectCategory pc) {
+                      clearCalculation();
                       if (pc.categoryId != 0) {
                         fetchSubCategoriesById(context, pc);
                       } else {
@@ -341,7 +345,8 @@ class PostState extends State<Post> {
                           id: 0,
                           categoryId: 0,
                           categoryName: "Select",
-                          subCategoryName: "Select");
+                          subCategoryName: "Select",
+                          chargeByCategory: 0.0);
                         });
                         clearSubCategoryDropdown();
                       }
@@ -372,6 +377,7 @@ class PostState extends State<Post> {
                     underline: SizedBox(),
                     onChanged: project == null ? (ProjectCategory pc) {
                       setState(() {
+                        clearCalculation();
                         defaultProjectSubCategory = pc;
                       });
                     } : null,
@@ -707,11 +713,13 @@ class PostState extends State<Post> {
       if (res['code'] == 200) {
         List<dynamic> projectSubCategories = res['projectCategories'];
         projectSubCategories.asMap().forEach((key, projectCategory) {
+          print("sc = ${projectCategory['chargeByCategory']}");
           ProjectCategory pc = new ProjectCategory(
             id: projectCategory['id'],
             subCategoryName: projectCategory['subCategoryName'],
-            categoryId: null,
+            categoryId: 0,
             categoryName: null,
+            chargeByCategory: projectCategory['chargeByCategory']
           );
           projectSubCategoriesDropDownList.add(
             DropdownMenuItem<ProjectCategory>(
@@ -742,7 +750,8 @@ class PostState extends State<Post> {
         id: 0,
         categoryId: 0,
         categoryName: "Select",
-        subCategoryName: "Select"
+        subCategoryName: "Select",
+        chargeByCategory: 0.0
       );
       projectSubCategoriesDropDownList.add(
           new DropdownMenuItem<ProjectCategory>(
@@ -979,14 +988,21 @@ class PostState extends State<Post> {
 
   void calculateEstimatedCost() {
     if (workerNeededCtl.text.isNotEmpty
-        && eachWorkerEarnCtl.text.isNotEmpty) {
+        && eachWorkerEarnCtl.text.isNotEmpty
+        && defaultProjectSubCategory.chargeByCategory != 0.0) {
       double ewe = double.tryParse(eachWorkerEarnCtl.text);
       int wn = int.tryParse(workerNeededCtl.text);
       double withoutCharge = ewe * wn;
-      double totalCharge = jobPostingCharge * ewe * wn;
+      double totalCharge = defaultProjectSubCategory.chargeByCategory * ewe * wn;
       double res = totalCharge + withoutCharge;
       estimatedCostCtl.text = res.toString();
     }
+  }
+
+  void clearCalculation(){
+    estimatedCostCtl.clear();
+    eachWorkerEarnCtl.clear();
+    workerNeededCtl.clear();
   }
 
   void clearListControllers() {
@@ -1020,13 +1036,15 @@ class PostState extends State<Post> {
       id: 0,
       categoryId: 0,
       categoryName: "Select",
-      subCategoryName: "Select"
+      subCategoryName: "Select",
+      chargeByCategory: 0.0
     );
     defaultProjectSubCategory = ProjectCategory(
       id: 0,
       categoryId: 0,
       categoryName: "Select",
-      subCategoryName: "Select"
+      subCategoryName: "Select",
+      chargeByCategory: 0.0
     );
   }
 

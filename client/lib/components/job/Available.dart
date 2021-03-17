@@ -608,6 +608,7 @@ class AvailableState extends State<Available> {
               categoryName: project['categoryName'],
               subCategoryId: project['subCategoryId'],
               subCategoryName: project['subCategoryName'],
+              chargeByCategory: project['chargeByCategory'],
               regionName: project['regionName'],
               countryNames: cNames,
               workerNeeded: project['workerNeeded'],

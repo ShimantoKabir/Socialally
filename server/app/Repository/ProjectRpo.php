@@ -172,6 +172,7 @@ class ProjectRpo
                     dpg.categoryName AS categoryName,
                     Projects.subCategoryId,
                     ProjectCategories.subCategoryName,
+                    ProjectCategories.chargeByCategory,
                     Projects.regionName,
                     Projects.imageUrl,
                     Projects.fileUrl,

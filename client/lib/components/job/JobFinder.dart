@@ -343,6 +343,7 @@ class JobFinderState extends State<JobFinder> {
               categoryName: project['categoryName'],
               subCategoryId: project['subCategoryId'],
               subCategoryName: project['subCategoryName'],
+              chargeByCategory: project['chargeByCategory'],
               regionName: project['regionName'],
               countryNames: cNames,
               workerNeeded: project['workerNeeded'],

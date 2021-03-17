@@ -349,7 +349,8 @@ List<DropdownMenuItem<ProjectCategory>> projectCategoriesDropDownList = [
     id: 0,
     categoryId: 0,
     categoryName: "Select",
-    subCategoryName: "Select"
+    subCategoryName: "Select",
+    chargeByCategory: 0.0
   )
 ].map<DropdownMenuItem<ProjectCategory>>((ProjectCategory projectCategory) {
   return DropdownMenuItem<ProjectCategory>(
@@ -360,7 +361,12 @@ List<DropdownMenuItem<ProjectCategory>> projectCategoriesDropDownList = [
 
 List<DropdownMenuItem<ProjectCategory>> projectSubCategoriesDropDownList = [
   ProjectCategory(
-      id: 0, categoryId: 0, categoryName: "Select", subCategoryName: "Select")
+    id: 0,
+    categoryId: 0,
+    categoryName: "Select",
+    subCategoryName: "Select",
+    chargeByCategory: 0.0
+  )
 ].map<DropdownMenuItem<ProjectCategory>>((ProjectCategory projectCategory) {
   return DropdownMenuItem<ProjectCategory>(
     value: projectCategory,

@@ -59,6 +59,7 @@ class ProjectCategoryRpo
             $res['projectCategories'] = ProjectCategory::select(
                 'id',
                 'subCategoryName',
+                'chargeByCategory'
             )->where('categoryId', $categoryId)
                 ->whereNotNull("subCategoryName")
                 ->get();
@@ -228,6 +229,7 @@ class ProjectCategoryRpo
             $projectCategory->categoryId = $rProjectCategory['categoryId'];
             $projectCategory->categoryName = $rProjectCategory['categoryName'];
             $projectCategory->subCategoryName = $rProjectCategory['subCategoryName'];
+            $projectCategory->chargeByCategory = $rProjectCategory['chargeByCategory'];
             $projectCategory->save();
 
             $res['msg'] = "Project category save successfully!";
@@ -260,7 +262,8 @@ class ProjectCategoryRpo
                 ->update(array(
                     "categoryId" => $rProjectCategory['categoryId'],
                     "categoryName" => $rProjectCategory['categoryName'],
-                    "subCategoryName" => $rProjectCategory['subCategoryName']
+                    "subCategoryName" => $rProjectCategory['subCategoryName'],
+                    "chargeByCategory" => $rProjectCategory['chargeByCategory']
                 ));
 
             $res['msg'] = "Project category updated successfully!";

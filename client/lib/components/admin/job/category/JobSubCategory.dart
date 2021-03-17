@@ -40,6 +40,7 @@ class JobSubCategoryState extends State<JobSubCategory> {
   ProjectCategory projectCategory;
   bool isSideBoxOpen;
   TextEditingController subCategoryNameCtl = new TextEditingController();
+  TextEditingController chargeByCategoryCtl = new TextEditingController();
   bool isInSaveMood;
   int subCategoryId;
 
@@ -55,10 +56,11 @@ class JobSubCategoryState extends State<JobSubCategory> {
     futureJobCategories = fetchJobCategories();
     subCategoryId = null;
     projectCategory = ProjectCategory(
-        id: 0,
-        categoryId: 0,
-        categoryName: "Select",
-        subCategoryName: "Select"
+      id: 0,
+      categoryId: 0,
+      categoryName: "Select",
+      subCategoryName: "Select",
+      chargeByCategory: 0.0
     );
   }
 
@@ -73,10 +75,14 @@ class JobSubCategoryState extends State<JobSubCategory> {
             if (snapshot.hasData) {
               List<ProjectCategory> projectCategories = snapshot.data;
               if(projectCategories.length == 0){
-                return Center(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("No job category found!"),
+                return SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: inputFields(),
+                    ),
                   ),
                 );
               }else {
@@ -98,31 +104,34 @@ class JobSubCategoryState extends State<JobSubCategory> {
                                   setState(() {
                                     subCategoryId = projectCategories[index].id;
                                   });
-                                  print("id $subCategoryId");
                                   onDelete(context);
                                 },
                               ),
-                              subtitle: Text("${projectCategories[index].subCategoryName}"),
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(projectCategories[index].categoryName),
                                   IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: (){
-                                      setState(() {
-                                        subCategoryId = projectCategories[index].id;
-                                        projectCategory.id = 0;
-                                        projectCategory.subCategoryName = "Select";
-                                        projectCategory.categoryName = projectCategories[index].categoryName;
-                                        projectCategory.categoryId = projectCategories[index].categoryId;
-                                        subCategoryNameCtl.text = projectCategories[index].subCategoryName;
-                                        isSideBoxOpen = true;
-                                        isInSaveMood = false;
-                                      });
-                                    }
+                                      icon: Icon(Icons.edit),
+                                      onPressed: (){
+                                        setState(() {
+                                          subCategoryId = projectCategories[index].id;
+                                          projectCategory.id = 0;
+                                          projectCategory.subCategoryName = "Select";
+                                          projectCategory.categoryName = projectCategories[index].categoryName;
+                                          projectCategory.categoryId = projectCategories[index].categoryId;
+                                          subCategoryNameCtl.text = projectCategories[index].subCategoryName;
+                                          chargeByCategoryCtl.text = projectCategories[index].chargeByCategory.toString();
+                                          isSideBoxOpen = true;
+                                          isInSaveMood = false;
+                                        });
+                                      }
                                   )
                                 ],
+                              ),
+                              subtitle: Text(
+                                "${projectCategories[index].subCategoryName}/"
+                                "Charge: ${projectCategories[index].chargeByCategory}"
                               )
                             ),
                             margin: EdgeInsets.all(5),
@@ -146,68 +155,7 @@ class JobSubCategoryState extends State<JobSubCategory> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                showRequiredHeading("Category"),
-                                SizedBox(height: 10),
-                                Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                                    ),
-                                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                                    child: DropdownButton<ProjectCategory>(
-                                        value: projectCategory,
-                                        isExpanded: true,
-                                        underline: SizedBox(),
-                                        onChanged: (ProjectCategory pc) {
-                                          setState(() {
-                                            projectCategory.id = 0;
-                                            projectCategory.categoryId = pc.categoryId;
-                                            projectCategory.categoryName = pc.categoryName;
-                                            projectCategory.subCategoryName = "Select";
-                                          });
-                                        },
-                                        items: projectCategoriesDropDownList
-                                    )
-                                ),
-                                SizedBox(height: 10),
-                                entryField(
-                                    title: "Category Name",
-                                    controller: subCategoryNameCtl
-                                ),
-                                SizedBox(height: 10),
-                                OutlineButton(
-                                  onPressed: (){
-                                    setState(() {
-                                      if(subCategoryNameCtl.text.isEmpty){
-                                        Alert.show(
-                                          alertDialog,
-                                          context,
-                                          Alert.SUCCESS,
-                                          "Sub category Name missing!"
-                                        );
-                                      }else {
-                                        if(isInSaveMood){
-                                          onSave(context);
-                                        }else {
-                                          onUpdate(context);
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: Text(
-                                    isInSaveMood ? "Save" : "Update"
-                                  )
-                                ),
-                                SizedBox(height: 10),
-                                OutlineButton(
-                                  onPressed: (){
-                                    clearProjectCategory(false);
-                                  },
-                                  child: Text("close")
-                                )
-                              ],
+                              children: inputFields(),
                             ),
                           ),
                           flex: 3
@@ -259,6 +207,75 @@ class JobSubCategoryState extends State<JobSubCategory> {
         ),
       ),
     );
+  }
+
+  List<Widget> inputFields(){
+    return [
+      showRequiredHeading("Category"),
+      SizedBox(height: 10),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+          child: DropdownButton<ProjectCategory>(
+              value: projectCategory,
+              isExpanded: true,
+              underline: SizedBox(),
+              onChanged: (ProjectCategory pc) {
+                setState(() {
+                  projectCategory.id = 0;
+                  projectCategory.categoryId = pc.categoryId;
+                  projectCategory.categoryName = pc.categoryName;
+                  projectCategory.chargeByCategory = 0.0;
+                  projectCategory.subCategoryName = "Select";
+                });
+              },
+              items: projectCategoriesDropDownList
+          )
+      ),
+      SizedBox(height: 10),
+      entryField(
+          title: "Sub Category Name",
+          controller: subCategoryNameCtl
+      ),
+      entryField(
+        title: "Charge By Category",
+        controller: chargeByCategoryCtl,
+        textInputFormatter: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(
+              RegExp(r'[0-9.]')
+          ),
+        ],
+        textInputType: TextInputType.number
+      ),
+      SizedBox(height: 10),
+      OutlineButton(
+          onPressed: (){
+            bool isInputVerified = verifyInput(context);
+            if(isInputVerified){
+              if(isInSaveMood){
+                onSave(context);
+              }else {
+                onUpdate(context);
+              }
+            }
+          },
+          child: Text(
+              isInSaveMood ? "Save" : "Update"
+          )
+      ),
+      SizedBox(height: 10),
+      OutlineButton(
+          onPressed: (){
+            clearProjectCategory(false);
+          },
+          child: Text("Close")
+      )
+    ];
+
   }
 
   Widget entryField({String title,
@@ -313,7 +330,8 @@ class JobSubCategoryState extends State<JobSubCategory> {
             id: value['id'],
             categoryId: value['categoryId'],
             categoryName: value['categoryName'],
-            subCategoryName: value['subCategoryName']
+            subCategoryName: value['subCategoryName'],
+            chargeByCategory: value['chargeByCategory']
           ));
         });
 
@@ -331,6 +349,7 @@ class JobSubCategoryState extends State<JobSubCategory> {
               categoryId: projectCategory['categoryId'],
               categoryName: projectCategory['categoryName'],
               subCategoryName: "Select",
+              chargeByCategory: 0.0
             );
             projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
               value: pc,
@@ -389,7 +408,8 @@ class JobSubCategoryState extends State<JobSubCategory> {
       "projectCategory": {
         "categoryId": projectCategory.categoryId,
         "categoryName" : projectCategory.categoryName,
-        "subCategoryName" : subCategoryNameCtl.text
+        "subCategoryName" : subCategoryNameCtl.text,
+        "chargeByCategory" : double.tryParse(chargeByCategoryCtl.text)
       }
     };
 
@@ -434,7 +454,8 @@ class JobSubCategoryState extends State<JobSubCategory> {
         "id" : subCategoryId,
         "categoryId" : projectCategory.categoryId,
         "categoryName": projectCategory.categoryName,
-        "subCategoryName": subCategoryNameCtl.text
+        "subCategoryName": subCategoryNameCtl.text,
+        "chargeByCategory" : double.tryParse(chargeByCategoryCtl.text)
       }
     };
 
@@ -475,14 +496,36 @@ class JobSubCategoryState extends State<JobSubCategory> {
   void clearProjectCategory(bool needToOpenSideBox) {
     setState(() {
       subCategoryNameCtl.clear();
+      chargeByCategoryCtl.clear();
       subCategoryId = null;
       projectCategory.id = 0;
       projectCategory.categoryId = 0;
       projectCategory.categoryName = "Select";
       projectCategory.subCategoryName = "Select";
+      projectCategory.chargeByCategory = 0.0;
       isSideBoxOpen = needToOpenSideBox;
       isInSaveMood = true;
     });
+  }
+
+  bool verifyInput(BuildContext context) {
+
+    bool isInputVerified = true;
+    String errMsg;
+
+    if (subCategoryNameCtl.text.isEmpty) {
+      errMsg = "Sub Category Name missing!";
+      isInputVerified = false;
+    }else if(chargeByCategoryCtl.text.isEmpty){
+      errMsg = "Charge by category is missing!!";
+      isInputVerified = false;
+    }
+
+    if (!isInputVerified) {
+      Alert.show(alertDialog, context, Alert.ERROR, errMsg);
+    }
+    return isInputVerified;
+
   }
 
 }

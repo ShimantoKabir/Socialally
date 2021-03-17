@@ -9,6 +9,7 @@ class Project {
   String categoryName;
   int subCategoryId;
   String subCategoryName;
+  double chargeByCategory;
   String regionName;
   List<String> countryNames;
   int workerNeeded;
@@ -40,6 +41,7 @@ class Project {
     this.categoryName,
     this.subCategoryId,
     this.subCategoryName,
+    this.chargeByCategory,
     this.regionName,
     this.countryNames,
     this.workerNeeded,
