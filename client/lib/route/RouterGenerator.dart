@@ -3,7 +3,7 @@ import 'package:wengine/pages/AboutUs.dart';
 import 'package:wengine/pages/Admin.dart';
 import 'package:wengine/pages/EmailVerification.dart';
 import 'package:flutter/material.dart';
-import 'package:wengine/pages/ContactUs.dart';
+import 'package:wengine/pages/ForgotPassword.dart';
 import 'package:wengine/pages/Login.dart';
 import 'package:wengine/pages/Registration.dart';
 import 'package:wengine/pages/User.dart';
@@ -30,9 +30,21 @@ class RouterGenerator {
       } else {
         return redirect(Unknown(), routeSettings, false);
       }
-    } else if (routeSettings.name == '/contactus') {
-      return redirect(ContactUs(), routeSettings, false);
-    }else if (routeSettings.name == '/about-us') {
+    }else if (routeSettings.name.contains('/forgot-password')) {
+      if (uri.pathSegments.length == 2 &&
+          uri.pathSegments.first == 'forgot-password') {
+        return redirect(
+            ForgotPassword(forgotPasswordId: uri.pathSegments[1]),
+            routeSettings,
+            false
+        );
+      } else if (uri.pathSegments.length == 1 &&
+          uri.pathSegments.first == 'forgot-password') {
+        return redirect(ForgotPassword(forgotPasswordId: "empty"), routeSettings, false);
+      } else {
+        return redirect(Unknown(), routeSettings, false);
+      }
+    } else if (routeSettings.name == '/about-us') {
       return redirect(AboutUs(), routeSettings, false);
     } else if (routeSettings.name == '/user/login') {
       return redirect(Login(type: 1), routeSettings, false);

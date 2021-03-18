@@ -189,13 +189,11 @@ class HistoryState extends State<History> {
 
     List<Transaction> transactionList = [];
     String url = baseUrl + "/transactions/query?user-info-id=${userInfo['id']}&par-page=$perPage&page-index=$pageIndex";
-    print("url = $url");
 
     var response = await get(url);
     if (response.statusCode == 200) {
       var res = jsonDecode(response.body);
 
-      print("res $res");
       List<dynamic> transactions = res['transactions'];
 
       transactions.asMap().forEach((key, value) {

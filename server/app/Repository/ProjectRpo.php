@@ -450,6 +450,8 @@ class ProjectRpo
     public function update(Request $request)
     {
 
+        date_default_timezone_set('Asia/Dhaka');
+
         $res = [
             "msg" => "",
             "code" => ""
@@ -459,13 +461,55 @@ class ProjectRpo
         DB::beginTransaction();
         try {
 
-            Project::where("id", $rProject['id'])
-                ->update(array(
-                    "estimatedDay" => $rProject['estimatedDay']
-                ));
+            $oldProject = Project::where('id', $rProject['id'])->first();
 
-            $res['msg'] = "Job updated successfully!";
-            $res['code'] = 200;
+            if ($rProject['estimatedCost'] > $oldProject['estimatedCost']) {
+
+                $newEstimatedCost = $rProject['estimatedCost'] - $oldProject['estimatedCost'];
+
+                $rTransaction = [
+                    "accountHolderId" => $oldProject['publishedBy'],
+                    "debitAmount" => $newEstimatedCost,
+                    "creditAmount" => null,
+                    "ledgerId" => 104,
+                    "status" => "Approved",
+                    "transactionId" => null,
+                    "accountNumber" => null,
+                    "paymentGatewayName" => null
+                ];
+
+                $balance = TransactionRpo::getBalance($rTransaction);
+
+                if ($rTransaction['debitAmount'] < $balance) {
+
+                    Project::where("id", $rProject['id'])
+                        ->update(array(
+                            "workerNeeded" => $rProject['workerNeeded'],
+                            "estimatedCost" => $rProject['estimatedCost'],
+                            "eachWorkerEarn" => $rProject['eachWorkerEarn'],
+                            "createdAt" => date('Y-m-d H:i:s')
+                        ));
+
+                    $msg = "You have successfully increased worker, which cost is " . $newEstimatedCost . " GBP";
+                    TransactionRpo::saveTransaction($rTransaction);
+                    Notification::create([
+                        "message" => $msg,
+                        "receiverId" => $oldProject['publishedBy'],
+                        "senderId" => 2,
+                        "isSeen" => 0,
+                        "type" => 1
+                    ]);
+
+                    $res['code'] = 200;
+                    $res['msg'] = $msg;
+                } else {
+                    $res['code'] = 404;
+                    $res['msg'] = "OOPS! Worker increasing cost cross the balance.";
+                }
+            } else {
+                $res['code'] = 404;
+                $res['msg'] = "Please increase you worker more then " . $oldProject['workerNeeded'] . ".";
+            }
 
             DB::commit();
         } catch (Exception $e) {

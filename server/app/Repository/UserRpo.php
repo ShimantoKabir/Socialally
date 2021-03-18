@@ -9,15 +9,16 @@ use Faker\Provider\Uuid;
 use App\Models\AppConstant;
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use App\Models\ChartOfAccount;
 use App\Models\PaymentGateway;
 use App\Helpers\TokenGenerator;
-use App\Models\ChartOfAccount;
 use App\Models\ProjectCategory;
+use App\Utilities\PHPMailSender;
 use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\PHPMailer;
 use App\Utilities\AppConstantReader;
-use App\Utilities\PHPMailSender;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class UserRpo
@@ -114,11 +115,11 @@ class UserRpo
                     'body' => $clientUrl . '/#/email-verification/' . $token
                 );
 
-                PHPMailSender::send($mailData);
+                // PHPMailSender::send($mailData);
 
-                // Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
-                //     $message->to($mailData['email'])->subject('Email Verification');
-                // });
+                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+                    $message->to($mailData['email'])->subject('Email Verification');
+                });
 
                 // Queue::push(new MailSender($mailData));
 

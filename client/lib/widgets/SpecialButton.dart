@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class DefaultButton extends StatelessWidget {
+class SpecialButton extends StatelessWidget {
   final data;
   final Function onClick;
-  const DefaultButton({
+  const SpecialButton({
     Key key,
     this.data,
     this.onClick,
@@ -23,9 +23,9 @@ class DefaultButton extends StatelessWidget {
         child: Text(
           data['title'].toUpperCase(),
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.red,
-            fontSize: data['fontSize']
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+              fontSize: data['fontSize']
           ),
         ),
       ),

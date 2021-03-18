@@ -1,11 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:wengine/components/AboutUsComponent.dart';
-import 'package:wengine/components/Feedback.dart';
-import 'package:wengine/components/Footer.dart';
-import 'package:wengine/components/JobGiver.dart';
-import 'package:wengine/components/JobSeeker.dart';
 import 'package:wengine/models/SupportInfo.dart';
 import 'package:wengine/widgets/WelcomeBanner.dart';
 import 'package:wengine/widgets/WelcomeNavBar.dart';

@@ -58,11 +58,16 @@ class LoginState extends State<Login> {
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.centerRight,
-                    child: Text('Forgot Password ?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500
-                      )
+                    child: InkWell(
+                      child: Text('Forgot Password ?',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500
+                          )
+                      ),
+                      onTap: (){
+                        Navigator.pushNamed(context, "/forgot-password");
+                      },
                     ),
                   ),
                   divider(),
@@ -186,7 +191,6 @@ class LoginState extends State<Login> {
               alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
         }
       }).catchError((err) {
-        print("err = $err");
         Navigator.of(context).pop(false);
         Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
       });

@@ -2,11 +2,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wengine/models/SupportInfo.dart';
 import 'package:wengine/utilities/Alert.dart';
-import 'package:wengine/widgets/DefaultButton.dart';
 import 'package:wengine/widgets/MenuItem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:wengine/widgets/SpecialButton.dart';
 
 class WelcomeNavBar extends StatefulWidget {
   WelcomeNavBar({
@@ -190,17 +190,6 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
       ),
       MenuItem(
         data: {
-          "title" : "Contact",
-          "padding" : data['menuPadding'],
-          "margin" : data['menuMargin'],
-          "fontSize" : data['menuFontSize']
-        },
-        onClick: () {
-          Navigator.pushNamed(context, "/contactus");
-        },
-      ),
-      MenuItem(
-        data: {
           "title" : "Login",
           "padding" : data['menuPadding'],
           "margin" : data['menuMargin'],
@@ -210,7 +199,7 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
           Navigator.pushNamed(context, "/user/login");
         },
       ),
-      DefaultButton(
+      SpecialButton(
         data: {
           "title" : "Registration",
           "padding" : data['menuPadding'],

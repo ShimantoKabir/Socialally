@@ -698,7 +698,7 @@ class ProfileState extends State<Profile> {
 
   void showProfilePic(userInfo) {
     if (userInfo['imageUrl'] == null) {
-      profileImageWidget = AssetImage("assets/images/people.png");
+      profileImageWidget = AssetImage("assets/images/dummy_user_image.png");
     } else {
       profileImageWidget = NetworkImage(userInfo['imageUrl']);
     }

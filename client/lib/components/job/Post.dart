@@ -95,10 +95,11 @@ class PostState extends State<Post> {
 
     workerNeededCtl.addListener(() {
       setState(() {
-        calculateEstimatedCost();
-        if(workerNeededCtl.text.isEmpty){
+        if(project == null && workerNeededCtl.text.isEmpty){
           eachWorkerEarnCtl.clear();
           estimatedCostCtl.clear();
+        }else {
+          calculateEstimatedCost();
         }
       });
     });
@@ -461,7 +462,6 @@ class PostState extends State<Post> {
                         height: 10,
                       ),
                       TextField(
-                        readOnly: project == null ? false : true,
                         controller: workerNeededCtl,
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -544,6 +544,7 @@ class PostState extends State<Post> {
                         height: 10,
                       ),
                       TextField(
+                        readOnly: project == null ? false : true,
                         controller: estimatedDayCtl,
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -631,14 +632,15 @@ class PostState extends State<Post> {
                     OutlineButton(
                       onPressed: () {
                         if (userInfo['profileCompleted'] == 100) {
-                          bool isInputVerified = verifyInput(context);
-                          if(isInputVerified){
-                            if(project == null){
+                          if(project == null){
+                            bool isInputVerified = verifyInput(context);
+                            if(isInputVerified){
                               onSave(context);
-                            }else {
-                              onUpdate(context);
                             }
+                          }else {
+                            onUpdate(context);
                           }
+
                         } else {
                           Alert.show(alertDialog, context, Alert.ERROR, "To post a new job, you need to complete your profile 100%.");
                         }
@@ -713,7 +715,6 @@ class PostState extends State<Post> {
       if (res['code'] == 200) {
         List<dynamic> projectSubCategories = res['projectCategories'];
         projectSubCategories.asMap().forEach((key, projectCategory) {
-          print("sc = ${projectCategory['chargeByCategory']}");
           ProjectCategory pc = new ProjectCategory(
             id: projectCategory['id'],
             subCategoryName: projectCategory['subCategoryName'],
@@ -1065,7 +1066,9 @@ class PostState extends State<Post> {
     var request = {
       "project": {
         "id": project.id,
-        "estimatedDay": int.parse(estimatedDayCtl.text),
+        "workerNeeded": int.parse(workerNeededCtl.text),
+        "estimatedCost": double.parse(estimatedCostCtl.text),
+        "eachWorkerEarn": double.parse(eachWorkerEarnCtl.text),
       }
     };
 
@@ -1085,10 +1088,6 @@ class PostState extends State<Post> {
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         if (body['code'] == 200) {
-          setState(() {
-            estimatedDayCtl.clear();
-          });
-          eventHub.fire("redirectToPostedJob");
           Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
         } else {
           Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
