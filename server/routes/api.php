@@ -42,6 +42,7 @@ Route::get('/users/user-info-id/query', [UserInfoCtl::class, 'readByUserInfoId']
 Route::get('/users/paginate/query', [UserInfoCtl::class, 'read']);
 // -- ?par-page=5&page-index=1
 Route::put('/users/status', [UserInfoCtl::class, 'changeStatus']);
+Route::put('/users/forgot-password', [UserInfoCtl::class, 'restorePassword']);
 
 // project category
 Route::get('/categories', [ProjectCategoryCtl::class, 'readCategory']);

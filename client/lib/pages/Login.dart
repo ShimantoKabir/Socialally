@@ -7,6 +7,7 @@ import 'package:wengine/utilities/HttpHandler.dart';
 import 'package:wengine/utilities/MySharedPreferences.dart';
 import 'package:wengine/widgets/WelcomeNavBar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   Login({Key key, this.type}) : super(key: key);
@@ -15,6 +16,8 @@ class Login extends StatefulWidget {
   @override
   LoginState createState() => LoginState(type: type);
 }
+
+
 
 class LoginState extends State<Login> {
 
@@ -25,9 +28,17 @@ class LoginState extends State<Login> {
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
 
+  GoogleSignIn _googleSignIn;
+
   @override
   void initState() {
     super.initState();
+    _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'https://www.googleapis.com/auth/contacts.readonly',
+      ],
+    );
   }
 
   @override
@@ -286,8 +297,12 @@ class LoginState extends State<Login> {
 
   Widget googleButton() {
     return InkWell(
-      onTap: (){
-
+      onTap: () async {
+        try {
+          await _googleSignIn.signIn();
+        } catch (error) {
+          print(error);
+        }
       },
       child: Container(
         height: 30,

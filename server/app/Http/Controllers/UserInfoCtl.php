@@ -78,4 +78,9 @@ class UserInfoCtl extends Controller
     {
         return $this->userRpo->readByUserInfoId($request);
     }
+
+    public function restorePassword(Request $request)
+    {
+        return $this->userRpo->restorePassword($request);
+    }
 }

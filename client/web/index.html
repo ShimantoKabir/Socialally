@@ -16,6 +16,7 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+  <meta name="google-signin-client_id" content="480051089275-n8294hc9b2f6608vls5dm4r0jsq46gs5.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,21 +34,26 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-auth.js"></script>
+
   <script>
-      var FACEBOOK_APP_ID = "1112072695975816";
-      window.fbAsyncInit = function () {
-          FB.init({
-              appId: FACEBOOK_APP_ID,
-              cookie: true,
-              status: true,
-              xfbml: true,
-              version: 'v3.2'
-          });
-          FB.AppEvents.logPageView();
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+          apiKey: "AIzaSyDYXBXM4x9x6fFr6CTQBHM_Olx7NCtNgvg",
+          authDomain: "microfreelancingplatform.firebaseapp.com",
+          projectId: "microfreelancingplatform",
+          storageBucket: "microfreelancingplatform.appspot.com",
+          messagingSenderId: "480051089275",
+          appId: "1:480051089275:web:e88e36edccd0e1241af7de"
       };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
   </script>
-  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-  <script src="flutter_facebook_auth.js" type="application/javascript"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {

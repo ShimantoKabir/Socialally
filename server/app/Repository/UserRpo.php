@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Helpers\StringManager;
 use Exception;
 use App\Jobs\MailSender;
 use App\Models\UserInfo;
@@ -654,5 +655,83 @@ class UserRpo
         }
 
         return response()->json($res, 200, [], JSON_NUMERIC_CHECK);
+    }
+
+    public static function restorePassword(Request $request)
+    {
+
+        $res = [
+            "msg" => "",
+            "code" => ""
+        ];
+
+        $rUserInfo = $request->userInfo;
+        DB::beginTransaction();
+        try {
+
+            if ($rUserInfo['token'] == "empty") {
+
+                $clientUrl = env("APP_DEBUG") ? env("APP_URL") : $rUserInfo['clientUrl'] . "/";
+
+                $userInfo = UserInfo::where("email", $rUserInfo['email'])->first();
+
+                if (is_null($userInfo)) {
+
+                    $res['code'] = 404;
+                    $res['msg'] = "You gmail address didn't belong to any account!";
+                } else {
+
+                    if ($userInfo['isEmailVerified'] == 0) {
+
+                        $res['code'] = 404;
+                        $res['msg'] = "Please verify your email address first!";
+                    } else {
+
+                        $token = TokenGenerator::generate();
+
+                        UserInfo::where("email", $rUserInfo['email'])->update([
+                            "token" => $token
+                        ]);
+
+                        $mailData = array(
+                            'email' => $userInfo['email'],
+                            'link' => $clientUrl . '#/forgot-password/' . $token
+                        );
+
+                        Mail::send("mail.passwordReset", $mailData, function ($message) use ($mailData) {
+                            $message->to($mailData['email'])->subject('Password Reset');
+                        });
+
+                        $res['code'] = 200;
+                        $res['msg'] = "Password reset link has been sent to your mail, Please check!";
+                    }
+                }
+            } else {
+
+                $userInfo = UserInfo::where("token", $rUserInfo['token'])->first();
+
+                if (is_null($userInfo)) {
+
+                    $res['code'] = 404;
+                    $res['msg'] = "Invalid token!";
+                } else {
+
+                    UserInfo::where("token", $rUserInfo['token'])->update([
+                        "password" => sha1($rUserInfo['password'])
+                    ]);
+
+                    $res['code'] = 200;
+                    $res['msg'] = "Password reset successfully!";
+                }
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $res['msg'] = $e->getMessage();
+            $res['code'] = 404;
+        }
+
+        return response()->json($res, 200);
     }
 }

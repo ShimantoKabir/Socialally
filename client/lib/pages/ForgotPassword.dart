@@ -25,7 +25,12 @@ class ForgotPasswordState extends State<ForgotPassword> {
   AlertDialog alertDialog;
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
-  TextEditingController confirmPasswordCtl = new TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +54,15 @@ class ForgotPasswordState extends State<ForgotPassword> {
                       thickness: 1,
                     ),
                     SizedBox(height: 20),
+                    forgotPasswordId == "empty" ?
                     entryField(
                       title: "Email",
                       controller: emailCtl,
+                    ) :
+                    entryField(
+                      title: "Password",
+                      controller: passwordCtl,
+                      isPassword: true
                     ),
                     SizedBox(height: 20),
                     submitButton(context),
@@ -81,16 +92,16 @@ class ForgotPasswordState extends State<ForgotPassword> {
             height: 10,
           ),
           TextField(
-              maxLines: maxLines == null ? 1 : maxLines,
-              keyboardType: textInputType,
-              obscureText: isPassword,
-              controller: controller,
-              inputFormatters: textInputFormatter,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true
-              )
+            maxLines: maxLines == null ? 1 : maxLines,
+            keyboardType: textInputType,
+            obscureText: isPassword,
+            controller: controller,
+            inputFormatters: textInputFormatter,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              fillColor: Color(0xfff3f3f4),
+              filled: true
+            )
           )
         ],
       ),
@@ -100,25 +111,31 @@ class ForgotPasswordState extends State<ForgotPassword> {
   Widget submitButton(BuildContext buildContext) {
     return InkWell(
       onTap: () {
-        onSubmit(buildContext);
+        bool isInputVerified = verifyInput(buildContext);
+        if(isInputVerified){
+          onSubmit(buildContext);
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.symmetric(vertical: 15),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.grey.shade200,
-                  offset: Offset(2, 4),
-                  blurRadius: 5,
-                  spreadRadius: 2)
-            ],
-            gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.green, Colors.greenAccent])),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.grey.shade200,
+              offset: Offset(2, 4),
+              blurRadius: 5,
+              spreadRadius: 2
+            )
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Colors.green, Colors.greenAccent]
+          )
+        ),
         child: Text(
           forgotPasswordId == "empty" ? 'Get Password Reset Link' : "Change Password",
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -128,39 +145,46 @@ class ForgotPasswordState extends State<ForgotPassword> {
   }
 
   onSubmit(BuildContext context){
-    bool isInputVerified = verifyInput(context);
-    if (isInputVerified) {
-      var request = {
+
+    var request;
+
+    if(forgotPasswordId == "empty"){
+      request = {
         "userInfo": {
-          "email": emailCtl.text
+          "email": emailCtl.text,
+          "token" : forgotPasswordId,
+          "clientUrl": Uri.base.origin
         }
       };
-
-      String url = baseUrl + '/users/login';
-      Map<String, String> headers = {"Content-type": "application/json"};
-
-      Alert.show(
-          alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
-      post(url, headers: headers, body: json.encode(request)).then((res) {
-        Navigator.of(context).pop(false);
-        if (res.statusCode == 200) {
-          var body = json.decode(res.body);
-          if (body['code'] == 200) {
-
-
-          } else {
-            Alert.show(
-                alertDialog, context, Alert.ERROR, body['msg']);
-          }
-        } else {
-          Alert.show(
-              alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    }else {
+      request = {
+        "userInfo": {
+          "password": passwordCtl.text,
+          "token" : forgotPasswordId
         }
-      }).catchError((err) {
-        Navigator.of(context).pop(false);
-        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
-      });
+      };
     }
+
+    String url = baseUrl + '/users/forgot-password';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    Alert.show(alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+    put(url, headers: headers, body: json.encode(request)).then((res) {
+      Navigator.of(context).pop(false);
+      if (res.statusCode == 200) {
+        var body = json.decode(res.body);
+        if (body['code'] == 200) {
+          Alert.show(alertDialog, context, Alert.SUCCESS, body['msg']);
+        } else {
+          Alert.show(alertDialog, context, Alert.ERROR, body['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      Navigator.of(context).pop(false);
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
   }
 
   Widget logo(Size screenSize) {
@@ -168,20 +192,56 @@ class ForgotPasswordState extends State<ForgotPassword> {
       child: Container(
         height: 50.0,
         width: screenSize.width,
-        child: Text("Forgot Password",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.green,
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-            )
+        child: Text(forgotPasswordId == "empty"
+            ? "Forgot Password" : "Reset Password",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.green,
+            fontSize: 20,
+            fontWeight: FontWeight.bold
+          )
         ),
       ),
     );
   }
 
-  bool verifyInput(BuildContext context) {
-    return true;
+  bool verifyInput(BuildContext buildContext) {
+    bool isInputVerified;
+    String msg;
+
+    if(forgotPasswordId == "empty"){
+
+      if (emailCtl.text.isEmpty) {
+        msg = "Email required!";
+        isInputVerified = false;
+      } else if (!emailRegExp.hasMatch(emailCtl.text)) {
+        msg = "Email address format not correct!";
+        isInputVerified = false;
+      } else {
+        isInputVerified = true;
+        msg = null;
+      }
+
+    }else {
+
+      if (passwordCtl.text.isEmpty) {
+        msg = "New password required!";
+        isInputVerified = false;
+      } else if (!passwordRegExp.hasMatch(passwordCtl.text)) {
+        msg = "Password should contain at least 8 character, one capital letter, one number and one special character!";
+        isInputVerified = false;
+      } else {
+        isInputVerified = true;
+        msg = null;
+      }
+
+    }
+
+    if(!isInputVerified){
+      Alert.show(alertDialog, buildContext, Alert.ERROR, msg);
+    }
+
+    return isInputVerified;
   }
 
 }
