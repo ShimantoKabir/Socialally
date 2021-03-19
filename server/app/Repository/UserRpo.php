@@ -73,12 +73,19 @@ class UserRpo
         ];
 
         $rUserInfo = $request->userInfo;
-        $clientUrl = $request->clientUrl;
-        $isUserInfoExist = UserInfo::where('email', $rUserInfo['email'])->exists();
+        $clientUrl = env("APP_URL");
+
+
+        if (is_null($rUserInfo['socialLoginId'])) {
+            $isUserInfoExist = UserInfo::where('email', $rUserInfo['email'])->exists();
+        } else {
+            $isUserInfoExist = UserInfo::where('socialLoginId', $rUserInfo['socialLoginId'])->exists();
+        }
 
         if ($isUserInfoExist) {
 
-            $res['msg'] = 'A account already been created using the email !';
+            $res['msg'] = is_null($rUserInfo['socialLoginId']) ? 'A account already been created using this email!'
+                : "A account already been created using this social information!";
             $res['code'] = 404;
         } else {
 
@@ -103,34 +110,50 @@ class UserRpo
                 $userInfo->agreedTermsAndCondition = $rUserInfo['agreedTermsAndCondition'];
                 $userInfo->regionName = $rUserInfo['regionName'];
                 $userInfo->countryName = $rUserInfo['countryName'];
+                $userInfo->socialLoginId = $rUserInfo['socialLoginId'];
+
                 if ($rUserInfo['referredBy'] != "empty") {
                     $userInfo->referredBy = $rUserInfo['referredBy'];
                 }
+
                 $userInfo->quantityOfEarnByRefer = $quantityOfEarnByRefer;
+
+                if (!is_null($rUserInfo['socialLoginId'])) {
+                    $userInfo->firstName = $rUserInfo['firstName'];
+                    $userInfo->isEmailVerified = 1;
+                    $userInfo->contactNumber = $rUserInfo['contactNumber'];
+                    $userInfo->imageUrl = $rUserInfo['imageUrl'];
+                }
+
                 $userInfo->save();
 
                 self::addUserInfoId($userInfo->id);
 
-                $mailData = array(
-                    'email' => $userInfo['email'],
-                    'body' => $clientUrl . '/#/email-verification/' . $token
-                );
+                if (is_null($rUserInfo['socialLoginId'])) {
 
-                // PHPMailSender::send($mailData);
+                    $mailData = array(
+                        'email' => $userInfo['email'],
+                        'body' => $clientUrl . '/#/email-verification/' . $token
+                    );
 
-                Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
-                    $message->to($mailData['email'])->subject('Email Verification');
-                });
+                    // PHPMailSender::send($mailData);
 
-                // Queue::push(new MailSender($mailData));
+                    Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+                        $message->to($mailData['email'])->subject('Email Verification');
+                    });
 
-                $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
-                // $res['msg'] = "Registration successful!";
-                $res['code'] = 200;
+                    // Queue::push(new MailSender($mailData));
+
+                    $res['msg'] = "Registration successful, a link has been sent to your email please check and click the link to active your account.";
+                    $res['code'] = 200;
+                } else {
+
+                    $res['msg'] = "Registration successful, Please login!";
+                    $res['code'] = 200;
+                }
 
                 DB::commit();
             } catch (Exception $e) {
-
                 DB::rollback();
                 $res['msg'] = $e->getMessage();
                 $res['code'] = 404;
@@ -204,36 +227,42 @@ class UserRpo
         DB::beginTransaction();
         try {
 
-            $isUserExists = UserInfo::where('email', $rUserInfo['email'])
-                ->where('password', sha1($rUserInfo['password']))
-                ->exists();
 
-            if ($isUserExists) {
+            if (is_null($rUserInfo['socialLoginId'])) {
 
-                $isEmailVerified = UserInfo::where('email', $rUserInfo['email'])
+                $user = UserInfo::where('email', $rUserInfo['email'])
+                    ->where('password', sha1($rUserInfo['password']));
+            } else {
+
+                $user = UserInfo::where('socialLoginId', $rUserInfo['socialLoginId'])
+                    ->where('password', sha1($rUserInfo['password']));
+            }
+
+            if ($user->exists()) {
+
+                $isEmailVerified = is_null($rUserInfo['socialLoginId']) ?
+                    UserInfo::where('email', $rUserInfo['email'])
                     ->where('isEmailVerified', true)
-                    ->exists();
+                    ->exists() : true;
 
                 if ($isEmailVerified) {
 
-                    $userInfo = UserInfo::where('email', $rUserInfo['email'])
-                        ->where('password', sha1($rUserInfo['password']))
-                        ->select(
-                            'id',
-                            'email',
-                            'firstName',
-                            'lastName',
-                            'regionName',
-                            'countryName',
-                            'contactNumber',
-                            'agreedTermsAndCondition',
-                            'wantNewsLetterNotification',
-                            'imageUrl',
-                            'referId',
-                            'type',
-                            'userInfoId',
-                            'isActive'
-                        )
+                    $userInfo = $user->select(
+                        'id',
+                        'email',
+                        'firstName',
+                        'lastName',
+                        'regionName',
+                        'countryName',
+                        'contactNumber',
+                        'agreedTermsAndCondition',
+                        'wantNewsLetterNotification',
+                        'imageUrl',
+                        'referId',
+                        'type',
+                        'userInfoId',
+                        'isActive'
+                    )
                         ->first();
 
                     if ($userInfo['isActive'] == 1) {
@@ -356,7 +385,7 @@ class UserRpo
         $imageString = $rUserInfo['imageString'];
         $id = $rUserInfo['id'];
         $fileExt = $rUserInfo['fileExt'];
-        $appUrl = env('APP_URL');
+        $appUrl = env('FTP_URL');
 
         DB::beginTransaction();
 
@@ -671,7 +700,7 @@ class UserRpo
 
             if ($rUserInfo['token'] == "empty") {
 
-                $clientUrl = env("APP_DEBUG") ? env("APP_URL") : $rUserInfo['clientUrl'] . "/";
+                $clientUrl = env("APP_URL");
 
                 $userInfo = UserInfo::where("email", $rUserInfo['email'])->first();
 

@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/models/MyLocation.dart';
@@ -186,7 +189,10 @@ class RegistrationState extends State<Registration> {
                   divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [facebookButton(), googleButton()],
+                    children: [
+                      facebookButton(context),
+                      googleButton(context)
+                    ],
                   ),
                   SizedBox(height: screenSize.height * .005),
                   createLoginLabel(),
@@ -234,38 +240,10 @@ class RegistrationState extends State<Registration> {
       onTap: () {
         bool isInputVerified = verifyInput(buildContext);
         if (isInputVerified) {
-          var request = {
-            "userInfo": {
-              "email": emailCtl.text,
-              "password": passwordCtl.text,
-              "referredBy": referrerId,
-              "type" : type,
-              "countryName" : myLocation.countryName,
-              "regionName" : myLocation.regionName,
-              "agreedTermsAndCondition" : agreedTermsAndCondition
-            },
-            "clientUrl": Uri.base.origin
-          };
-          Alert.show(
-              alertDialog, buildContext, Alert.LOADING, Alert.LOADING_MSG);
-          HttpHandler().createPost("/users/registration", request).then((res) {
-            Navigator.of(buildContext).pop(false);
-            if (res.statusCode == 200) {
-              if (res.data['code'] == 200) {
-                Alert.show(
-                    alertDialog, buildContext, Alert.SUCCESS, res.data['msg']);
-              } else {
-                Alert.show(
-                    alertDialog, buildContext, Alert.ERROR, res.data['msg']);
-              }
-            } else {
-              Alert.show(
-                  alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
-            }
-          }).catchError((err) {
-            Navigator.of(buildContext).pop(false);
-            Alert.show(alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
-          });
+          onRegistration(
+            buildContext: buildContext,
+            socialUser: null
+          );
         }
       },
       child: Container(
@@ -294,6 +272,64 @@ class RegistrationState extends State<Registration> {
         ),
       ),
     );
+  }
+
+  void onRegistration({BuildContext buildContext,User socialUser}){
+    var request;
+
+    if(socialUser == null){
+
+      request = {
+        "userInfo": {
+          "email": emailCtl.text,
+          "password": passwordCtl.text,
+          "referredBy": referrerId,
+          "type" : type,
+          "countryName" : myLocation.countryName,
+          "regionName" : myLocation.regionName,
+          "agreedTermsAndCondition" : agreedTermsAndCondition,
+          "socialLoginId" : null
+        }
+      };
+
+    }else {
+
+      request = {
+        "userInfo": {
+          "email": socialUser.email,
+          "password": socialUser.uid,
+          "referredBy": referrerId,
+          "type" : type,
+          "countryName" : null,
+          "regionName" : null,
+          "firstName" : socialUser.displayName,
+          "contactNumber" : socialUser.phoneNumber,
+          "agreedTermsAndCondition" : false,
+          "imageUrl" : socialUser.photoURL,
+          "socialLoginId" : socialUser.uid
+        }
+      };
+
+    }
+
+    Alert.show(
+        alertDialog, buildContext, Alert.LOADING, Alert.LOADING_MSG);
+    HttpHandler().createPost("/users/registration", request).then((res) {
+      Navigator.of(buildContext).pop(false);
+      if (res.statusCode == 200) {
+        print("data ${res.data}");
+        if (res.data['code'] == 200) {
+          Alert.show(alertDialog, buildContext, Alert.SUCCESS, res.data['msg']);
+        } else {
+          Alert.show(alertDialog, buildContext, Alert.ERROR, res.data['msg']);
+        }
+      } else {
+        Alert.show(alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      Navigator.of(buildContext).pop(false);
+      Alert.show(alertDialog, buildContext, Alert.ERROR, Alert.ERROR_MSG);
+    });
   }
 
   Widget divider() {
@@ -329,106 +365,145 @@ class RegistrationState extends State<Registration> {
     );
   }
 
-  Widget facebookButton() {
-    return Container(
-      height: 30,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      width: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xff1959a9),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(5),
-                  topLeft: Radius.circular(5)
+  Widget facebookButton(BuildContext buildContext) {
+    return InkWell(
+      onTap: () async {
+        try {
+          AccessToken accessToken = await FacebookAuth.instance.login();
+          OAuthCredential credential = FacebookAuthProvider.credential(
+            accessToken.token,
+          );
+          FirebaseAuth.instance.signInWithCredential(credential).then((value){
+            onRegistration(
+              buildContext: buildContext,
+              socialUser: value.user
+            );
+          });
+        } catch (error) {
+          print("Facebook registration error $error");
+        }
+      },
+      child: Container(
+        height: 30,
+        margin: EdgeInsets.symmetric(vertical: 10),
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff1959a9),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      topLeft: Radius.circular(5)
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text('f',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400
+                    )
                 ),
               ),
-              alignment: Alignment.center,
-              child: Text('f',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                )
-              ),
             ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xff2872ba),
-                borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(5),
-                  topRight: Radius.circular(5)
+            Expanded(
+              flex: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff2872ba),
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(5),
+                      topRight: Radius.circular(5)
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text('Facebook',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400
+                    )
                 ),
               ),
-              alignment: Alignment.center,
-              child: Text('Facebook',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400
-                )
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget googleButton() {
-    return Container(
-      height: 30,
-      width: 120,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(5),
-                    topLeft: Radius.circular(5)),
+  Widget googleButton(BuildContext buildContext) {
+    return InkWell(
+      onTap: () async {
+        try {
+          GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+          GoogleSignInAuthentication googleSignInAuthentication = await
+          googleSignInAccount.authentication;
+          AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleSignInAuthentication.accessToken,
+            idToken: googleSignInAuthentication.idToken,
+          );
+          FirebaseAuth.instance.signInWithCredential(credential).then((value){
+            onRegistration(
+              buildContext: buildContext,
+              socialUser: value.user
+            );
+          });
+        } catch (error) {
+          print("Google registration error $error");
+        }
+      },
+      child: Container(
+        height: 30,
+        width: 120,
+        margin: EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      topLeft: Radius.circular(5)),
+                ),
+                alignment: Alignment.center,
+                child: Text('G',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400)),
               ),
-              alignment: Alignment.center,
-              child: Text('G',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400)),
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(5),
-                    topRight: Radius.circular(5)),
+            Expanded(
+              flex: 4,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(5),
+                      topRight: Radius.circular(5)),
+                ),
+                alignment: Alignment.center,
+                child: Text('Google',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400)),
               ),
-              alignment: Alignment.center,
-              child: Text('Google',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400)),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

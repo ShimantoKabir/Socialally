@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:badges/badges.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
@@ -226,13 +228,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                         color: Colors.black
                     ),
                     onPressed: () {
-                      MySharedPreferences.clear("userInfo").then((isClear) {
-                        if (isClear) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context, "/", (r) => false
-                          );
-                        }
-                      });
+                      logout(context);
                     },
                   ),
                 visible: data['needToShowDesktopStaff'],
@@ -260,6 +256,22 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
     }
 
     return response;
+
+  }
+
+  Future<void> logout(BuildContext context) async {
+
+    bool isSignInWithGoogle = await googleSignIn.isSignedIn();
+
+    if(isSignInWithGoogle){
+      await googleSignIn.disconnect();
+      await googleSignIn.signOut();
+    }
+
+    await FirebaseAuth.instance.signOut();
+    await MySharedPreferences.clear("userInfo");
+
+    Navigator.pushNamedAndRemoveUntil(context, "/", (r) => false);
 
   }
 }

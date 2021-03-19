@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:wengine/constants.dart';
 import 'package:wengine/pages/Admin.dart';
-import 'package:wengine/pages/User.dart';
+import 'package:wengine/pages/User.dart' as u;
 import 'package:wengine/utilities/Alert.dart';
 import 'package:wengine/utilities/HttpHandler.dart';
 import 'package:wengine/utilities/MySharedPreferences.dart';
@@ -17,8 +19,6 @@ class Login extends StatefulWidget {
   LoginState createState() => LoginState(type: type);
 }
 
-
-
 class LoginState extends State<Login> {
 
   int type;
@@ -28,17 +28,9 @@ class LoginState extends State<Login> {
   TextEditingController emailCtl = new TextEditingController();
   TextEditingController passwordCtl = new TextEditingController();
 
-  GoogleSignIn _googleSignIn;
-
   @override
   void initState() {
     super.initState();
-    _googleSignIn = GoogleSignIn(
-      scopes: [
-        'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
-      ],
-    );
   }
 
   @override
@@ -84,7 +76,10 @@ class LoginState extends State<Login> {
                   divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [facebookButton(), googleButton()],
+                    children: [
+                      facebookButton(context),
+                      googleButton(context)
+                    ],
                   ),
                   SizedBox(height: screenSize.height * .005),
                   createAccountLabel(),
@@ -115,7 +110,10 @@ class LoginState extends State<Login> {
             controller: isPassword ? passwordCtl : emailCtl,
             obscureText: isPassword,
             onSubmitted: (value){
-              onSubmit(context);
+              onLogin(
+                context: context,
+                socialUser: null
+              );
             },
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -131,7 +129,13 @@ class LoginState extends State<Login> {
   Widget submitButton(BuildContext buildContext) {
     return InkWell(
       onTap: () {
-        onSubmit(buildContext);
+        bool isInputVerified = verifyInput(context);
+        if (isInputVerified) {
+          onLogin(
+            context: buildContext,
+            socialUser: null
+          );
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -158,54 +162,68 @@ class LoginState extends State<Login> {
     );
   }
 
-  onSubmit(BuildContext context){
-    bool isInputVerified = verifyInput(context);
-    if (isInputVerified) {
-      var request = {
+  void onLogin({BuildContext context,User socialUser}){
+
+    var request;
+
+    if(socialUser == null){
+      request = {
         "userInfo": {
           "email": emailCtl.text,
           "password": passwordCtl.text,
+          "socialLoginId": null,
           "type" : type
         }
       };
-      Alert.show(
-          alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
-      HttpHandler().createPost("/users/login", request).then((res) {
-        Navigator.of(context).pop(false);
-        if (res.statusCode == 200) {
-          if (res.data['code'] == 200) {
-            MySharedPreferences.setStringValue(
-                'userInfo', jsonEncode(res.data['userInfo'])
+    }else{
+      request = {
+        "userInfo": {
+          "socialLoginId": socialUser.uid,
+          "password": socialUser.uid,
+          "email": null,
+          "type" : type
+        }
+      };
+    }
+
+    Alert.show(
+        alertDialog, context, Alert.LOADING, Alert.LOADING_MSG);
+    HttpHandler().createPost("/users/login", request).then((res) {
+      Navigator.of(context).pop(false);
+      if (res.statusCode == 200) {
+        if (res.data['code'] == 200) {
+          MySharedPreferences.setStringValue(
+              'userInfo', jsonEncode(res.data['userInfo'])
+          );
+          var ui = res.data['userInfo'];
+          if(ui['type'] == 1){
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => u.User(userInfo: ui)
+                ),(route) => false
             );
-            var ui = res.data['userInfo'];
-            if(ui['type'] == 1){
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>User(userInfo: ui)
-                  ),(route) => false
-              );
-            }else {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Admin(userInfo: ui)
-                  ),(route) => false
-              );
-            }
-          } else {
-            Alert.show(
-                alertDialog, context, Alert.ERROR, res.data['msg']);
+          }else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Admin(userInfo: ui)
+                ),(route) => false
+            );
           }
         } else {
           Alert.show(
-              alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+              alertDialog, context, Alert.ERROR, res.data['msg']);
         }
-      }).catchError((err) {
-        Navigator.of(context).pop(false);
-        Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
-      });
-    }
+      } else {
+        Alert.show(
+            alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+      }
+    }).catchError((err) {
+      Navigator.of(context).pop(false);
+      Alert.show(alertDialog, context, Alert.ERROR, Alert.ERROR_MSG);
+    });
+
   }
 
   Widget divider() {
@@ -241,7 +259,7 @@ class LoginState extends State<Login> {
     );
   }
 
-  Widget facebookButton() {
+  Widget facebookButton(BuildContext buildContext) {
     return InkWell(
       child: Container(
         height: 30,
@@ -289,19 +307,45 @@ class LoginState extends State<Login> {
           ],
         ),
       ),
-      onTap: (){
+      onTap: () async {
+        try {
+          AccessToken accessToken = await FacebookAuth.instance.login();
+          OAuthCredential credential = FacebookAuthProvider.credential(
+            accessToken.token,
+          );
+          FirebaseAuth.instance.signInWithCredential(credential).then((value){
+            onLogin(
+              context: buildContext,
+              socialUser: value.user
+            );
+          });
+        } catch (error) {
 
+          print("Facebook login error $error");
+        }
       },
     );
   }
 
-  Widget googleButton() {
+  Widget googleButton(BuildContext buildContext) {
     return InkWell(
       onTap: () async {
         try {
-          await _googleSignIn.signIn();
+          GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+          GoogleSignInAuthentication googleSignInAuthentication = await
+          googleSignInAccount.authentication;
+          AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleSignInAuthentication.accessToken,
+            idToken: googleSignInAuthentication.idToken,
+          );
+          FirebaseAuth.instance.signInWithCredential(credential).then((value){
+            onLogin(
+              context: buildContext,
+              socialUser: value.user
+            );
+          });
         } catch (error) {
-          print(error);
+          print("Google login error $error");
         }
       },
       child: Container(

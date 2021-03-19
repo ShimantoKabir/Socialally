@@ -23,6 +23,7 @@ class UserInfo extends Model
         'contactNumber',
         'nationalId',
         'passportId',
+        'socialLoginId',
         'isActive',
         'isEmailVerified',
         'agreedTermsAndCondition',

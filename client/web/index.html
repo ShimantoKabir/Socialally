@@ -55,6 +55,20 @@
       firebase.initializeApp(firebaseConfig);
   </script>
   <script>
+      var FACEBOOK_APP_ID = "1160963127707411";
+      window.fbAsyncInit = function () {
+          FB.init({
+              appId: FACEBOOK_APP_ID,
+              cookie: true,
+              xfbml: true,
+              version: "v9.0",
+          });
+          FB.AppEvents.logPageView();
+      };
+  </script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js" ></script>
+  <script src="flutter_facebook_auth.js" type="application/javascript" ></script>
+  <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
         navigator.serviceWorker.register('flutter_service_worker.js');

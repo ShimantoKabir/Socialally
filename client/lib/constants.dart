@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:wengine/models/AdCostPlan.dart';
 import 'package:wengine/models/ChartOfAccount.dart';
 import 'package:wengine/models/MyLocation.dart';
@@ -480,3 +481,10 @@ Widget showRequiredHeading(String title){
 }
 
 int minimumDayDifferance = 30;
+
+GoogleSignIn googleSignIn = GoogleSignIn(
+  scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);

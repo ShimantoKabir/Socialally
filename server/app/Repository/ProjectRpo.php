@@ -25,7 +25,7 @@ class ProjectRpo
 
         $rProject = $request->project;
         $rUserInfo = $request->userInfo;
-        $appUrl = env('APP_URL');
+        $appUrl = env('FTP_URL');
 
         DB::beginTransaction();
         try {

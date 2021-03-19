@@ -24,7 +24,7 @@ class ProofSubmissionRpo
         ];
 
         $rProofSubmission = $request->proofSubmission;
-        $appUrl = env('APP_URL');
+        $appUrl = env('FTP_URL');
 
         DB::beginTransaction();
         try {

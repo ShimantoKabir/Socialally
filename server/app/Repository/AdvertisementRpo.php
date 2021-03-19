@@ -26,7 +26,7 @@ class AdvertisementRpo
         ];
 
         $rAdvertisement = $request->advertisement;
-        $appUrl = env('APP_URL');
+        $appUrl = env('FTP_URL');
 
         DB::beginTransaction();
         try {
