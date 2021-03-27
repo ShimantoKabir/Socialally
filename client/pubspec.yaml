@@ -28,7 +28,7 @@ dependencies:
   responsive_image: ^0.1.0
   cached_network_image: ^2.5.0
   universal_html: ^1.2.4
-  universal_io: ^1.0.2
+  universal_io: ^2.0.1
   clipboard: ^0.1.2+8
   marquee: ^1.7.0
   change_app_package_name: ^0.1.2

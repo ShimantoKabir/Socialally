@@ -54,21 +54,19 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
     this.userInfo,
   });
 
-  Future futureBalanceSummary;
-  String balance;
-  String withdrawAmount;
+  String earningAmount;
+  String depositAmount;
   bool isSideNavOpen;
+  bool needToFreezeUi;
 
   @override
   void initState() {
     super.initState();
-    balance = "0.0";
-    withdrawAmount = "0.0";
+    earningAmount = "0.0";
+    depositAmount = "0.0";
     isSideNavOpen = true;
-    futureBalanceSummary = fetchBalanceSummary();
-    eventHub.on("reloadBalance", (dynamic data) {
-      fetchBalanceSummary();
-    });
+    needToFreezeUi = true;
+    fetchBalanceSummary();
   }
 
   @override
@@ -122,19 +120,33 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
           padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
           child: Row(
             children: [
-              // Visibility(
-              //   child: IconButton(
-              //     icon: Icon(
-              //       Icons.refresh,
-              //       size: 20,
-              //       color: Colors.black
-              //     ),
-              //     onPressed: (){
-              //
-              //     },
-              //   ),
-              //   visible: type == 1,
-              // ),
+              Visibility(
+                child: IconButton(
+                  icon: Icon(
+                    Icons.refresh,
+                    size: 20,
+                    color: Colors.black
+                  ),
+                  onPressed: (){
+                    setState(() {
+                      needToFreezeUi = true;
+                    });
+                    fetchBalanceSummary();
+                  },
+                ),
+                visible: type == 1 && !needToFreezeUi,
+              ),
+              Visibility(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  height: 15,
+                  width: 15,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+                visible: needToFreezeUi,
+              ),
               SizedBox(width: 10),
               Visibility(
                 child: FlatButton(
@@ -146,7 +158,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   child: Row(
                     children: <Widget>[
                       Text(
-                        "Earning £$withdrawAmount",
+                        "Earned £$earningAmount",
                         style: TextStyle(color: Colors.white)
                       )
                     ],
@@ -165,7 +177,7 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
                   child: Row(
                     // Replace with a Row for horizontal icon + text
                     children: <Widget>[
-                      Text("Balance £$balance",
+                      Text("Deposit £$depositAmount",
                           style: TextStyle(color: Colors.white))
                     ],
                   ),
@@ -249,8 +261,9 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
       var res = jsonDecode(response.body);
       if (res['code'] == 200) {
         setState(() {
-          balance = res['balance'].toString();
-          withdrawAmount = res['withdrawTransaction']['debitAmount'].toString();
+          needToFreezeUi = false;
+          depositAmount = res['depositTransaction']['creditAmount'].toString();
+          earningAmount = res['earningTransaction']['creditAmount'].toString();
         });
       }
     }

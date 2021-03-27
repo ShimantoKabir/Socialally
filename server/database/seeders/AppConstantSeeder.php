@@ -148,6 +148,13 @@ class AppConstantSeeder extends Seeder
                 "appConstantJsonValue" => null,
                 "appConstantIntegerValue" => 0,
                 "appConstantDoubleValue" => null
+            ],
+            [
+                "appConstantName" => "withdrawalFee",
+                "appConstantStringValue" => null,
+                "appConstantJsonValue" => null,
+                "appConstantIntegerValue" => null,
+                "appConstantDoubleValue" => 1.0
             ]
         ];
 

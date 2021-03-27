@@ -66,10 +66,11 @@ class JobFilterState extends State<JobFilter>{
 
       if (!isValueExist) {
         ProjectCategory pc = new ProjectCategory(
-          id: null,
+          id: 0,
           subCategoryName: null,
           categoryId: projectCategory['categoryId'],
           categoryName: projectCategory['categoryName'],
+          chargeByCategory: 0.0
         );
 
         projectCategoriesDropDownList.add(new DropdownMenuItem<ProjectCategory>(
@@ -83,8 +84,9 @@ class JobFilterState extends State<JobFilter>{
       setState(() {
         defaultProjectCategory.categoryId = filterCriteria.categoryId;
         defaultProjectCategory.subCategoryName = null;
-        defaultProjectCategory.id = null;
+        defaultProjectCategory.id = 0;
         defaultProjectCategory.categoryName = filterCriteria.categoryName;
+        defaultProjectCategory.chargeByCategory = 0.0;
       });
     }
 
@@ -157,12 +159,23 @@ class JobFilterState extends State<JobFilter>{
                 underline: SizedBox(),
                 onChanged: (ProjectCategory pc) {
                   setState(() {
-                    defaultProjectCategory = new ProjectCategory(
-                      id: pc.id,
-                      categoryId: pc.categoryId,
-                      categoryName: pc.categoryName,
-                      subCategoryName: pc.subCategoryName
-                    );
+                    if (pc.categoryId != 0) {
+                      defaultProjectCategory = new ProjectCategory(
+                        id: 0,
+                        subCategoryName: null,
+                        categoryId: pc.categoryId,
+                        categoryName: pc.categoryName,
+                        chargeByCategory: 0.0
+                      );
+                    }else{
+                      defaultProjectCategory = new ProjectCategory(
+                        id: 0,
+                        categoryId: 0,
+                        categoryName: "Select",
+                        subCategoryName: "Select",
+                        chargeByCategory: 0.0
+                      );
+                    }
                   });
                 },
                 items: projectCategoriesDropDownList
@@ -276,7 +289,8 @@ class JobFilterState extends State<JobFilter>{
         id: 0,
         categoryId: 0,
         categoryName: "Select",
-        subCategoryName: "Select"
+        subCategoryName: "Select",
+        chargeByCategory: 0.0
       );
       regionName = "Select";
       sortBy = "Select";

@@ -230,22 +230,22 @@ class ProjectRpo
 
                 if ($type == 1) { // available job
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.status = 'Approved' AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE (status = 'Pending' OR status = 'Approved') AND ProofSubmissions.projectId = Projects.id) ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND Projects.status = 'Approved' AND Projects.id NOT IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") AND Projects.workerNeeded > (SELECT COUNT(*) FROM ProofSubmissions WHERE (status = 'Pending' OR status = 'Approved') AND ProofSubmissions.projectId = Projects.id) ORDER BY Projects.createdAt DESC ";
                 } else if ($type == 2) { // job approve request
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
-                    $sql = $sql . " ORDER BY p.id DESC ";
+                    $sql = $sql . " ORDER BY p.createdAt DESC ";
                 } else if ($type == 3) { // job published by me
                     $sql = $sql . " = " . $userInfoId;
-                    $sql = $sql . " ORDER BY Projects.id DESC ";
+                    $sql = $sql . " ORDER BY Projects.createdAt DESC ";
                 } else if ($type == 4) { // job applied by me
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND Projects.id IN (SELECT projectId FROM ProofSubmissions WHERE submittedBy = " . $userInfoId . ") ORDER BY Projects.createdAt DESC ";
                 } else if ($type == 5) { // advertised job
                     $sql = $sql . " != " . $userInfoId;
-                    $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY) ORDER BY Projects.id DESC ";
+                    $sql = $sql . " AND NOW() BETWEEN Projects.adPublishDate AND DATE_ADD(Projects.adPublishDate, INTERVAL Projects.adDuration DAY) ORDER BY Projects.createdAt DESC ";
                 } else { // applicants
                     $sql = $sqlBefore . $sql . " = " . $userInfoId . $sqlAfter;
-                    $sql = $sql . " WHERE p.id = " . $projectId . " ORDER BY p.id DESC ";
+                    $sql = $sql . " WHERE p.id = " . $projectId . " ORDER BY p.createdAt DESC ";
                 }
 
                 $sql = $sql . " LIMIT " . $pageIndex . ", " . $parPage;

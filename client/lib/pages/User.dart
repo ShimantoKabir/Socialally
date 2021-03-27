@@ -303,167 +303,218 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
                                     Container(
                                       height: height,
                                       child: Navigator(
-                                          key: userNavigatorKey,
-                                          onGenerateRoute: (settings) {
-                                            if (settings.name ==
-                                                "/user/profile/update") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Profile(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/user/profile/change-password") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => ChangePassword(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name == "/job/post") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Post(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      project: project));
-                                            } else if (settings.name ==
-                                                "/job/available") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => JobFinder(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria));
-                                            } else if (settings.name == "/job/accept") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Available(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 2));
-                                            } else if (settings.name == "/job/posted") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Available(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 3));
-                                            } else if (settings.name ==
-                                                "/job/applied") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Available(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 4));
-                                            } else if (settings.name == "/job/submit") {
-                                              scrollController.jumpTo(200);
-                                              return MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProofSubmissionComponent(
-                                                          eventHub: eventHub,
-                                                          userInfo: userInfo,
-                                                          project: project));
-                                            } else if (settings.name ==
-                                                "/wallet/deposit") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Deposit(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/wallet/withdraw") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Withdraw(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/wallet/history") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => History(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/advertisement/job") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      JobAdvertisementSender(
-                                                          eventHub: eventHub,
-                                                          userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/advertisement/advertised/job") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Available(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: 5));
-                                            } else if (settings.name ==
-                                                "/advertisement/any") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      AnyAdvertisementSender(
-                                                          eventHub: eventHub,
-                                                          userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/advertisement/advertised/any") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => AdvertisedAny(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      type: 2));
-                                            } else if (settings.name ==
-                                                "/users/notifications") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      NotificationComponent(
-                                                          eventHub: eventHub,
-                                                          userInfo: userInfo,
-                                                          type: 1));
-                                            } else if (settings.name == "/job/filter") {
-                                              scrollController.jumpTo(googleAdsenseHeight);
-                                              return MaterialPageRoute(
-                                                  builder: (context) => JobFilter(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria,
-                                                      type: type));
-                                            } else if (settings.name ==
-                                                "/refer-and-earn") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => ReferAndEarn(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo));
-                                            } else if (settings.name == "/support") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      SupportInfoPresenter(
-                                                          eventHub: eventHub,
-                                                          userInfo: userInfo));
-                                            } else if (settings.name ==
-                                                "/job/applicants") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => Applicants(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      project: project));
-                                            }else if (settings.name ==
-                                                "/play-and-earn") {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => PlayAndEarn(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo
-                                                  ));
-                                            } else {
-                                              return MaterialPageRoute(
-                                                  builder: (context) => JobFinder(
-                                                      eventHub: eventHub,
-                                                      userInfo: userInfo,
-                                                      filterCriteria: filterCriteria
-                                                  ));
-                                            }
-                                          }),
+                                        key: userNavigatorKey,
+                                        onGenerateRoute: (settings) {
+                                          if (settings.name == "/user/profile/update") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Profile(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/user/profile/change-password") {
+                                            // scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => ChangePassword(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/post") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Post(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                project: project
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/available") {
+                                            // return MaterialPageRoute(
+                                            //     builder: (context) => JobFinder(
+                                            //         eventHub: eventHub,
+                                            //         userInfo: userInfo,
+                                            //         filterCriteria: filterCriteria));
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 1
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/accept") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 2
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/posted") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 3
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/applied") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 4
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/submit") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => ProofSubmissionComponent(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                project: project
+                                              )
+                                            );
+                                          } else if (settings.name == "/wallet/deposit") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Deposit(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/wallet/withdraw") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Withdraw(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/wallet/history") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => History(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/advertisement/job") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => JobAdvertisementSender(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/advertisement/advertised/job") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 5
+                                              )
+                                            );
+                                          } else if (settings.name == "/advertisement/any") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => AnyAdvertisementSender(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/advertisement/advertised/any") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => AdvertisedAny(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                type: 2
+                                              )
+                                            );
+                                          } else if (settings.name == "/users/notifications") {
+                                            scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => NotificationComponent(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                type: 1
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/filter") {
+                                            scrollController.jumpTo(googleAdsenseHeight);
+                                            return MaterialPageRoute(
+                                              builder: (context) => JobFilter(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: type
+                                              )
+                                            );
+                                          } else if (settings.name == "/refer-and-earn") {
+                                            // scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => ReferAndEarn(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/support") {
+                                            // scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => SupportInfoPresenter(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo
+                                              )
+                                            );
+                                          } else if (settings.name == "/job/applicants") {
+                                            // scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => Applicants(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                project: project
+                                              )
+                                            );
+                                          }else if (settings.name == "/play-and-earn") {
+                                            // scrollController.jumpTo(0);
+                                            return MaterialPageRoute(
+                                              builder: (context) => PlayAndEarn(
+                                                  eventHub: eventHub,
+                                                  userInfo: userInfo
+                                              )
+                                            );
+                                          } else {
+                                            // scrollController.jumpTo(0);
+                                            // return MaterialPageRoute(
+                                            //   builder: (context) => JobFinder(
+                                            //     eventHub: eventHub,
+                                            //     userInfo: userInfo,
+                                            //     filterCriteria: filterCriteria
+                                            //   )
+                                            // );
+                                            return MaterialPageRoute(
+                                              builder: (context) => Available(
+                                                eventHub: eventHub,
+                                                userInfo: userInfo,
+                                                filterCriteria: filterCriteria,
+                                                type: 1
+                                              )
+                                            );
+                                          }
+                                        }
+                                      ),
                                     ),
                                     getGoogleAdsenseView()
                                   ],
