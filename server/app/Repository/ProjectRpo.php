@@ -183,6 +183,7 @@ class ProjectRpo
                     Projects.eachWorkerEarn,
                     Projects.estimatedCost,
                     Projects.publishedBy,
+                    Projects.createdAt,
                     IFNULL(UserInfos.firstName, UserInfos.email) AS publisherName,
                     (
                     SELECT

@@ -259,22 +259,27 @@ class TransactionRpo
 
                 $depositTransaction = [
                     "accountHolderId" => $request->query("account-holder-id"),
-                    "ledgerId" => 101
+                    "ledgerIds" => "101"
                 ];
 
                 $withdrawTransaction = [
                     "accountHolderId" => $request->query("account-holder-id"),
-                    "ledgerId" => 102
+                    "ledgerIds" => "102"
                 ];
 
                 $earningTransaction = [
                     "accountHolderId" => $request->query("account-holder-id"),
-                    "ledgerId" => 103
+                    "ledgerIds" => "103"
                 ];
 
                 $jobPostingTransaction = [
                     "accountHolderId" => $request->query("account-holder-id"),
-                    "ledgerId" => 103
+                    "ledgerIds" => "104"
+                ];
+
+                $earnedTransaction = [
+                    "accountHolderId" => $request->query("account-holder-id"),
+                    "ledgerIds" => "103, 106, 107"
                 ];
 
                 $res['balance'] = self::getBalance($depositTransaction);
@@ -282,6 +287,7 @@ class TransactionRpo
                 $res['withdrawTransaction'] = self::getAmountByLedger($withdrawTransaction);
                 $res['earningTransaction'] = self::getAmountByLedger($earningTransaction);
                 $res['jobPostingTransaction'] = self::getAmountByLedger($jobPostingTransaction);
+                $res['earnedTransaction'] = self::getAmountByLedger($earnedTransaction);
                 $res['code'] = 200;
                 $res['msg'] = "Balance summary getting successful!";
             }
@@ -316,11 +322,11 @@ class TransactionRpo
             IFNULL(SUM(debitAmount),0.0) AS debitAmount,
             IFNULL(SUM(creditAmount),0.0) AS creditAmount
         FROM
-            Transactions 
+            Transactions
         WHERE
             status = 'Approved'
         AND
-            accountHolderId = " . $rTransaction['accountHolderId'] . " AND ledgerId = " . $rTransaction['ledgerId'];
+            accountHolderId = " . $rTransaction['accountHolderId'] . " AND ledgerId IN(" . $rTransaction['ledgerIds'] . ")";
 
         $res = DB::select(DB::raw($sql));
 
