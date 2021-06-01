@@ -3,8 +3,8 @@ import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/utilities/Alert.dart';
 
 class UserManager extends StatefulWidget {
   UserManager({Key key, this.userInfo, this.eventHub}) : super(key: key);

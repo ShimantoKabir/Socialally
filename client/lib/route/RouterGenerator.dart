@@ -1,15 +1,15 @@
 import 'dart:convert';
-import 'package:wengine/pages/AboutUs.dart';
-import 'package:wengine/pages/Admin.dart';
-import 'package:wengine/pages/EmailVerification.dart';
 import 'package:flutter/material.dart';
-import 'package:wengine/pages/ForgotPassword.dart';
-import 'package:wengine/pages/Login.dart';
-import 'package:wengine/pages/Registration.dart';
-import 'package:wengine/pages/User.dart';
-import 'package:wengine/pages/Unknown.dart';
-import 'package:wengine/pages/Welcome.dart';
-import 'package:wengine/utilities/MySharedPreferences.dart';
+import 'package:socialally/pages/AboutUs.dart';
+import 'package:socialally/pages/Admin.dart';
+import 'package:socialally/pages/EmailVerification.dart';
+import 'package:socialally/pages/ForgotPassword.dart';
+import 'package:socialally/pages/Login.dart';
+import 'package:socialally/pages/Registration.dart';
+import 'package:socialally/pages/User.dart';
+import 'package:socialally/pages/Unknown.dart';
+import 'package:socialally/pages/Welcome.dart';
+import 'package:socialally/utilities/MySharedPreferences.dart';
 
 class RouterGenerator {
   Route<dynamic> generate(RouteSettings routeSettings) {

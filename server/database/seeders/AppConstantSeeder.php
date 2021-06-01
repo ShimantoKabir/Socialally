@@ -88,27 +88,27 @@ class AppConstantSeeder extends Seeder
                 "appConstantJsonValue" => json_encode([
                     [
                         "name" => "Youtube",
-                        "address" => "https://www.youtube.com/channel/UCuVshDJklV0TeIDPuw3K7-Q"
+                        "address" => "https://www.youtube.com/channel/UCjb2NEAm-QWl3hz2O-mJ8NA"
                     ],
                     [
                         "name" => "Facebook",
-                        "address" => "https://web.facebook.com/WorkersEngine?_rdc=1&_rdr"
+                        "address" => "https://web.facebook.com/Socialally"
                     ],
                     [
                         "name" => "Twitter",
-                        "address" => "https://twitter.com/WorkersEngine"
+                        "address" => "https://twitter.com/Socialally"
                     ],
                     [
                         "name" => "Email",
-                        "address" => "help.workersengine@gmail.com"
+                        "address" => "help.socialally@gmail.com"
                     ],
                     [
                         "name" => "WhatsApp",
-                        "address" => "+447456336006"
+                        "address" => "+01751117995"
                     ],
                     [
                         "name" => "AnswerSendMail",
-                        "address" => "help.workersengine@gmail.com"
+                        "address" => "help.socialally@gmail.com"
                     ]
                 ]),
                 "appConstantIntegerValue" => null,

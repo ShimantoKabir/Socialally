@@ -1,4 +1,4 @@
-package com.workersengine.wengine
+package club.socialally.client
 
 import io.flutter.embedding.android.FlutterActivity
 

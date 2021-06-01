@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:universal_io/io.dart';
-import 'package:wengine/models/AdCostPlan.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/models/AdCostPlan.dart';
+import 'package:socialally/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:wengine/constants.dart';
 import 'package:http/http.dart';
 
 class AnyAdvertisementSender extends StatefulWidget {

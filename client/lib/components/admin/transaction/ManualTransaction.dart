@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart';
-import 'package:wengine/models/ChartOfAccount.dart';
-import 'package:wengine/models/Transaction.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/UserInfo.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/models/ChartOfAccount.dart';
+import 'package:socialally/models/Transaction.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/UserInfo.dart';
+import 'package:socialally/utilities/Alert.dart';
 
 class ManualTransaction extends StatefulWidget {
 

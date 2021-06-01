@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/Question.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/Question.dart';
+import 'package:socialally/utilities/Alert.dart';
 
 class QuestionManager extends StatefulWidget {
   QuestionManager({Key key, this.userInfo, this.eventHub}) : super(key: key);

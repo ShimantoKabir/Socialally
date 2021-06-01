@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/PaymentGateway.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/PaymentGateway.dart';
+import 'package:socialally/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

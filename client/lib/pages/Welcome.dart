@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:wengine/models/SupportInfo.dart';
-import 'package:wengine/widgets/WelcomeBanner.dart';
-import 'package:wengine/widgets/WelcomeNavBar.dart';
+import 'package:socialally/models/SupportInfo.dart';
+import 'package:socialally/widgets/WelcomeBanner.dart';
+import 'package:socialally/widgets/WelcomeNavBar.dart';
+import 'package:socialally/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:wengine/constants.dart';
 
 class Welcome extends StatefulWidget {
 

@@ -1,12 +1,12 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wengine/models/SupportInfo.dart';
-import 'package:wengine/utilities/Alert.dart';
-import 'package:wengine/widgets/MenuItem.dart';
+import 'package:socialally/models/SupportInfo.dart';
+import 'package:socialally/utilities/Alert.dart';
+import 'package:socialally/widgets/MenuItem.dart';
+import 'package:socialally/widgets/SpecialButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'package:wengine/widgets/SpecialButton.dart';
 
 class WelcomeNavBar extends StatefulWidget {
   WelcomeNavBar({
@@ -157,10 +157,10 @@ class WelcomeNavBarState extends State<WelcomeNavBar>{
         ],
       ) :
       SelectableText(
-        "WorkersEngine",
+        "Socialally",
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.green,
+          color: Colors.grey,
           fontSize: 20
         ),
       ),

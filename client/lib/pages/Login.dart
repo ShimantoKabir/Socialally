@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/pages/Admin.dart';
-import 'package:wengine/pages/User.dart' as u;
-import 'package:wengine/utilities/Alert.dart';
-import 'package:wengine/utilities/HttpHandler.dart';
-import 'package:wengine/utilities/MySharedPreferences.dart';
-import 'package:wengine/widgets/WelcomeNavBar.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/pages/Admin.dart';
+import 'package:socialally/pages/User.dart' as u;
+import 'package:socialally/utilities/Alert.dart';
+import 'package:socialally/utilities/HttpHandler.dart';
+import 'package:socialally/utilities/MySharedPreferences.dart';
+import 'package:socialally/widgets/WelcomeNavBar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

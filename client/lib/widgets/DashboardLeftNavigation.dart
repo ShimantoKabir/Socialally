@@ -1,4 +1,4 @@
-import 'package:wengine/utilities/MySharedPreferences.dart';
+import 'package:socialally/utilities/MySharedPreferences.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +85,7 @@ class DashboardLeftNavigationState extends State<DashboardLeftNavigation>{
                 height: 130.0,
                 width: 130.0,
                 child: Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo_main.png",
                   fit: BoxFit.contain,
                 ),
               ),

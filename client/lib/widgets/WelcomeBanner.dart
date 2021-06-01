@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'package:wengine/models/SupportInfo.dart';
+import 'package:socialally/models/SupportInfo.dart';
 
 class WelcomeBanner extends StatefulWidget {
   WelcomeBanner({
@@ -72,18 +72,18 @@ class WelcomeBannerState extends State<WelcomeBanner>{
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SelectableText(
-          "WorkersEngine",
+          "Socialally",
           style: TextStyle(
             fontSize: data["lgFontSize"],
             fontWeight: FontWeight.w700,
-            color: Colors.green
+            color: Colors.grey
           ),
         ),
         SizedBox(
           height: 8,
         ),
         SelectableText(
-          "WorkersEngine is an innovative crowdsources platform that connects Employer as well as Workers globally. WorkersEngine is a UK based registered company with registration number 13162011 is registered as WorkersEngine Ltd. We offer effective solutions to companies, businesses and persons in need to outsource their jobs and projects. Solutions may include constructive ways of breaking down vast tasks to be distributed to workers, minimizing your time to finish your project and collect results on your target date. Our platform concentrates in deploying micro jobs to workers such as data collection and analysis, moderation and/or extraction of data, annotation, classification, image or video tagging, conversion and transcription, product testing, research and survey jobs and more. WorkersEngine began in 2021 and is now one of the growing and trusted crowd-based outsourcing platforms online.",
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           style: TextStyle(
             fontSize: data["smFontSize"],
             fontWeight: FontWeight.w300,

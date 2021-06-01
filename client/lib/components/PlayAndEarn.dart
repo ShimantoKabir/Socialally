@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wengine/models/Question.dart';
-import 'package:wengine/constants.dart';
+import 'package:socialally/models/Question.dart';
+import 'package:socialally/constants.dart';
 
 class PlayAndEarn extends StatefulWidget {
   PlayAndEarn({

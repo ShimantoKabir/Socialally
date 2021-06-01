@@ -1,4 +1,4 @@
-import 'package:wengine/route/RouterGenerator.dart';
+import 'package:socialally/route/RouterGenerator.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       onGenerateRoute: RouterGenerator().generate,
-      title: 'WorkersEngine',
+      title: 'Socialally',
       debugShowCheckedModeBanner: false
     );
   }

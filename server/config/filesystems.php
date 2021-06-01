@@ -54,8 +54,11 @@ return [
 
         'ftp' => [
             'driver' => 'ftp',
-            'host' => '127.0.0.1',
-            'username' => 'storage@localhost.com',
+            // 'host' => '127.0.0.1',
+            // 'username' => 'storage@localhost.com',
+            // 'password' => 'pAZaymmszCs7',
+            'host' => 'ftp.socialally.club',
+            'username' => 'storage@socialally.club',
             'password' => 'pAZaymmszCs7',
             'port'     => 21
             // 'passive'  => true,

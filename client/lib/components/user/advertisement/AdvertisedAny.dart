@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/Advertisement.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/Advertisement.dart';
+import 'package:socialally/utilities/Alert.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

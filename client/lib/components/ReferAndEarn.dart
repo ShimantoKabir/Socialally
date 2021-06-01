@@ -1,4 +1,4 @@
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/utilities/Alert.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';

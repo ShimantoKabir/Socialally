@@ -1,26 +1,25 @@
-import 'package:wengine/components/NotificationComponent.dart';
-import 'package:wengine/components/PlayAndEarn.dart';
-import 'package:wengine/components/ReferAndEarn.dart';
-import 'package:wengine/components/SupportInfoPresenter.dart';
-import 'package:wengine/components/job/Applicants.dart';
-import 'package:wengine/components/job/Available.dart';
-import 'package:wengine/components/Profile.dart';
-import 'package:wengine/components/job/JobFilter.dart';
-import 'package:wengine/components/job/JobFinder.dart';
-import 'package:wengine/components/job/Post.dart';
-import 'package:wengine/components/profile/ChangePassword.dart';
-import 'package:wengine/components/user/advertisement/AdvertisedAny.dart';
-import 'package:wengine/components/user/advertisement/AnyAdvertisementSender.dart';
-import 'package:wengine/components/user/advertisement/JobAdvertisementSender.dart';
-import 'package:wengine/components/wallet/Deposit.dart';
-import 'package:wengine/components/wallet/History.dart';
-import 'package:wengine/components/wallet/Withdraw.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/FilterCriteria.dart';
-import 'package:wengine/models/Project.dart';
-import 'package:wengine/widgets/DashboardLeftNavigation.dart';
-import 'package:wengine/widgets/DashboardTopNavigation.dart';
-import 'package:wengine/components/job/ProofSubmissionComponent.dart';
+import 'package:socialally/components/NotificationComponent.dart';
+import 'package:socialally/components/PlayAndEarn.dart';
+import 'package:socialally/components/ReferAndEarn.dart';
+import 'package:socialally/components/SupportInfoPresenter.dart';
+import 'package:socialally/components/job/Applicants.dart';
+import 'package:socialally/components/job/Available.dart';
+import 'package:socialally/components/Profile.dart';
+import 'package:socialally/components/job/JobFilter.dart';
+import 'package:socialally/components/job/Post.dart';
+import 'package:socialally/components/profile/ChangePassword.dart';
+import 'package:socialally/components/user/advertisement/AdvertisedAny.dart';
+import 'package:socialally/components/user/advertisement/AnyAdvertisementSender.dart';
+import 'package:socialally/components/user/advertisement/JobAdvertisementSender.dart';
+import 'package:socialally/components/wallet/Deposit.dart';
+import 'package:socialally/components/wallet/History.dart';
+import 'package:socialally/components/wallet/Withdraw.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/FilterCriteria.dart';
+import 'package:socialally/models/Project.dart';
+import 'package:socialally/widgets/DashboardLeftNavigation.dart';
+import 'package:socialally/widgets/DashboardTopNavigation.dart';
+import 'package:socialally/components/job/ProofSubmissionComponent.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -663,7 +662,7 @@ class UserState extends State<User> with SingleTickerProviderStateMixin {
 
   void showProfilePic(userInfo) {
     if (userInfo['imageUrl'] == null) {
-      profileImageWidget = AssetImage("assets/images/people.png");
+      profileImageWidget = AssetImage("assets/images/dummy_user_image.png");
     } else {
       profileImageWidget = NetworkImage(userInfo['imageUrl']);
     }

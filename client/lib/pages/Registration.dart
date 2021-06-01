@@ -4,11 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/MyLocation.dart';
-import 'package:wengine/widgets/WelcomeNavBar.dart';
-import 'package:wengine/utilities/HttpHandler.dart';
-import 'package:wengine/utilities/Alert.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/MyLocation.dart';
+import 'package:socialally/widgets/WelcomeNavBar.dart';
+import 'package:socialally/utilities/HttpHandler.dart';
+import 'package:socialally/utilities/Alert.dart';
 import 'package:flutter/material.dart';
 
 class Registration extends StatefulWidget {

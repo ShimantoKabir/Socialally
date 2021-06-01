@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:wengine/main.dart' as app;
+import 'package:socialally/main.dart' as app;
 
 void main() => _testMain();
 

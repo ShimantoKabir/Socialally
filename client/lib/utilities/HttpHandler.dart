@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:wengine/constants.dart';
+import 'package:socialally/constants.dart';
 import 'package:dio/dio.dart';
 
 class HttpHandler{

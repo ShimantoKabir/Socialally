@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
-import 'package:wengine/constants.dart';
-import 'package:wengine/utilities/Alert.dart';
-import 'package:wengine/widgets/WelcomeNavBar.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/utilities/Alert.dart';
+import 'package:socialally/widgets/WelcomeNavBar.dart';
 
 class ForgotPassword extends StatefulWidget {
   ForgotPassword({Key key, this.forgotPasswordId}) : super(key: key);

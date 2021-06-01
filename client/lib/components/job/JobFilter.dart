@@ -1,6 +1,6 @@
-import 'package:wengine/constants.dart';
-import 'package:wengine/models/FilterCriteria.dart';
-import 'package:wengine/models/ProjectCategory.dart';
+import 'package:socialally/constants.dart';
+import 'package:socialally/models/FilterCriteria.dart';
+import 'package:socialally/models/ProjectCategory.dart';
 import 'package:event_hub/event_hub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
