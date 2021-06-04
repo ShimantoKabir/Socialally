@@ -14,7 +14,7 @@ const kTextColor = Color(0xFF707070);
 const kTextLightColor = Color(0xFF555555);
 const kDefaultPadding = 20.0;
 // const baseUrl = "http://127.0.0.1:8000/api";
-const baseUrl = "http://socialally.club/server/public/api";
+const baseUrl = "https://socialally.club/server/public/api";
 // const baseUrl = "http://localhost/server/public";
 
 const maxImageSize = 2097152;

@@ -273,17 +273,24 @@ class DashboardTopNavigationState extends State<DashboardTopNavigation>{
 
   Future<void> logout(BuildContext context) async {
 
-    bool isSignInWithGoogle = await googleSignIn.isSignedIn();
+    try {
 
-    if(isSignInWithGoogle){
-      await googleSignIn.disconnect();
-      await googleSignIn.signOut();
+      bool isSignInWithGoogle = await googleSignIn.isSignedIn();
+
+      if(isSignInWithGoogle){
+        await googleSignIn.disconnect();
+        await googleSignIn.signOut();
+      }
+
+      await FirebaseAuth.instance.signOut();
+      print("Firebase and google logout successfully!");
+
+    } catch (e) {
+      print("Logout error = $e");
+    } finally {
+      print("Redirect to home page!");
+      await MySharedPreferences.clear("userInfo");
+      Navigator.pushNamedAndRemoveUntil(context, "/", (r) => false);
     }
-
-    await FirebaseAuth.instance.signOut();
-    await MySharedPreferences.clear("userInfo");
-
-    Navigator.pushNamedAndRemoveUntil(context, "/", (r) => false);
-
   }
 }

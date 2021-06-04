@@ -136,11 +136,11 @@ class UserRpo
                         'body' => $clientUrl . '/#/email-verification/' . $token
                     );
 
-                    // PHPMailSender::send($mailData);
+                    PHPMailSender::send($mailData);
 
-                    Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
-                        $message->to($mailData['email'])->subject('Email Verification');
-                    });
+                    // Mail::send("mail.emailVerification", $mailData, function ($message) use ($mailData) {
+                    //     $message->to($mailData['email'])->subject('Email Verification');
+                    // });
 
                     // Queue::push(new MailSender($mailData));
 

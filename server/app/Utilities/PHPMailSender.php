@@ -15,10 +15,10 @@ class PHPMailSender
         $mail->SMTPAuth = true;
         $mail->Username = env('MAIL_USERNAME');
         $mail->Password = env('MAIL_PASSWORD');
-        $mail->setFrom(env('MAIL_USERNAME'), 'Workers Engine');
-        $mail->addReplyTo(env('MAIL_USERNAME'), 'Workers Engine');
+        $mail->setFrom(env('MAIL_USERNAME'), 'Socialally');
+        $mail->addReplyTo(env('MAIL_USERNAME'), 'Socialally');
         $mail->addAddress($mailData['email']);
-        $mail->Subject = 'Workers Engine email verification';
+        $mail->Subject = 'Socialally email verification';
         $mail->Body = $mailData['body'];
         $mail->send();
     }
